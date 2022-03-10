@@ -1,0 +1,85 @@
+databaseChangeLog:
+  - changeSet:
+      id: '1.0'
+      author: Michel Douglas Grigoli
+      changes:
+        - createTable:
+            schemaName: estoque
+            tableName: es_item
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: nome
+                  type: varchar(45)
+        - createTable:
+            schemaName: estoque
+            tableName: es_evento_entrada
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: data_entrada
+                  type: datetime
+              - column:
+                  name: descricao
+                  type: varchar(100)
+        - createTable:
+            schemaName: estoque
+            tableName: es_item_evento_entrada
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: item_id
+                  type: bigint
+              - column:
+                  name: evento_entrada_id
+                  type: bigint
+              - column:
+                  name: quantidade
+                  type: INT
+        - addForeignKeyConstraint:
+            baseColumnNames: item_id
+            baseTableName: es_item_evento_entrada
+            baseTableSchemaName: estoque
+            constraintName: fk_es_item_evento_entrada_1
+            referencedColumnNames: id
+            referencedTableName: es_item
+            referencedTableSchemaName: estoque
+            validate: true
+        - addForeignKeyConstraint:
+            baseColumnNames: evento_entrada_id
+            baseTableName: es_item_evento_entrada
+            baseTableSchemaName: estoque
+            constraintName: fk_es_item_evento_entrada_2
+            referencedColumnNames: id
+            referencedTableName: es_evento_entrada
+            referencedTableSchemaName: estoque
+            validate: true
+  - changeSet:
+      id: '2.0'
+      author: Michel Douglas Grigoli
+      changes:
+        - addColumn:
+            schemaName: estoque
+            tableName: es_item
+            columns:
+              - column:
+                  name: categoria
+                  type: varchar(50)
