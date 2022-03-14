@@ -82,7 +82,6 @@ export default function ItemReducer(state, action) {
                 status: ItemActionTypes.STATUS_OCIOSO,
                 list: action.payload.result,
                 page: action.payload.page,
-                size: state.item.size,
                 termo: action.payload.termo
             }
         });

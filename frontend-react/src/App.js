@@ -1,11 +1,11 @@
 import {
     Route,
-    Link,
     Routes,
     NavLink
 } from "react-router-dom";
 import styled from 'styled-components';
 import './App.scss';
+import EntradaPage from "./pages/entrada/EntradaPage";
 import ItemPageConnected from "./pages/item/ItemPage";
 import store from './store';
 
@@ -17,12 +17,6 @@ const DefaultMenuStyled = styled.div`
     top: 0px;
     width: 100%;
     z-index: 100;
-
-    &:hover {
-        .appTitle {
-            font-size: 36px;
-        }
-    }
 
     .appTitle {
         background-color: #111;
@@ -100,7 +94,7 @@ export default function App() {
                 <Routes>
                     <Route exact path='/' element={<h1>Início</h1>} />
                     <Route path='/itens' element={<ItemPageConnected />} />
-                    <Route path='/entradas' element={<h1>Entradas</h1>} />
+                    <Route path='/entradas' element={<EntradaPage />} />
                     <Route path='/saidas' element={<h1>Saídas</h1>} />
                 </Routes>
             </Content>

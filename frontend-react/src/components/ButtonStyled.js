@@ -9,7 +9,7 @@ const ButtonStyled = styled.button`
     font-weight: bold;
     padding: 10px 14px;
     outline: none;
-    transition: all 0.5s;
+    transition: all 0.25s;
 
     &:hover {
         background-color: #333a;
@@ -43,9 +43,32 @@ const ButtonStyled = styled.button`
     &.transparent {
         background-color: transparent;
         color: #111;
+        padding: 7px;
 
         &:hover {
             background-color: #eeec;
+        }
+
+        &.noHover:hover {
+            background-color: transparent;
+        }
+
+        &:disabled {
+
+            &:hover {
+                background-color: #39f;
+            }
+        }
+    }
+
+    &.link {
+        background-color: transparent;
+        color: #39f;
+        font-size: 16px;
+        padding: 0px;
+
+        &:hover {
+            color: #111;
         }
 
         &:disabled {

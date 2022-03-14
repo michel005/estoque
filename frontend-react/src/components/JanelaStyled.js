@@ -1,6 +1,4 @@
-import React, { useState } from "react";
 import styled from "styled-components";
-import ButtonStyled from "./ButtonStyled";
 
 const JanelaStyled = styled.div`
     background-color: #3333;

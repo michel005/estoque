@@ -9,8 +9,9 @@ import Message from "../../components/Message";
 import JanelaStyled from "../../components/JanelaStyled";
 import ChoiceMessage from "../../components/ChoiceMessage";
 import ItemActionTypes from "../../constants/ItemActionTypes";
+import { useState } from "react";
 
-const ItemIndexStyled = styled.div`
+const ItemPageStyled = styled.div`
     width: 100%;
 
     .space {
@@ -71,6 +72,13 @@ const ItemIndexStyled = styled.div`
 `;
 
 function ItemPage({ status, itens, error, current, size, page }) {
+    const [constructorHasRun, setConstructorHasRun] = useState(false);
+
+    function constructor() {
+        if (constructorHasRun) return;
+        atualizar();
+        setConstructorHasRun(true);
+    };
 
     function mostrarFormularioCadastrar() {
         store.dispatch(ItemAction.statusCadastrar());
@@ -107,7 +115,7 @@ function ItemPage({ status, itens, error, current, size, page }) {
     }
 
     function atualizar() {
-        store.dispatch(ItemAction.buscarTodos({ termo: document.getElementById('termoBusca').value }));
+        store.dispatch(ItemAction.buscarTodos({ termo: document.getElementById('termoBusca') ? document.getElementById('termoBusca').value : '' }));
     }
 
     function buscarMais() {
@@ -131,8 +139,10 @@ function ItemPage({ status, itens, error, current, size, page }) {
         store.dispatch(ItemAction.statusOcioso());
     }
 
+    constructor();
+
     return (
-        <ItemIndexStyled>
+        <ItemPageStyled>
             <h1>Gestão de Itens</h1>
             <span className="lead">Gerencie os itens que serão manipulados dentro do seu controle de estoque</span>
             
@@ -157,7 +167,7 @@ function ItemPage({ status, itens, error, current, size, page }) {
                             return (
                                 <tr key={index}>
                                     <td>{item.nome}</td>
-                                    <td><a href="#" onClick={() => filtrar(item)}>{item.categoria}</a></td>
+                                    <td><ButtonStyled className="link" href="#" onClick={() => filtrar(item)}>{item.categoria}</ButtonStyled></td>
                                     <td className="buttonCell">
                                         <ButtonStyled onClick={() => mostrarFormularioAlterar(item)}>Alterar</ButtonStyled>
                                         <ButtonStyled className="alert" onClick={() => mostrarFormularioExcluir(item)}>Excluir</ButtonStyled>
@@ -200,7 +210,7 @@ function ItemPage({ status, itens, error, current, size, page }) {
             </> : <></>}
 
             {error !== null ? <Message text={error.toString()} closeEvent={fecharMensagemErro} /> : <></>}
-        </ItemIndexStyled>
+        </ItemPageStyled>
     );
 };
 
