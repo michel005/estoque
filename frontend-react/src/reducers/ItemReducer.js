@@ -67,12 +67,18 @@ export default function ItemReducer(state, action) {
     } else
     if (action.type === ItemActionTypes.BUSCAR_TODOS) {
         API.get('/item/buscaPorTermo?pagina=0&tamanho=' + state.item.size + '&termo=' + action.payload.termo).then((response) => {
-            store.dispatch(ItemAction.preencherConsulta({ result: response.data, page: 0, termo: action.payload.termo }));
+            var x = 1;
+            var pages = [];
+            while (x <= response.data.totalPages) {
+                pages.push({ page: x })
+                x++;
+            }
+            store.dispatch(ItemAction.preencherConsulta({ result: response.data.content, pageInfo: pages, page: 0, termo: action.payload.termo }));
         });
     } else
-    if (action.type === ItemActionTypes.BUSCAR_MAIS) {
-        API.get('/item/buscaPorTermo?pagina=' + (state.item.page + 1) + '&tamanho=' + state.item.size + '&termo=' + action.payload.termo).then((response) => {
-            store.dispatch(ItemAction.preencherConsulta({ result: state.item.list.concat(response.data), page: state.item.page + 1, termo: action.payload.termo }));
+    if (action.type === ItemActionTypes.BUSCAR_PAGINA) {
+        API.get('/item/buscaPorTermo?pagina=' + action.payload.pagina + '&tamanho=' + state.item.size + '&termo=' + state.item.termo).then((response) => {
+            store.dispatch(ItemAction.preencherConsulta({ result: response.data.content, pageInfo: state.item.pageInfo, page: action.payload.pagina, termo: state.item.termo }));
         });
     } else
     if (action.type === ItemActionTypes.PREENCHER_CONSULTA) {
@@ -82,6 +88,7 @@ export default function ItemReducer(state, action) {
                 status: ItemActionTypes.STATUS_OCIOSO,
                 list: action.payload.result,
                 page: action.payload.page,
+                pageInfo: action.payload.pageInfo,
                 termo: action.payload.termo
             }
         });

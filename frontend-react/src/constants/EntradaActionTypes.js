@@ -1,19 +1,26 @@
 class EntradaActionTypes {
-    static PREFIX = 'ENTRADA_';
+    static MODULE = 'ENTRADA';
 
-    static STATUS_CADASTRAR = this.PREFIX + 'STATUS_CADASTRAR';
-    static STATUS_ALTERAR = this.PREFIX + 'STATUS_ALTERAR';
-    static STATUS_EXCLUIR = this.PREFIX + 'STATUS_EXCLUIR';
-    static STATUS_OCIOSO = this.PREFIX + 'STATUS_OCIOSO';
+    static STATUS_CADASTRAR = { module: this.MODULE, step: 'STATUS_CADASTRAR' };
+    static STATUS_ALTERAR = { module: this.MODULE, step: 'STATUS_ALTERAR' };
+    static STATUS_EXCLUIR = { module: this.MODULE, step: 'STATUS_EXCLUIR' };
+    static STATUS_OCIOSO = { module: this.MODULE, step: 'STATUS_OCIOSO' };
     
-    static CADASTRAR = this.PREFIX + 'CADASTRAR';
-    static ALTERAR = this.PREFIX + 'ALTERAR';
-    static EXCLUIR = this.PREFIX + 'EXCLUIR';
-    static BUSCAR_MAIS = this.PREFIX + 'BUSCAR_MAIS';
-    static BUSCAR_TODOS = this.PREFIX + 'BUSCAR_TODOS';
-    static PREENCHER_CONSULTA = this.PREFIX + 'PREENCHER_CONSULTA';
-    static MOSTRAR_ERRO = this.PREFIX + 'MOSTRAR_ERRO';
-    static RESETAR_ERRO = this.PREFIX + 'RESETAR_ERRO';
+    static PREENCHE_CURRENT_ENTRADA = { module: this.MODULE, step: 'PREENCHE_CURRENT_ENTRADA' };
+    static CADASTRAR = { module: this.MODULE, step: 'CADASTRAR' };
+    static ALTERAR = { module: this.MODULE, step: 'ALTERAR' };
+    static EXCLUIR = { module: this.MODULE, step: 'EXCLUIR' };
+    static BUSCAR_MAIS = { module: this.MODULE, step: 'BUSCAR_MAIS' };
+    static BUSCAR_TODOS = { module: this.MODULE, step: 'BUSCAR_TODOS' };
+    static BUSCAR_PAGINA = { module: this.MODULE, step: 'BUSCAR_PAGINA' };
+    static PREENCHER_CONSULTA = { module: this.MODULE, step: 'PREENCHER_CONSULTA' };
+    static MOSTRAR_ERRO = { module: this.MODULE, step: 'MOSTRAR_ERRO' };
+    static RESETAR_ERRO = { module: this.MODULE, step: 'RESETAR_ERRO' };
+    static ATUALIZAR_DATA = { module: this.MODULE, step: 'ATUALIZAR_DATA' };
+    static PREENCHER_LISTA_ITENS = { module: this.MODULE, step: 'PREENCHER_LISTA_ITENS' };
+    static ADICIONA_ITEM_CURRENT_ENTRADA = { module: this.MODULE, step: 'ADICIONA_ITEM_CURRENT_ENTRADA' };
+    static REMOVE_ITEM_CURRENT_ENTRADA = { module: this.MODULE, step: 'REMOVE_ITEM_CURRENT_ENTRADA' };
+    static FUNCTION_DEFINE_DATA_ENTRADA_CALENDAR = { module: this.MODULE, step: 'FUNCTION_DEFINE_DATA_ENTRADA_CALENDAR' };
 }
 
 export default EntradaActionTypes;

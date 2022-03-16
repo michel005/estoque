@@ -1,5 +1,6 @@
 package com.michel.estoque.service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -14,6 +15,7 @@ import com.michel.estoque.model.EventoEntradaModel;
 import com.michel.estoque.model.ItemEventoEntradaModel;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -32,7 +34,7 @@ public class EventoEntradaService extends AbstractService<EventoEntrada, EventoE
 
     @Override
     public void antesAlterar(EventoEntrada entidade) {
-        entidade.setDataEntrada(LocalDateTime.now());
+        
     }
 
     public ServiceResponse<EventoEntrada> cadastrar(EventoEntradaAnaliticoModel model) {
@@ -82,6 +84,12 @@ public class EventoEntradaService extends AbstractService<EventoEntrada, EventoE
                 model.getItens().add(new ItemEventoEntradaModel(itemEventoEntrada));
             }
             return model;
+        });
+    }
+
+    public ServiceResponse<Page<EventoEntrada>> buscarPorDataEntrada(int pagina, int tamanho, LocalDate dataEntrada) {
+        return ServiceResponse.callback(() -> {
+            return negocio.buscarPorDataEntrada(pagina, tamanho, dataEntrada);
         });
     }
 }

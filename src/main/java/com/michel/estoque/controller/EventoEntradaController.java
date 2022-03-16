@@ -1,11 +1,18 @@
 package com.michel.estoque.controller;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.michel.estoque.entity.EventoEntrada;
 import com.michel.estoque.model.EventoEntradaAnaliticoModel;
 import com.michel.estoque.model.EventoEntradaModel;
 import com.michel.estoque.service.EventoEntradaService;
 import com.michel.estoque.service.ServiceResponse;
 
+import org.springframework.data.domain.Page;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -42,6 +49,20 @@ public class EventoEntradaController extends AbstractController<EventoEntrada, E
     @GetMapping("/visualizarAnalitico")
     public ResponseEntity<?> visualizarAnalitico(@RequestParam("id") Long id) {
         ServiceResponse<EventoEntradaAnaliticoModel> originalResposta = servico.visualizarAnalitico(id);
+
+        if (originalResposta.temExcecao()) {
+            return ResponseEntity.badRequest().body(originalResposta.getExcecao().getErros());
+        }
+        return ResponseEntity.ok().body(originalResposta.getObjeto());
+    }
+
+    @GetMapping("/buscaPorDataEntrada")
+    public ResponseEntity<?> buscaPorDataEntrada(@RequestParam("pagina") int pagina, @RequestParam("tamanho") int tamanho, 
+    @RequestParam("dataEntrada")
+    @JsonFormat(pattern = "ddMMyyyy")
+    @DateTimeFormat(pattern = "ddMMyyyy")
+    LocalDate dataEntrada) {
+        ServiceResponse<Page<EventoEntrada>> originalResposta = servico.buscarPorDataEntrada(pagina, tamanho, dataEntrada);
 
         if (originalResposta.temExcecao()) {
             return ResponseEntity.badRequest().body(originalResposta.getExcecao().getErros());

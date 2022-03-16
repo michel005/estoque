@@ -3,9 +3,9 @@ package com.michel.estoque.service;
 import com.michel.estoque.business.ItemBusiness;
 import com.michel.estoque.entity.Item;
 import com.michel.estoque.utils.CharUtils;
-import org.springframework.stereotype.Service;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.stereotype.Service;
 
 @Service
 public class ItemService extends AbstractService<Item, ItemBusiness> {
@@ -24,8 +24,8 @@ public class ItemService extends AbstractService<Item, ItemBusiness> {
         return ServiceResponse.callback(() -> negocio.buscaPorNome(nome));
     }
 
-    public ServiceResponse<List<Item>> buscaPorTermoBusca(int pagina, int tamanho, String termo) {
-        return ServiceResponse.callback(() -> negocio.buscaPorTermo(pagina, tamanho, termo).getContent());
+    public ServiceResponse<Page<Item>> buscaPorTermoBusca(int pagina, int tamanho, String termo) {
+        return ServiceResponse.callback(() -> negocio.buscaPorTermo(pagina, tamanho, termo));
     }
 
 }

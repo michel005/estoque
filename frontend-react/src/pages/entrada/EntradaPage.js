@@ -3,6 +3,7 @@ import styled from "styled-components";
 import EntradaAction from "../../actions/EntradaAction";
 import Calendar from "../../components/Calendar";
 import TableStyled from "../../components/TableStyled";
+import SelectField from "../../components/forms/SelectField";
 import Message from "../../components/Message";
 import store from "../../store";
 import ButtonStyled from "../../components/ButtonStyled";
@@ -22,29 +23,24 @@ const EntradaPageStyled = styled.div`
         color: #999;
     }
 
-    .commandButtons {
-        display: flex;
-        flex-direction: row-reverse;
-        margin: 14px 0px;
-
-        .termoBusca {
-            margin-left: 14px;
-            width: 350px;
-        }
-
-        button {
-            margin-left: 14px;
-        }
-    }
-
     .conteudo {
         display: flex;
         flex-direction: row;
         margin-top: 14px;
 
+        .filtro {
+
+            & > button {
+                margin-top: 14px;
+                width: 100%;
+            }
+
+        }
+
         .tabela {
             margin-left: 14px;
             width: 100%;
+            height: 100%;
 
             .comandos {
                 display: flex;
@@ -65,25 +61,43 @@ const EntradaPageStyled = styled.div`
             table {
                 width: 100%;
             }
+        }
+    }
 
-            .contador {
-                color: #AAA;
-                padding: 14px;
-                text-align: right;
-                width: 100%;
+    .listaItensContainer {
+
+        .adicionadorItens {
+            display: flex;
+            flex-direction: row;
+            margin-bottom: 14px;
+
+            .quantidade {
+                margin-left: 14px;
+            }
+
+            .aux {
+                display: flex;
+                flex-direction: column;
+                justify-content: flex-end;
+                margin-left: 14px;
             }
         }
+
+        table {
+            width: 100%;
+        }
+
     }
 `;
 
-function EntradaPage({ status, entradas, error, current, size, page }) {
+function EntradaPage({ status, entradas, error, current, size, page, currentDate, itemList, pageInfo }) {
 
     function mostrarFormularioCadastrar() {
         store.dispatch(EntradaAction.statusCadastrar());
     }
 
     function mostrarFormularioAlterar(entrada) {
-        store.dispatch(EntradaAction.statusAlterar(entrada));
+        store.dispatch(EntradaAction.statusAlterar(entrada.id));
     }
 
     function mostrarFormularioExcluir(entrada) {
@@ -96,7 +110,7 @@ function EntradaPage({ status, entradas, error, current, size, page }) {
 
     function salvar() {
         var curr = current;
-        curr.descricao = document.getElementById('descricaoEntrada').value;
+        curr.eventoEntrada.descricao = document.getElementById('descricaoEntrada').value;
 
         if (status === EntradaActionTypes.STATUS_CADASTRAR) {
             store.dispatch(EntradaAction.cadastrar(curr));
@@ -106,12 +120,12 @@ function EntradaPage({ status, entradas, error, current, size, page }) {
         }
     }
 
-    function reset() {
-        atualizar();
-    }
-
     function atualizar() {
-        store.dispatch(EntradaAction.buscarTodos({ termo: document.getElementById('termoBusca') ? document.getElementById('termoBusca').value : '' }));
+        if (currentDate == null) {
+            store.dispatch(EntradaAction.statusOcioso());
+        } else {
+            store.dispatch(EntradaAction.buscarTodos(currentDate));
+        }
     }
 
     function fecharJanela() {
@@ -123,15 +137,28 @@ function EntradaPage({ status, entradas, error, current, size, page }) {
     }
 
     function atualizaFiltro(data) {
-        store.dispatch(EntradaAction.buscarTodos());
+        store.dispatch(EntradaAction.atualizarData(data));
     }
 
-    function buscarMais() {
-        if (entradas.length === 0) {
-            store.dispatch(EntradaAction.buscarTodos());
-        } else {
-            store.dispatch(EntradaAction.buscarMais());
-        }
+    function buscarPagina(pagina) {
+        store.dispatch(EntradaAction.buscarPagina({ pagina: pagina - 1 }));
+    }
+
+    function adicionarItem() {
+        var item = document.getElementById('listaItens').value;
+        var quantidade = document.getElementById('quantidade').value;
+        store.dispatch(EntradaAction.adicionaItemNoCurrentEntrada({ nomeItem: item, quantidade: quantidade }));
+        document.getElementById('listaItens').value = '';
+        document.getElementById('quantidade').value = '';
+    }
+
+    function removerItem(item) {
+        store.dispatch(EntradaAction.removeItemNoCurrentEntrada(item.nome));
+    }
+
+    function setCurrent(x) {
+        x(currentDate);
+        store.dispatch(EntradaAction.defineDataEntradaCalendar(x));
     }
 
     return (
@@ -143,17 +170,12 @@ function EntradaPage({ status, entradas, error, current, size, page }) {
 
             <div className="conteudo">
                 <div className="filtro">
-                    <Calendar whenModifyCurrentDate={(data) => atualizaFiltro(data) }></Calendar>
+                    <Calendar whenModifyCurrentDate={(data) => atualizaFiltro(data) } setCurrentVariable={setCurrent}></Calendar>
+                    <ButtonStyled onClick={mostrarFormularioCadastrar} className="primary">Cadastrar</ButtonStyled>
+                    <ButtonStyled disabled={currentDate === null} onClick={atualizar}>Atualizar</ButtonStyled>
                 </div>
 
                 <div className="tabela">
-                    <div className="comandos">
-                        <ButtonStyled onClick={mostrarFormularioCadastrar} className="primary">Cadastrar</ButtonStyled>
-                        <TextField placeholder="Buscar pelo nome ou categoria" fieldID="termoBusca" />
-                        <ButtonStyled onClick={atualizar}>Buscar</ButtonStyled>
-                        <ButtonStyled onClick={reset}>Reset</ButtonStyled>
-                    </div>
-
                     <TableStyled>
                         <thead>
                             <tr>
@@ -166,35 +188,78 @@ function EntradaPage({ status, entradas, error, current, size, page }) {
                             {entradas.map((entrada, index) => {
                                 return ( 
                                 <tr key={index}>
-                                    <td>{entrada.dataEntrada}</td>
-                                    <td>{entrada.descricao}</td>
+                                    <td className="dataEntrada">{entrada.dataEntrada}</td>
+                                    <td className="descricao">{entrada.descricao}</td>
                                     <td className="buttonCell">
                                         <ButtonStyled onClick={() => mostrarFormularioAlterar(entrada)}>Alterar</ButtonStyled>
                                         <ButtonStyled className="alert" onClick={() => mostrarFormularioExcluir(entrada)}>Excluir</ButtonStyled>
                                     </td>
                                 </tr> );
                             })}
-                            {(entradas.length === 0 || ((page + 1) * size) <= entradas.length) ?
+                            {currentDate === null ? 
                             <tr>
-                                <td colSpan={3}><ButtonStyled style={{width: '100%'}} className="transparent" onClick={buscarMais}>Mais {size} registros...</ButtonStyled></td>
+                                <td colSpan={3}>Selecione uma data</td>
+                            </tr> : 
+                            entradas.length === 0 ?
+                            <tr>
+                                <td colSpan={3}>Nenhum registro encontrado</td>
                             </tr> : <></>}
                         </tbody>
+                        {entradas.length !== 0 ?
+                        <tfoot>
+                            <tr>
+                                <th colSpan={3}>
+                                    <ButtonStyled disabled={page <= 0} onClick={() => buscarPagina(page)}>{'<'}</ButtonStyled>
+                                    {pageInfo.map((value, index) => {
+                                        return ( <ButtonStyled className={value.page === (page + 1) ? 'primary' : ''} key={index} onClick={() => buscarPagina(value.page)}>{value.page}</ButtonStyled> )
+                                    })}
+                                    <ButtonStyled disabled={((page + 1) === pageInfo.length) || pageInfo.length === 0} onClick={() => buscarPagina(page + 2)}>{'>'}</ButtonStyled>
+                                </th>
+                            </tr>
+                        </tfoot> : <></> }
                     </TableStyled>
-                    <div className="contador">
-                        {entradas.length === 1 ? '1 entrada em exibição' : entradas.length + ' entradas em exibição'}
-                    </div>
                 </div>
             </div>
 
             {status === EntradaActionTypes.STATUS_CADASTRAR || status === EntradaActionTypes.STATUS_ALTERAR ? <>
                 <JanelaStyled>
                     <div className="content">
-                        <div className="title">Formulário de Item</div>
+                        <div className="title">Formulário de Entrada de Itens</div>
                         <div className="innerContent">
-                            {status === EntradaActionTypes.STATUS_ALTERAR ? <TextField label="ID do Item" fieldID="idItem" defaultValue={current.id} disabled={current.id !== null} /> : <></> }
+                            {status === EntradaActionTypes.STATUS_ALTERAR ? <TextField label="ID do Item" fieldID="idItem" defaultValue={current.eventoEntrada.id} disabled={current.id !== null} /> : <></> }
+                            {status === EntradaActionTypes.STATUS_ALTERAR ? <div className="space"></div> : <></> }
+                            <TextField label="Descrição" fieldID="descricaoEntrada" defaultValue={current.eventoEntrada.descricao} nullable={false} />
                             <div className="space"></div>
-                            <TextField label="Descrição" fieldID="descricaoEntrada" defaultValue={current.descricao} nullable={false} />
-                            <div className="space"></div>
+                            {status === EntradaActionTypes.STATUS_ALTERAR ? <TextField label="Data Entrada" defaultValue={current.eventoEntrada.dataEntrada} disabled={true} /> : <></> }
+                            {status === EntradaActionTypes.STATUS_ALTERAR ? <div className="space"></div> : <></> }
+                            <div className="listaItensContainer">
+                                <div className="adicionadorItens">
+                                    <SelectField list={itemList} label="Item" fieldID="listaItens" />
+                                    <TextField type="number" label="Quantidade" fieldID="quantidade" />
+                                    <div className="aux"><ButtonStyled onClick={adicionarItem} className="primary">Adicionar</ButtonStyled></div>
+                                </div>
+                                <TableStyled>
+                                    <thead>
+                                        <tr>
+                                            <th width="100%">Nome Item</th>
+                                            <th>Quantidade</th>
+                                            <th>Comandos</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {current.itens.map((value, index) => {
+                                            return (
+                                                <tr key={index}>
+                                                    <td>{value.nomeItem}</td>
+                                                    <td>{value.quantidade}</td>
+                                                    <td><ButtonStyled onClick={() => removerItem(value)} className="alert">Remover</ButtonStyled></td>
+                                                </tr>
+                                            )
+                                        })}
+                                        {current.itens.length === 0 ? <tr><td colSpan={3}>Nenhum item adicionado</td></tr> : <></>}
+                                    </tbody>
+                                </TableStyled>
+                            </div>
                             <div className="commands">
                                 <ButtonStyled className="primary" onClick={salvar}>Salvar</ButtonStyled>
                                 <ButtonStyled onClick={fecharJanela}>Fechar</ButtonStyled>
@@ -220,7 +285,10 @@ const EntradaPageConnected = connect((state) => {
         error: state.entrada.error,
         current: state.entrada.currentEntrada,
         size: state.entrada.size,
-        page: state.entrada.page
+        page: state.entrada.page,
+        currentDate: state.entrada.currentDate,
+        itemList: state.entrada.itemList,
+        pageInfo: state.entrada.pageInfo
     }
  })(EntradaPage);
 

@@ -5,12 +5,13 @@ import ButtonStyled from './ButtonStyled';
 import styled from "styled-components";
 
 const CalendarStyled = styled.div`
-    background-color: #333;
     border-radius: 7px;
+    box-shadow: #ccc 0px 0px 7px;
     overflow: hidden;
     width: 280px;
 
     .commands {
+        background-color: #333;
         display: flex;
         flex-direction: row;
         padding: 4px;
@@ -139,7 +140,7 @@ const CalendarStyled = styled.div`
     }
 `;
 
-export default function Calendar({ whenModifyCurrentDate = () => {} }) {
+export default function Calendar({ whenModifyCurrentDate = () => {}, setCurrentVariable = () => {} }) {
     const [current, setCurrent] = useState(new Date());
     const [selectedDate, setSelectedDate] = useState(null);
     const [dayList, setDayList] = useState([]);
@@ -152,6 +153,7 @@ export default function Calendar({ whenModifyCurrentDate = () => {} }) {
     function constructor () {
         if (constructorHasRun) return;
         montarDias();
+        setCurrentVariable(mudarDiaAtual);
         setConstructorHasRun(true);
     };
 
@@ -159,8 +161,6 @@ export default function Calendar({ whenModifyCurrentDate = () => {} }) {
         var curr = current;
         curr.setMonth(curr.getMonth() + qtd)
         setCurrent(curr);
-
-        console.log('Ultimo dia o mês: ' + curr.toLocaleDateString());
         montarDias();
     }
 
@@ -168,8 +168,6 @@ export default function Calendar({ whenModifyCurrentDate = () => {} }) {
         var curr = current;
         curr.setMonth(curr.getMonth() - qtd)
         setCurrent(curr);
-
-        console.log('Ultimo dia o mês: ' + curr.toLocaleDateString());
         montarDias();
     }
 

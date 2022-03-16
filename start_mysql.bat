@@ -1,1 +1,1 @@
-wsl docker-compose up -d
+wsl docker-compose up

@@ -56,7 +56,7 @@ const StyleError = styled.span`
 const SelectField = ( {
     externalError = '', 
     fieldID = '', 
-    validation = () => {}, 
+    validation = () => { return ''; }, 
     label = '', 
     nullable = true, 
     defaultValue, 

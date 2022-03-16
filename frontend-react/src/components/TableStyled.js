@@ -6,6 +6,7 @@ const TableStyled = styled.table`
     border-radius: 7px;
     box-shadow: #CCC 0px 0px 7px;
     overflow: hidden;
+    margin-bottom: 14px;
 
     thead {
         background-color: #333;
@@ -22,7 +23,6 @@ const TableStyled = styled.table`
 
     tbody {
         width: 100%;
-        overflow-y: scroll;
         height: 100%;
 
         tr {
@@ -49,7 +49,7 @@ const TableStyled = styled.table`
                 &.buttonCell {
                     display: flex;
                     flex-direction: row;
-                    padding: 14px;
+                    padding: 10px 14px;
 
                     button {
                         border-radius: 0px;
@@ -62,6 +62,18 @@ const TableStyled = styled.table`
                             border-radius: 0px 7px 7px 0px;
                         }
                     }
+                }
+            }
+        }
+    }
+
+    tfoot {
+        tr {
+            th {
+                padding: 14px;
+
+                button {
+                    margin-right: 7px;
                 }
             }
         }

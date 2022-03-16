@@ -1,5 +1,7 @@
 package com.michel.estoque.business;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import com.michel.estoque.entity.EventoEntrada;
@@ -8,6 +10,9 @@ import com.michel.estoque.repository.EventoEntradaRepository;
 import com.michel.estoque.validation.EventoEntradaValidation;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -23,5 +28,10 @@ public class EventoEntradaBusiness extends AbstractBusiness<EventoEntrada, Event
             itemEventoEntradaBusiness.excluir(item);
         }
         super.excluir(entidade);
+    }
+
+    public Page<EventoEntrada> buscarPorDataEntrada(int pagina, int tamanho, LocalDate dataEntrada) {
+        PageRequest pageRequest = PageRequest.of(pagina, tamanho, Sort.Direction.DESC, "dataEntrada");
+        return repo.findByDataEntrada(pageRequest, dataEntrada);
     }
 }

@@ -65,13 +65,13 @@ const ItemPageStyled = styled.div`
 
     .contador {
         color: #AAA;
-        padding: 14px;
+        padding: 0px 14px 14px;
         text-align: right;
         width: 100%;
     }
 `;
 
-function ItemPage({ status, itens, error, current, size, page }) {
+function ItemPage({ status, itens, error, current, size, page, pageInfo }) {
     const [constructorHasRun, setConstructorHasRun] = useState(false);
 
     function constructor() {
@@ -109,21 +109,12 @@ function ItemPage({ status, itens, error, current, size, page }) {
         store.dispatch(ItemAction.excluir(current));
     }
 
-    function reset() {
-        document.getElementById('termoBusca').value = '';
-        atualizar();
-    }
-
     function atualizar() {
         store.dispatch(ItemAction.buscarTodos({ termo: document.getElementById('termoBusca') ? document.getElementById('termoBusca').value : '' }));
     }
 
-    function buscarMais() {
-        if (itens.length === 0) {
-            store.dispatch(ItemAction.buscarTodos({ termo: document.getElementById('termoBusca').value }));
-        } else {
-            store.dispatch(ItemAction.buscarMais({ termo: document.getElementById('termoBusca').value }));
-        }
+    function buscarPagina(pagina) {
+        store.dispatch(ItemAction.buscarPagina({ pagina: pagina - 1 }));
     }
 
     function filtrar(item) {
@@ -147,7 +138,6 @@ function ItemPage({ status, itens, error, current, size, page }) {
             <span className="lead">Gerencie os itens que serão manipulados dentro do seu controle de estoque</span>
             
             <div className="commandButtons">
-                <ButtonStyled onClick={reset}>Reset</ButtonStyled>
                 <ButtonStyled onClick={atualizar}>Buscar</ButtonStyled>
                 <TextField placeholder="Buscar pelo nome ou categoria" fieldID="termoBusca" />
                 <ButtonStyled className="primary" onClick={mostrarFormularioCadastrar}>Cadastrar</ButtonStyled>
@@ -174,15 +164,19 @@ function ItemPage({ status, itens, error, current, size, page }) {
                                     </td>
                                 </tr>);
                         })}
-                        {(itens.length === 0 || ((page + 1) * size) <= itens.length) ?
-                        <tr>
-                            <td colSpan={3}><ButtonStyled style={{width: '100%'}} className="transparent" onClick={buscarMais}>Mais {size} registros...</ButtonStyled></td>
-                        </tr> : <></>}
                     </tbody>
+                    <tfoot>
+                        <tr>
+                            <th colSpan="3">
+                                <ButtonStyled disabled={page <= 0} onClick={() => buscarPagina(page)}>{'<'}</ButtonStyled>
+                                {pageInfo.map((value, index) => {
+                                    return ( <ButtonStyled className={value.page === (page + 1) ? 'primary' : ''} key={index} onClick={() => buscarPagina(value.page)}>{value.page}</ButtonStyled> )
+                                })}
+                                <ButtonStyled disabled={((page + 1) === pageInfo.length) || pageInfo.length === 0} onClick={() => buscarPagina(page + 2)}>{'>'}</ButtonStyled>
+                            </th>
+                        </tr>
+                    </tfoot>
                 </TableStyled>
-                <div className="contador">
-                    {itens.length === 1 ? '1 item em exibição' : itens.length + ' itens em exibição'}
-                </div>
             </div>
 
             {status === ItemActionTypes.STATUS_CADASTRAR || status === ItemActionTypes.STATUS_ALTERAR ? <>
@@ -221,7 +215,8 @@ const ItemPageConnected = connect((state) => {
         error: state.item.error,
         current: state.item.currentItem,
         size: state.item.size,
-        page: state.item.page
+        page: state.item.page,
+        pageInfo: state.item.pageInfo
     }
  })(ItemPage);
 

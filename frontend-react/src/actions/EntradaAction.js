@@ -18,6 +18,10 @@ export default class EntradaAction {
         return { type: EntradaActionTypes.STATUS_OCIOSO };
     };
 
+    static preencheCurrentEntrada = (payload) => {
+        return { type: EntradaActionTypes.PREENCHE_CURRENT_ENTRADA, payload };
+    };
+
     static cadastrar = (payload) => {
         return { type: EntradaActionTypes.CADASTRAR, payload };
     };
@@ -34,8 +38,8 @@ export default class EntradaAction {
         return { type: EntradaActionTypes.BUSCAR_TODOS, payload };
     };
 
-    static buscarMais = (payload) => {
-        return { type: EntradaActionTypes.BUSCAR_MAIS, payload };
+    static buscarPagina = (payload) => {
+        return { type: EntradaActionTypes.BUSCAR_PAGINA, payload };
     };
 
     static preencherConsulta = (payload) => {
@@ -48,6 +52,26 @@ export default class EntradaAction {
 
     static resetarErro = (payload) => {
         return { type: EntradaActionTypes.RESETAR_ERRO, payload };
+    };
+
+    static atualizarData = (payload) => {
+        return { type: EntradaActionTypes.ATUALIZAR_DATA, payload };
+    };
+
+    static preencherListaItens = (payload) => {
+        return { type: EntradaActionTypes.PREENCHER_LISTA_ITENS, payload };
+    };
+
+    static adicionaItemNoCurrentEntrada = (payload) => {
+        return { type: EntradaActionTypes.ADICIONA_ITEM_CURRENT_ENTRADA, payload };
+    };
+
+    static removeItemNoCurrentEntrada = (payload) => {
+        return { type: EntradaActionTypes.REMOVE_ITEM_CURRENT_ENTRADA, payload };
+    };
+
+    static defineDataEntradaCalendar = (payload) => {
+        return { type: EntradaActionTypes.FUNCTION_DEFINE_DATA_ENTRADA_CALENDAR, payload };
     };
 
 }

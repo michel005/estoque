@@ -34,6 +34,10 @@ class ItemAction {
         return { type: ItemActionTypes.BUSCAR_TODOS, payload };
     };
 
+    static buscarPagina = (payload) => {
+        return { type: ItemActionTypes.BUSCAR_PAGINA, payload };
+    };
+
     static buscarMais = (payload) => {
         return { type: ItemActionTypes.BUSCAR_MAIS, payload };
     };

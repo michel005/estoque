@@ -9,27 +9,32 @@ const initialState = {
         status: ItemActionTypes.STATUS_OCIOSO,
         currentItem: null,
         list: [],
+        pageInfo: [],
         page: 0,
-        size: 10,
+        size: 5,
         error: null,
         termo: ''
     },
     entrada: {
         status: EntradaActionTypes.STATUS_OCIOSO,
+        currentDate: null,
         currentEntrada: null,
         list: [],
+        itemList: [],
+        pageInfo: [],
         page: 0,
         size: 10,
         error: null,
-        termo: ''
+        termo: '',
+        functionDataEntradaCalendar: null
     }
 };
 
 function rootReducer(state = initialState, action) {
-    if (action.type.startsWith(ItemActionTypes.PREFIX)) {
+    if (action.type.module && action.type.module === ItemActionTypes.MODULE) {
         return ItemReducer(state, action);
     } else
-    if (action.type.startsWith(EntradaActionTypes.PREFIX)) {
+    if (action.type.module && action.type.module === EntradaActionTypes.MODULE) {
         return EntradaReducer(state, action);
     } else {
         return state;
