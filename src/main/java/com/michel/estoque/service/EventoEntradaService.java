@@ -39,15 +39,31 @@ public class EventoEntradaService extends AbstractService<EventoEntrada, EventoE
 
     public ServiceResponse<EventoEntrada> cadastrar(EventoEntradaAnaliticoModel model) {
         return ServiceResponse.callback(() -> {
-            if (model.getEventoEntrada().getId() != null) {
-                negocio.excluir(model.getEventoEntrada());
-                model.getEventoEntrada().setId(null);
-            }
-
             model.getEventoEntrada().setDataEntrada(LocalDateTime.now());
             EventoEntrada eventoEntrada = negocio.cadastrar(model.getEventoEntrada());
 
             List<ItemEventoEntradaModel> itens = model.getItens();
+            for (ItemEventoEntradaModel item : itens) {
+                Item i = itemBusiness.buscaPorNome(item.getNomeItem());
+                ItemEventoEntrada itemEventoEntrada = new ItemEventoEntrada();
+                itemEventoEntrada.setEventoEntrada(eventoEntrada);
+                itemEventoEntrada.setItem(i);
+                itemEventoEntrada.setQuantidade(item.getQuantidade());
+                itemEventoEntradaBusiness.cadastrar(itemEventoEntrada);
+            }
+            return eventoEntrada;
+        });
+    }
+
+    public ServiceResponse<EventoEntrada> alterar(EventoEntradaAnaliticoModel model) {
+        return ServiceResponse.callback(() -> {
+            EventoEntrada eventoEntrada = negocio.alterar(model.getEventoEntrada());
+
+            List<ItemEventoEntradaModel> itens = model.getItens();
+            List<ItemEventoEntrada> itensAntes = itemEventoEntradaBusiness.buscaPorEventoEntrada(eventoEntrada.getId());
+            for (ItemEventoEntrada ia : itensAntes) {
+                itemEventoEntradaBusiness.excluir(ia);
+            }
             for (ItemEventoEntradaModel item : itens) {
                 Item i = itemBusiness.buscaPorNome(item.getNomeItem());
                 ItemEventoEntrada itemEventoEntrada = new ItemEventoEntrada();

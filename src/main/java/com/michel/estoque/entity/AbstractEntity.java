@@ -37,4 +37,8 @@ public abstract class AbstractEntity implements Comparable<AbstractEntity> {
     public int compareTo(AbstractEntity o) {
         return o.toString().equals(this.toString()) ? 0 : 1;
     }
+
+    public final boolean isNew() {
+        return id == null;
+    }
 }

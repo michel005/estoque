@@ -11,6 +11,8 @@ import EntradaActionTypes from "../../constants/EntradaActionTypes";
 import TextField from "../../components/forms/TextField";
 import JanelaStyled from "../../components/JanelaStyled";
 import ChoiceMessage from "../../components/ChoiceMessage";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCheck, faDotCircle, faPen, faTrash } from "@fortawesome/free-solid-svg-icons";
 
 const EntradaPageStyled = styled.div`
     width: 100%;
@@ -21,6 +23,16 @@ const EntradaPageStyled = styled.div`
 
     .lead {
         color: #999;
+    }
+
+    .form {
+        display: flex;
+        flex-direction: row;
+
+        .campos {
+            margin-right: 14px;
+            width: 300px;
+        }
     }
 
     .conteudo {
@@ -111,6 +123,7 @@ function EntradaPage({ status, entradas, error, current, size, page, currentDate
     function salvar() {
         var curr = current;
         curr.eventoEntrada.descricao = document.getElementById('descricaoEntrada').value;
+        curr.eventoEntrada.status = document.getElementById('listaStatus').value;
 
         if (status === EntradaActionTypes.STATUS_CADASTRAR) {
             store.dispatch(EntradaAction.cadastrar(curr));
@@ -179,8 +192,9 @@ function EntradaPage({ status, entradas, error, current, size, page, currentDate
                     <TableStyled>
                         <thead>
                             <tr>
-                                <th width="20%">Data / Hora</th>
-                                <th width="80%">Descrição</th>
+                                <th width="15%">Data / Hora</th>
+                                <th width="100%">Descrição</th>
+                                <th>Status</th>
                                 <th>Comandos</th>
                             </tr>
                         </thead>
@@ -190,25 +204,28 @@ function EntradaPage({ status, entradas, error, current, size, page, currentDate
                                 <tr key={index}>
                                     <td className="dataEntrada">{entrada.dataEntrada}</td>
                                     <td className="descricao">{entrada.descricao}</td>
+                                    <td className="descricao">{entrada.status}</td>
                                     <td className="buttonCell">
-                                        <ButtonStyled onClick={() => mostrarFormularioAlterar(entrada)}>Alterar</ButtonStyled>
-                                        <ButtonStyled className="alert" onClick={() => mostrarFormularioExcluir(entrada)}>Excluir</ButtonStyled>
+                                        <ButtonStyled onClick={() => mostrarFormularioAlterar(entrada)} title="Alterar"><FontAwesomeIcon icon={faPen} /></ButtonStyled>
+                                        <ButtonStyled className="alert" onClick={() => mostrarFormularioExcluir(entrada)} title="Excluir"><FontAwesomeIcon icon={faTrash} /></ButtonStyled>
+                                        <ButtonStyled className="success" title="Aprovar"><FontAwesomeIcon icon={faCheck} /></ButtonStyled>
+                                        <ButtonStyled title="Cancelar"><FontAwesomeIcon icon={faDotCircle} /></ButtonStyled>
                                     </td>
                                 </tr> );
                             })}
                             {currentDate === null ? 
                             <tr>
-                                <td colSpan={3}>Selecione uma data</td>
+                                <td colSpan={4}>Selecione uma data</td>
                             </tr> : 
                             entradas.length === 0 ?
                             <tr>
-                                <td colSpan={3}>Nenhum registro encontrado</td>
+                                <td colSpan={4}>Nenhum registro encontrado</td>
                             </tr> : <></>}
                         </tbody>
                         {entradas.length !== 0 ?
                         <tfoot>
                             <tr>
-                                <th colSpan={3}>
+                                <th colSpan={4}>
                                     <ButtonStyled disabled={page <= 0} onClick={() => buscarPagina(page)}>{'<'}</ButtonStyled>
                                     {pageInfo.map((value, index) => {
                                         return ( <ButtonStyled className={value.page === (page + 1) ? 'primary' : ''} key={index} onClick={() => buscarPagina(value.page)}>{value.page}</ButtonStyled> )
@@ -226,39 +243,49 @@ function EntradaPage({ status, entradas, error, current, size, page, currentDate
                     <div className="content">
                         <div className="title">Formulário de Entrada de Itens</div>
                         <div className="innerContent">
-                            {status === EntradaActionTypes.STATUS_ALTERAR ? <TextField label="ID do Item" fieldID="idItem" defaultValue={current.eventoEntrada.id} disabled={current.id !== null} /> : <></> }
-                            {status === EntradaActionTypes.STATUS_ALTERAR ? <div className="space"></div> : <></> }
-                            <TextField label="Descrição" fieldID="descricaoEntrada" defaultValue={current.eventoEntrada.descricao} nullable={false} />
-                            <div className="space"></div>
-                            {status === EntradaActionTypes.STATUS_ALTERAR ? <TextField label="Data Entrada" defaultValue={current.eventoEntrada.dataEntrada} disabled={true} /> : <></> }
-                            {status === EntradaActionTypes.STATUS_ALTERAR ? <div className="space"></div> : <></> }
-                            <div className="listaItensContainer">
-                                <div className="adicionadorItens">
-                                    <SelectField list={itemList} label="Item" fieldID="listaItens" />
-                                    <TextField type="number" label="Quantidade" fieldID="quantidade" />
-                                    <div className="aux"><ButtonStyled onClick={adicionarItem} className="primary">Adicionar</ButtonStyled></div>
+                            <div className="form">
+                                <div className="campos">
+                                    {status === EntradaActionTypes.STATUS_ALTERAR ? <TextField label="ID do Item" fieldID="idItem" defaultValue={current.eventoEntrada.id} disabled={current.id !== null} /> : <></> }
+                                    {status === EntradaActionTypes.STATUS_ALTERAR ? <div className="space"></div> : <></> }
+                                    <TextField label="Descrição" fieldID="descricaoEntrada" defaultValue={current.eventoEntrada.descricao} nullable={false} />
+                                    <div className="space"></div>
+                                    {status === EntradaActionTypes.STATUS_ALTERAR ? <TextField label="Data Entrada" defaultValue={current.eventoEntrada.dataEntrada} disabled={true} /> : <></> }
+                                    {status === EntradaActionTypes.STATUS_ALTERAR ? <div className="space"></div> : <></> }
+                                    <SelectField list={[ 
+                                        {text: 'Pendênte', value: 'PENDENTE'}, 
+                                        {text: 'Aprovado', value: 'APROVADO'}, 
+                                        {text: 'Cancelado', value: 'CANCELADO'} 
+                                    ]} nativeSelect={true} label="Status" fieldID="listaStatus" defaultValue={current.eventoEntrada.status} nullable={false} />
+                                    <div className="space"></div>
                                 </div>
-                                <TableStyled>
-                                    <thead>
-                                        <tr>
-                                            <th width="100%">Nome Item</th>
-                                            <th>Quantidade</th>
-                                            <th>Comandos</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {current.itens.map((value, index) => {
-                                            return (
-                                                <tr key={index}>
-                                                    <td>{value.nomeItem}</td>
-                                                    <td>{value.quantidade}</td>
-                                                    <td><ButtonStyled onClick={() => removerItem(value)} className="alert">Remover</ButtonStyled></td>
-                                                </tr>
-                                            )
-                                        })}
-                                        {current.itens.length === 0 ? <tr><td colSpan={3}>Nenhum item adicionado</td></tr> : <></>}
-                                    </tbody>
-                                </TableStyled>
+                                <div className="listaItensContainer">
+                                    <div className="adicionadorItens">
+                                        <SelectField list={itemList} label="Item" fieldID="listaItens" />
+                                        <TextField type="number" label="Quantidade" fieldID="quantidade" />
+                                        <div className="aux"><ButtonStyled onClick={adicionarItem} className="primary">Adicionar</ButtonStyled></div>
+                                    </div>
+                                    <TableStyled>
+                                        <thead>
+                                            <tr>
+                                                <th width="100%">Nome Item</th>
+                                                <th>Quantidade</th>
+                                                <th>Comandos</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {current.itens.map((value, index) => {
+                                                return (
+                                                    <tr key={index}>
+                                                        <td>{value.nomeItem}</td>
+                                                        <td>{value.quantidade}</td>
+                                                        <td><ButtonStyled onClick={() => removerItem(value)} className="alert">Remover</ButtonStyled></td>
+                                                    </tr>
+                                                )
+                                            })}
+                                            {current.itens.length === 0 ? <tr><td colSpan={3}>Nenhum item adicionado</td></tr> : <></>}
+                                        </tbody>
+                                    </TableStyled>
+                                </div>
                             </div>
                             <div className="commands">
                                 <ButtonStyled className="primary" onClick={salvar}>Salvar</ButtonStyled>

@@ -51,7 +51,8 @@ export default function EntradaReducer(state, action) {
                 currentEntrada: { 
                     eventoEntrada: { 
                         id: null, 
-                        descricao: 'Nova Entrada de Itens' 
+                        descricao: 'Nova Entrada de Itens',
+                        status: 'Pendênte'
                     }, 
                     itens: [] 
                 }
@@ -95,7 +96,7 @@ export default function EntradaReducer(state, action) {
         });
     } else
     if (action.type === EntradaActionTypes.ALTERAR) {
-        API.post('/evento/entrada/alterar?id=' + action.payload.id, action.payload).then(() => {
+        API.post('/evento/entrada/alterarModelo', action.payload).then(() => {
             store.dispatch(EntradaAction.buscarTodos());
         }).catch((error) => {
             store.dispatch(EntradaAction.mostrarErro(error.response.data));
@@ -119,15 +120,14 @@ export default function EntradaReducer(state, action) {
                 }
             });
         } else {
-            var page = (state.entrada.page === null || state.entrada.page === undefined) ? 0 : state.entrada.page;
-            API.get(montarUrlBusca(page, state.entrada.size, state.entrada.currentDate)).then((response) => {
+            API.get(montarUrlBusca(0, state.entrada.size, state.entrada.currentDate)).then((response) => {
                 var x = 1;
                 var pages = [];
                 while (x <= response.data.totalPages) {
                     pages.push({ page: x })
                     x++;
                 }
-                store.dispatch(EntradaAction.preencherConsulta({ result: response.data.content, pageInfo: pages, page: page }));
+                store.dispatch(EntradaAction.preencherConsulta({ result: response.data.content, pageInfo: pages, page: 0 }));
             });
         }
     } else

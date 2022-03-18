@@ -15,7 +15,7 @@ const Style = styled.div`
         }
     }
 
-    input {
+    input, select {
         border-radius: 4px;
         border: 1px solid #aaa;
         margin: 0px;
@@ -61,7 +61,8 @@ const SelectField = ( {
     nullable = true, 
     defaultValue, 
     list = [], 
-    placeholder = ''
+    placeholder = '',
+    nativeSelect = false
 } ) => {
     const [error, setError] = useState(externalError);
 
@@ -94,12 +95,20 @@ const SelectField = ( {
     return (
         <Style className={(error && error !== '' ? 'withError ' + fieldID : fieldID)}>
             <label htmlFor={fieldID}>{label} {nullable === false ? <span className="notNullable">(Obrigatório)</span> : <></>}</label>
-            <input list={fieldID + '_datalist'} type="text" id={fieldID} defaultValue={defaultValue} onBlur={validate} placeholder={placeholder} />
-            <datalist id={fieldID + '_datalist'}>
-                {list.map((value,index) => {
-                    return (<option key={index} value={value} />);
+            { nativeSelect === false ?
+            <>
+                <input list={fieldID + '_datalist'} type="text" id={fieldID} defaultValue={defaultValue} onBlur={validate} placeholder={placeholder} />
+                <datalist id={fieldID + '_datalist'}>
+                    {list.map((value,index) => {
+                        return (<option key={index} value={value} />);
+                    })}
+                </datalist>
+            </>
+            : <select defaultValue={defaultValue} id={fieldID} placeholder={placeholder}>
+                {Object.keys(list).map((value,index) => {
+                    return (<option key={index} value={list[value].value}>{list[value].text}</option>);
                 })}
-            </datalist>
+            </select>}
             <StyleError>{error}</StyleError>
         </Style>
     );

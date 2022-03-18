@@ -83,3 +83,14 @@ databaseChangeLog:
               - column:
                   name: categoria
                   type: varchar(50)
+  - changeSet:
+      id: '3.0'
+      author: Michel Douglas Grigoli
+      changes:
+        - addColumn:
+            schemaName: estoque
+            tableName: es_evento_entrada
+            columns:
+              - column:
+                  name: status
+                  type: varchar(50)

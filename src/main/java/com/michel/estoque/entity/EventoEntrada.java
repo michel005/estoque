@@ -8,6 +8,8 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.Table;
 import java.time.LocalDateTime;
 
@@ -25,5 +27,9 @@ public class EventoEntrada extends AbstractEntity {
 
     @Column(name = "descricao", nullable = false, length = 100)
     private String descricao;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = true)
+    private StatusEventoEntrada status = StatusEventoEntrada.PENDENTE;
 
 }

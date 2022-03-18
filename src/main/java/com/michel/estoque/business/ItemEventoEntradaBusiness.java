@@ -30,4 +30,8 @@ public class ItemEventoEntradaBusiness extends AbstractBusiness<ItemEventoEntrad
         return quantidade == null ? 0 : quantidade;
     }
 
+    public ItemEventoEntrada buscarPorEventoEntradaItem(EventoEntrada eventoEntrada, Item item) {
+        return repo.findByEventoEntradaItem(eventoEntrada, item).orElse(null);
+    }
+
 }

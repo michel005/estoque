@@ -26,8 +26,19 @@ import org.springframework.web.bind.annotation.RestController;
 public class EventoEntradaController extends AbstractController<EventoEntrada, EventoEntradaService> {
 
     @PostMapping("/cadastrarModelo")
-    public ResponseEntity<?> cadastrar(@RequestBody EventoEntradaAnaliticoModel model) {
+    public ResponseEntity<?> cadastrarModelo(@RequestBody EventoEntradaAnaliticoModel model) {
         ServiceResponse<?> response = servico.cadastrar(model);
+
+        if (response.temExcecao()) {
+            return ResponseEntity.badRequest().body(response.getExcecao().getErros());
+        }
+
+        return visualizarAnalitico(((EventoEntrada)response.getObjeto()).getId());
+    }
+
+    @PostMapping("/alterarModelo")
+    public ResponseEntity<?> alterarModelo(@RequestBody EventoEntradaAnaliticoModel model) {
+        ServiceResponse<?> response = servico.alterar(model);
 
         if (response.temExcecao()) {
             return ResponseEntity.badRequest().body(response.getExcecao().getErros());

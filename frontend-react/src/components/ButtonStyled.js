@@ -40,6 +40,22 @@ const ButtonStyled = styled.button`
         }
     }
 
+    &.success {
+        background-color: #00821a;
+        color: #fff;
+
+        &:hover {
+            background-color: #00821aaa;
+        }
+
+        &:disabled {
+
+            &:hover {
+                background-color: #00821a;
+            }
+        }
+    }
+
     &.transparent {
         background-color: transparent;
         color: #111;
