@@ -7,6 +7,7 @@ import DateUtils from "../utils/DateUtils";
 export default function EntradaReducer(state, action) {
 
     function montarUrlBusca(pagina, tamanho, dataEntrada) {
+        console.log(dataEntrada);
         if (dataEntrada === undefined || dataEntrada === null) {
             dataEntrada = state.entrada.currentDate;
         }

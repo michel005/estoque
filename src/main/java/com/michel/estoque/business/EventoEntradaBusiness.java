@@ -2,6 +2,7 @@ package com.michel.estoque.business;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 import com.michel.estoque.entity.EventoEntrada;
@@ -31,7 +32,9 @@ public class EventoEntradaBusiness extends AbstractBusiness<EventoEntrada, Event
     }
 
     public Page<EventoEntrada> buscarPorDataEntrada(int pagina, int tamanho, LocalDate dataEntrada) {
+        LocalDateTime dataInicial = LocalDateTime.of(dataEntrada, LocalTime.of(0, 0, 0));
+        LocalDateTime dataFinal = LocalDateTime.of(dataEntrada, LocalTime.of(23, 59, 59));
         PageRequest pageRequest = PageRequest.of(pagina, tamanho, Sort.Direction.DESC, "dataEntrada");
-        return repo.findByDataEntrada(pageRequest, dataEntrada);
+        return repo.findByDataEntrada(pageRequest, dataInicial, dataFinal);
     }
 }

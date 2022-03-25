@@ -34,4 +34,14 @@ public class ItemController extends AbstractController<Item, ItemService> {
         return ResponseEntity.ok().body(originalResposta.getObjeto());
     }
 
+    @GetMapping("/buscaTudoComQuantidade")
+    public ResponseEntity<?> buscaTudoComQuantidade(@RequestParam("pagina") int pagina, @RequestParam("tamanho") int tamanho, @RequestParam("termo") String termo) {
+        ServiceResponse<?> originalResposta = servico.buscaTudoComQuantidade(pagina, tamanho, termo);
+
+        if (originalResposta.temExcecao()) {
+            return ResponseEntity.badRequest().body(originalResposta.getExcecao().getErros());
+        }
+        return ResponseEntity.ok().body(originalResposta.getObjeto());
+    }
+
 }

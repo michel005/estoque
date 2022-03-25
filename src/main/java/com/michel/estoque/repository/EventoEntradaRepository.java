@@ -1,6 +1,7 @@
 package com.michel.estoque.repository;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import com.michel.estoque.entity.EventoEntrada;
 
@@ -13,7 +14,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface EventoEntradaRepository extends JpaRepository<EventoEntrada, Long> {
 
-    @Query(value = "select x from EventoEntrada x where day(dataEntrada) = day(:dataEntrada) and month(dataEntrada) = month(:dataEntrada) and year(dataEntrada) = year(:dataEntrada)")
-    Page<EventoEntrada> findByDataEntrada(Pageable pageable, LocalDate dataEntrada);
+    @Query(value = "select x from EventoEntrada x where dataEntrada between :dataInicial and :dataFinal")
+    Page<EventoEntrada> findByDataEntrada(Pageable pageable, LocalDateTime dataInicial, LocalDateTime dataFinal);
 
 }

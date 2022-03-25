@@ -1,6 +1,8 @@
 package com.michel.estoque.repository;
 
 import com.michel.estoque.entity.Item;
+import com.michel.estoque.model.QuantidadeItemModel;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -16,4 +18,7 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
 
     @Query("select x from Item x where nome like '%' || :termo || '%' or categoria like '%' || :termo || '%'")
     Page<Item> findByTermoBusca(Pageable pageable, String termo);
+
+    @Query("select new com.michel.estoque.model.QuantidadeItemModel( x, coalesce(sum(i.quantidade), 0) ) from ItemEventoEntrada i right join i.item x where i.item.nome like '%' || :termo || '%' or i.item.categoria like '%' || :termo || '%' group by x")
+    Page<QuantidadeItemModel> findAllComQuantidade(Pageable pageable, String termo);
 }

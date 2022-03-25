@@ -2,6 +2,7 @@ package com.michel.estoque.controller;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -21,6 +22,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @RestController
 @RequestMapping("/api/evento/entrada")
 public class EventoEntradaController extends AbstractController<EventoEntrada, EventoEntradaService> {

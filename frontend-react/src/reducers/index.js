@@ -11,7 +11,7 @@ const initialState = {
         list: [],
         pageInfo: [],
         page: 0,
-        size: 5,
+        size: 10,
         error: null,
         termo: ''
     },

@@ -8,5 +8,6 @@ services:
       MYSQL_DATABASE: estoque
       MYSQL_USER: michel
       MYSQL_PASSWORD: michel
+    command: ['mysqld', '--default-time-zone=-03:00']
     ports:
       - "3306:3306"

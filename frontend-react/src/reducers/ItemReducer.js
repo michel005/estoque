@@ -66,7 +66,7 @@ export default function ItemReducer(state, action) {
         });
     } else
     if (action.type === ItemActionTypes.BUSCAR_TODOS) {
-        API.get('/item/buscaPorTermo?pagina=0&tamanho=' + state.item.size + '&termo=' + action.payload.termo).then((response) => {
+        API.get('/item/buscaTudoComQuantidade?pagina=0&tamanho=' + state.item.size + '&termo=' + action.payload.termo).then((response) => {
             var x = 1;
             var pages = [];
             while (x <= response.data.totalPages) {
@@ -77,7 +77,7 @@ export default function ItemReducer(state, action) {
         });
     } else
     if (action.type === ItemActionTypes.BUSCAR_PAGINA) {
-        API.get('/item/buscaPorTermo?pagina=' + action.payload.pagina + '&tamanho=' + state.item.size + '&termo=' + state.item.termo).then((response) => {
+        API.get('/item/buscaTudoComQuantidade?pagina=' + action.payload.pagina + '&tamanho=' + state.item.size + '&termo=' + state.item.termo).then((response) => {
             store.dispatch(ItemAction.preencherConsulta({ result: response.data.content, pageInfo: state.item.pageInfo, page: action.payload.pagina, termo: state.item.termo }));
         });
     } else

@@ -2,6 +2,7 @@ package com.michel.estoque.service;
 
 import com.michel.estoque.business.ItemBusiness;
 import com.michel.estoque.entity.Item;
+import com.michel.estoque.model.QuantidadeItemModel;
 import com.michel.estoque.utils.CharUtils;
 
 import org.springframework.data.domain.Page;
@@ -26,6 +27,10 @@ public class ItemService extends AbstractService<Item, ItemBusiness> {
 
     public ServiceResponse<Page<Item>> buscaPorTermoBusca(int pagina, int tamanho, String termo) {
         return ServiceResponse.callback(() -> negocio.buscaPorTermo(pagina, tamanho, termo));
+    }
+
+    public ServiceResponse<Page<QuantidadeItemModel>> buscaTudoComQuantidade(int pagina, int tamanho, String termo) {
+        return ServiceResponse.callback(() -> negocio.buscaTudoComQuantidade(pagina, tamanho, termo));
     }
 
 }

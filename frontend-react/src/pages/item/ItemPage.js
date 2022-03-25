@@ -149,6 +149,7 @@ function ItemPage({ status, itens, error, current, size, page, pageInfo }) {
                         <tr>
                             <th width="80%">Nome do Item</th>
                             <th width="20%">Categoria</th>
+                            <th>Quantidade</th>
                             <th>Ação</th>
                         </tr>
                     </thead>
@@ -156,18 +157,19 @@ function ItemPage({ status, itens, error, current, size, page, pageInfo }) {
                         {itens.map((item, index) => {
                             return (
                                 <tr key={index}>
-                                    <td>{item.nome}</td>
-                                    <td><ButtonStyled className="link" href="#" onClick={() => filtrar(item)}>{item.categoria}</ButtonStyled></td>
+                                    <td>{item.item.nome}</td>
+                                    <td><ButtonStyled className="link" href="#" onClick={() => filtrar(item.item)}>{item.item.categoria}</ButtonStyled></td>
+                                    <td>{item.quantidade}</td>
                                     <td className="buttonCell">
-                                        <ButtonStyled onClick={() => mostrarFormularioAlterar(item)}>Alterar</ButtonStyled>
-                                        <ButtonStyled className="alert" onClick={() => mostrarFormularioExcluir(item)}>Excluir</ButtonStyled>
+                                        <ButtonStyled onClick={() => mostrarFormularioAlterar(item.item)}>Alterar</ButtonStyled>
+                                        <ButtonStyled className="alert" onClick={() => mostrarFormularioExcluir(item.item)}>Excluir</ButtonStyled>
                                     </td>
                                 </tr>);
                         })}
                     </tbody>
                     <tfoot>
                         <tr>
-                            <th colSpan="3">
+                            <th colSpan="4">
                                 <ButtonStyled disabled={page <= 0} onClick={() => buscarPagina(page)}>{'<'}</ButtonStyled>
                                 {pageInfo.map((value, index) => {
                                     return ( <ButtonStyled className={value.page === (page + 1) ? 'primary' : ''} key={index} onClick={() => buscarPagina(value.page)}>{value.page}</ButtonStyled> )

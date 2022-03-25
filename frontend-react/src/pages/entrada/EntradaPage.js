@@ -245,7 +245,7 @@ function EntradaPage({ status, entradas, error, current, size, page, currentDate
                         <div className="innerContent">
                             <div className="form">
                                 <div className="campos">
-                                    {status === EntradaActionTypes.STATUS_ALTERAR ? <TextField label="ID do Item" fieldID="idItem" defaultValue={current.eventoEntrada.id} disabled={current.id !== null} /> : <></> }
+                                    {status === EntradaActionTypes.STATUS_ALTERAR ? <TextField label="ID da Entrada" fieldID="idItem" defaultValue={current.eventoEntrada.id} disabled={current.id !== null} /> : <></> }
                                     {status === EntradaActionTypes.STATUS_ALTERAR ? <div className="space"></div> : <></> }
                                     <TextField label="Descrição" fieldID="descricaoEntrada" defaultValue={current.eventoEntrada.descricao} nullable={false} />
                                     <div className="space"></div>

@@ -220,6 +220,7 @@ export default function Calendar({ whenModifyCurrentDate = () => {}, setCurrentV
     }
 
     function mudarDiaAtual(data) {
+        console.log(data);
         setSelectedDate(data);
         whenModifyCurrentDate(data);
     }
