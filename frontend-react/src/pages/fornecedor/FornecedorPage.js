@@ -1,6 +1,6 @@
 import { connect } from "react-redux";
-import ItemAction from "../../actions/ItemAction";
 import TextField from "../../components/forms/TextField";
+import SelectField from "../../components/forms/SelectField";
 import store from "../../store";
 import ButtonStyled from './../../components/ButtonStyled';
 import styled from "styled-components";
@@ -8,12 +8,13 @@ import TableStyled from "../../components/TableStyled";
 import Message from "../../components/Message";
 import JanelaStyled from "../../components/JanelaStyled";
 import ChoiceMessage from "../../components/ChoiceMessage";
-import ItemActionTypes from "../../constants/ItemActionTypes";
 import { useState } from "react";
+import FornecedorAction from "../../actions/FornecedorAction";
+import FornecedorActionTypes from "../../constants/FornecedorActionTypes";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPen, faTrash } from "@fortawesome/free-solid-svg-icons";
 
-const ItemPageStyled = styled.div`
+const FornecedorPageStyled = styled.div`
     width: 100%;
 
     .space {
@@ -73,76 +74,76 @@ const ItemPageStyled = styled.div`
     }
 `;
 
-function ItemPage({ status, itens, error, current, size, page, pageInfo }) {
+function FornecedorPage({ status, fornecedores, error, current, size, page, pageInfo }) {
     const [constructorHasRun, setConstructorHasRun] = useState(false);
 
     function constructor() {
         if (constructorHasRun) return;
-        document.title = 'Controle de Estoque - Itens';
+        document.title = 'Controle de Estoque - Fornecedores';
         atualizar();
         setConstructorHasRun(true);
-    };
+    }
 
     function mostrarFormularioCadastrar() {
-        store.dispatch(ItemAction.statusCadastrar());
+        store.dispatch(FornecedorAction.statusCadastrar());
     }
 
-    function mostrarFormularioAlterar(item) {
-        store.dispatch(ItemAction.statusAlterar(item));
+    function mostrarFormularioAlterar(fornecedor) {
+        store.dispatch(FornecedorAction.statusAlterar(fornecedor));
     }
 
-    function mostrarFormularioExcluir(item) {
-        store.dispatch(ItemAction.statusExcluir(item));
+    function mostrarFormularioExcluir(fornecedor) {
+        store.dispatch(FornecedorAction.statusExcluir(fornecedor));
     }
 
     function salvar() {
         var curr = current;
-        curr.nome = document.getElementById('nomeItem').value;
-        curr.categoria = document.getElementById('categoriaItem').value;
+        curr.nome = document.getElementById('nomeFornecedor').value;
+        if (document.getElementById('tipoPessoa').value !== '') {
+            curr.tipoPessoa = document.getElementById('tipoPessoa').value;
+        } else {
+            curr.tipoPessoa = null;
+        }
+        curr.cpfCnpj = document.getElementById('cpfCnpjFornecedor').value;
 
-        if (status === ItemActionTypes.STATUS_CADASTRAR) {
-            store.dispatch(ItemAction.cadastrar(curr));
+        if (status === FornecedorActionTypes.STATUS_CADASTRAR) {
+            store.dispatch(FornecedorAction.cadastrar(curr));
         } else
-        if (status === ItemActionTypes.STATUS_ALTERAR) {
-            store.dispatch(ItemAction.alterar(curr));
+        if (status === FornecedorActionTypes.STATUS_ALTERAR) {
+            store.dispatch(FornecedorAction.alterar(curr));
         }
     }
     
     function excluir() {
-        store.dispatch(ItemAction.excluir(current));
+        store.dispatch(FornecedorAction.excluir(current));
     }
 
     function atualizar() {
-        store.dispatch(ItemAction.buscarTodos({ termo: document.getElementById('termoBusca') ? document.getElementById('termoBusca').value : '' }));
+        store.dispatch(FornecedorAction.buscarTodos({ termo: document.getElementById('termoBusca') ? document.getElementById('termoBusca').value : '' }));
     }
 
     function buscarPagina(pagina) {
-        store.dispatch(ItemAction.buscarPagina({ pagina: pagina - 1 }));
-    }
-
-    function filtrar(item) {
-        document.getElementById('termoBusca').value = item.categoria;
-        store.dispatch(ItemAction.buscarTodos({ termo: item.categoria }));
-    }
-
-    function fecharMensagemErro() {
-        store.dispatch(ItemAction.resetarErro());
+        store.dispatch(FornecedorAction.buscarPagina({ pagina: pagina - 1 }));
     }
 
     function fecharJanela() {
-        store.dispatch(ItemAction.statusOcioso());
+        store.dispatch(FornecedorAction.statusOcioso());
+    }
+
+    function fecharMensagemErro() {
+        store.dispatch(FornecedorAction.resetarErro());
     }
 
     constructor();
 
     return (
-        <ItemPageStyled>
-            <h1>Itens</h1>
-            <span className="lead">Gerencie os itens que serão manipulados dentro do seu controle de estoque</span>
+        <FornecedorPageStyled>
+            <h1>Fornecedores</h1>
+            <span className="lead">Cadastro de todos os fornecedores que dão entrada no estoque</span>
             
             <div className="commandButtons">
                 <ButtonStyled onClick={atualizar}>Buscar</ButtonStyled>
-                <TextField placeholder="Buscar pelo nome ou categoria" fieldID="termoBusca" />
+                <TextField placeholder="Buscar pelo nome ou CPF/CNPJ" fieldID="termoBusca" />
                 <ButtonStyled className="primary" onClick={mostrarFormularioCadastrar}>Cadastrar</ButtonStyled>
             </div>
 
@@ -150,29 +151,29 @@ function ItemPage({ status, itens, error, current, size, page, pageInfo }) {
                 <TableStyled>
                     <thead>
                         <tr>
-                            <th width="80%">Nome do Item</th>
-                            <th width="20%">Categoria</th>
-                            <th>Quantidade</th>
+                            <th width="80%">Nome do Fornecedor</th>
+                            <th width="20%">Tipo Pessoa</th>
+                            <th width="20%">CPF/CNPJ</th>
                             <th>Ação</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {itens.map((item, index) => {
+                        {fornecedores.map((fornecedor, index) => {
                             return (
                                 <tr key={index}>
-                                    <td>{item.item.nome}</td>
-                                    <td><ButtonStyled className="link" href="#" onClick={() => filtrar(item.item)}>{item.item.categoria}</ButtonStyled></td>
-                                    <td>{item.quantidade}</td>
+                                    <td>{fornecedor.nome}</td>
+                                    <td>{fornecedor.tipoPessoa === 'F' ? 'Física' : 'Juridica'}</td>
+                                    <td>{fornecedor.cpfCnpj}</td>
                                     <td className="buttonCell">
-                                        <ButtonStyled onClick={() => mostrarFormularioAlterar(item.item)} title="Alterar"><FontAwesomeIcon icon={faPen} /></ButtonStyled>
-                                        <ButtonStyled className="alert" onClick={() => mostrarFormularioExcluir(item.item)} title="Excluir"><FontAwesomeIcon icon={faTrash} /></ButtonStyled>
+                                        <ButtonStyled onClick={() => mostrarFormularioAlterar(fornecedor)} title="Alterar"><FontAwesomeIcon icon={faPen} /></ButtonStyled>
+                                        <ButtonStyled className="alert" onClick={() => mostrarFormularioExcluir(fornecedor)} title="Excluir"><FontAwesomeIcon icon={faTrash} /></ButtonStyled>
                                     </td>
                                 </tr>);
                         })}
                     </tbody>
                     <tfoot>
                         <tr>
-                            <th colSpan="4">
+                            <th colSpan="3">
                                 <ButtonStyled disabled={page <= 0} onClick={() => buscarPagina(page)}>{'<'}</ButtonStyled>
                                 {pageInfo.map((value, index) => {
                                     return ( <ButtonStyled className={value.page === (page + 1) ? 'primary' : ''} key={index} onClick={() => buscarPagina(value.page)}>{value.page}</ButtonStyled> )
@@ -184,16 +185,18 @@ function ItemPage({ status, itens, error, current, size, page, pageInfo }) {
                 </TableStyled>
             </div>
 
-            {status === ItemActionTypes.STATUS_CADASTRAR || status === ItemActionTypes.STATUS_ALTERAR ? <>
+            {status === FornecedorActionTypes.STATUS_CADASTRAR || status === FornecedorActionTypes.STATUS_ALTERAR ? <>
                 <JanelaStyled>
                     <div className="content">
-                        <div className="title">Formulário de Item</div>
+                        <div className="title">Formulário de Fornecedor</div>
                         <div className="innerContent">
-                            {status === ItemActionTypes.STATUS_ALTERAR ? <TextField label="ID do Item" fieldID="idItem" defaultValue={current.id} disabled={current.id !== null} /> : <></> }
+                            {status === FornecedorActionTypes.STATUS_ALTERAR ? <TextField label="ID do Fornecedor" fieldID="idFornecedor" defaultValue={current.id} disabled={current.id !== null} /> : <></> }
+                            {status === FornecedorActionTypes.STATUS_ALTERAR ? <div className="space"></div> : <></> }
+                            <TextField label="Nome do Fornecedor" fieldID="nomeFornecedor" defaultValue={current.nome} nullable={false} />
                             <div className="space"></div>
-                            <TextField label="Nome do Item" fieldID="nomeItem" defaultValue={current.nome} nullable={false} />
+                            <SelectField label="Tipo Pessoa" fieldID="tipoPessoa" nullable={false} defaultValue={current.tipoPessoa} nativeSelect={true} list={[ { text: 'Física', value: 'F' }, { text: 'Juridica', value: 'J' } ]} />
                             <div className="space"></div>
-                            <TextField label="Categoria" fieldID="categoriaItem" defaultValue={current.categoria} />
+                            <TextField label="CPF/CNPJ" fieldID="cpfCnpjFornecedor" defaultValue={current.cpfCnpj} nullable={false} />
                             <div className="space"></div>
                             <div className="commands">
                                 <ButtonStyled className="primary" onClick={salvar}>Salvar</ButtonStyled>
@@ -204,25 +207,25 @@ function ItemPage({ status, itens, error, current, size, page, pageInfo }) {
                 </JanelaStyled>
             </> : <></>}
 
-            {status === ItemActionTypes.STATUS_EXCLUIR ? <>
-                <ChoiceMessage title="Exclusão de item" text={'Deseja realmente excluir o item "' + current.nome + '"?'} choices={[ { name: 'Sim', command: excluir }, { name: 'Não, cancelar!', command: fecharJanela } ]} />
+            {status === FornecedorActionTypes.STATUS_EXCLUIR ? <>
+                <ChoiceMessage title="Exclusão de fornecedor" text={'Deseja realmente excluir o fornecedor "' + current.nome + '"?'} choices={[ { name: 'Sim', command: excluir }, { name: 'Não, cancelar!', command: fecharJanela } ]} />
             </> : <></>}
 
             {error !== null ? <Message text={error.toString()} closeEvent={fecharMensagemErro} /> : <></>}
-        </ItemPageStyled>
+        </FornecedorPageStyled>
     );
 };
 
-const ItemPageConnected = connect((state) => { 
+const FornecedorPageConnected = connect((state) => { 
     return {
-        status: state.item.status,
-        itens: state.item.list,
-        error: state.item.error,
-        current: state.item.currentItem,
-        size: state.item.size,
-        page: state.item.page,
-        pageInfo: state.item.pageInfo
+        status: state.fornecedor.status,
+        fornecedores: state.fornecedor.list,
+        error: state.fornecedor.error,
+        current: state.fornecedor.currentFornecedor,
+        size: state.fornecedor.size,
+        page: state.fornecedor.page,
+        pageInfo: state.fornecedor.pageInfo
     }
- })(ItemPage);
+ })(FornecedorPage);
 
-export default ItemPageConnected;
+export default FornecedorPageConnected;

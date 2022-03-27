@@ -7,7 +7,6 @@ import DateUtils from "../utils/DateUtils";
 export default function EntradaReducer(state, action) {
 
     function montarUrlBusca(pagina, tamanho, dataEntrada) {
-        console.log(dataEntrada);
         if (dataEntrada === undefined || dataEntrada === null) {
             dataEntrada = state.entrada.currentDate;
         }
@@ -22,6 +21,15 @@ export default function EntradaReducer(state, action) {
                 itens.push(response.data[value].nome);
             });
             store.dispatch(EntradaAction.preencherListaItens(itens));
+        });
+        API.get('/fornecedor/buscarTodos').then((response) => {
+            var fornecedores = [];
+            var valores = Object.keys(response.data);
+            valores.map((value) => {
+                fornecedores.push({ text: response.data[value].nome + ' (' + response.data[value].cpfCnpj + ')', value: response.data[value].id });
+            });
+            console.log(fornecedores);
+            store.dispatch(EntradaAction.preencherListaFornecedores(fornecedores));
         });
     }
 
@@ -53,7 +61,7 @@ export default function EntradaReducer(state, action) {
                     eventoEntrada: { 
                         id: null, 
                         descricao: 'Nova Entrada de Itens',
-                        status: 'Pendênte'
+                        status: 'PENDENTE'
                     }, 
                     itens: [] 
                 }
@@ -167,13 +175,18 @@ export default function EntradaReducer(state, action) {
             }
         });
     } else
+    if (action.type === EntradaActionTypes.PREENCHER_LISTA_FORNECEDORES) {
+        return Object.assign({}, state, {
+            entrada: {
+                ...state.entrada,
+                fornecedoresList: action.payload,
+            }
+        });
+    } else
     if (action.type === EntradaActionTypes.ADICIONA_ITEM_CURRENT_ENTRADA) {
         var itemEncontrado = false;
         var valores = state.entrada.currentEntrada.itens;
-        console.log(valores);
         valores.map((value) => {
-            console.log(value.nome);
-            console.log(action.payload.nome);
             if (value.nomeItem === action.payload.nomeItem) {
                 value.quantidade = parseInt(value.quantidade) + parseInt(action.payload.quantidade);
                 itemEncontrado = true;

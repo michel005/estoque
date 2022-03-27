@@ -1,17 +1,22 @@
 package com.michel.estoque.entity;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import org.springframework.format.annotation.DateTimeFormat;
+import java.time.LocalDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import java.time.LocalDateTime;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+import org.springframework.format.annotation.DateTimeFormat;
+
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 @Entity
 @Table(name = "es_evento_entrada")
@@ -31,5 +36,9 @@ public class EventoEntrada extends AbstractEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = true)
     private StatusEventoEntrada status = StatusEventoEntrada.PENDENTE;
+
+    @ManyToOne
+    @JoinColumn(name="fornecedor_id")
+    private Fornecedor fornecedor;
 
 }

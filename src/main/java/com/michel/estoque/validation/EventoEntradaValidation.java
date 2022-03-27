@@ -15,6 +15,10 @@ public class EventoEntradaValidation extends AbstractValidation<EventoEntrada, E
 
         exception.add(evento.getDescricao() == null || evento.getDescricao().isBlank(), "DESCRICAO", "EVENTO-ENTRADA-001");
 
+        exception.add(evento.getStatus() == null, "STATUS", "EVENTO-ENTRADA-003");
+
+        exception.add(evento.getFornecedor() == null, "FORNECEDOR", "EVENTO-ENTRADA-004");
+
         exception.invocarExcecao();
     }
 
@@ -23,6 +27,10 @@ public class EventoEntradaValidation extends AbstractValidation<EventoEntrada, E
         BusinessException exception = new BusinessException();
 
         exception.add(evento.getDescricao().isBlank(), "DESCRICAO", "EVENTO-ENTRADA-002");
+
+        exception.add(evento.getStatus() == null, "STATUS", "EVENTO-ENTRADA-003");
+
+        exception.add(evento.getFornecedor() == null, "FORNECEDOR", "EVENTO-ENTRADA-004");
 
         exception.invocarExcecao();
     }

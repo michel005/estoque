@@ -5,7 +5,9 @@ import {
 } from "react-router-dom";
 import styled from 'styled-components';
 import './App.scss';
+import EntradaPageConnected from "./pages/entrada/EntradaPage";
 import EntradaPage from "./pages/entrada/EntradaPage";
+import FornecedorPageConnected from "./pages/fornecedor/FornecedorPage";
 import ItemPageConnected from "./pages/item/ItemPage";
 import store from './store';
 
@@ -85,6 +87,7 @@ export default function App() {
                 <div className="appTitle">{store.getState().appName}</div>
                 <div className="menuOptions">
                     <NavLink to="/">Início</NavLink>
+                    <NavLink to="/fornecedores">Fornecedores</NavLink>
                     <NavLink to="/itens">Itens</NavLink>
                     <NavLink to="/entradas">Entradas</NavLink>
                     <NavLink to="/saidas">Saídas</NavLink>
@@ -93,8 +96,9 @@ export default function App() {
             <Content>
                 <Routes>
                     <Route exact path='/' element={<h1>Início</h1>} />
+                    <Route path='/fornecedores' element={<FornecedorPageConnected />} />
                     <Route path='/itens' element={<ItemPageConnected />} />
-                    <Route path='/entradas' element={<EntradaPage />} />
+                    <Route path='/entradas' element={<EntradaPageConnected />} />
                     <Route path='/saidas' element={<h1>Saídas</h1>} />
                 </Routes>
             </Content>

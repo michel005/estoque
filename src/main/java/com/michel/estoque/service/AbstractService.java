@@ -3,6 +3,7 @@ package com.michel.estoque.service;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 
 import com.michel.estoque.business.AbstractBusiness;
 import com.michel.estoque.entity.AbstractEntity;
@@ -44,8 +45,8 @@ public abstract class AbstractService <T extends AbstractEntity, N extends Abstr
         return ServiceResponse.callback(() -> negocio.buscaTodos());
     }
 
-    public ServiceResponse<List<T>> buscaPaginada(int pagina, int tamanho) {
-        return ServiceResponse.callback(() -> negocio.buscaPaginada(pagina, tamanho).getContent());
+    public ServiceResponse<Page<T>> buscaPaginada(int pagina, int tamanho) {
+        return ServiceResponse.callback(() -> negocio.buscaPaginada(pagina, tamanho));
     }
 
 }

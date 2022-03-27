@@ -62,6 +62,10 @@ export default class EntradaAction {
         return { type: EntradaActionTypes.PREENCHER_LISTA_ITENS, payload };
     };
 
+    static preencherListaFornecedores = (payload) => {
+        return { type: EntradaActionTypes.PREENCHER_LISTA_FORNECEDORES, payload };
+    };
+
     static adicionaItemNoCurrentEntrada = (payload) => {
         return { type: EntradaActionTypes.ADICIONA_ITEM_CURRENT_ENTRADA, payload };
     };

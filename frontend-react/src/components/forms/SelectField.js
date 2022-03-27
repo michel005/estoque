@@ -82,8 +82,10 @@ const SelectField = ( {
             erro = 'Campo obrigatório não preenchido!';
         }
         if (erro === '' && value !== null && value !== '' && fieldID && fieldID !== null) {
-            if (!list.includes(value)) {
-                erro = 'Valor informado não é válido';
+            if (nativeSelect === false) {
+                if (!list.includes(value)) {
+                    erro = 'Valor informado não é válido';
+                }
             }
         }
         if (erro === '' && value !== null && value !== '' && validation !== undefined) {
@@ -104,7 +106,8 @@ const SelectField = ( {
                     })}
                 </datalist>
             </>
-            : <select defaultValue={defaultValue} id={fieldID} placeholder={placeholder}>
+            : <select defaultValue={defaultValue} id={fieldID} onBlur={validate} placeholder={placeholder}>
+                <option value={null}></option>
                 {Object.keys(list).map((value,index) => {
                     return (<option key={index} value={list[value].value}>{list[value].text}</option>);
                 })}

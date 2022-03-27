@@ -94,3 +94,43 @@ databaseChangeLog:
               - column:
                   name: status
                   type: varchar(50)
+  - changeSet:
+      id: '4.0'
+      author: Michel Douglas Grigoli
+      changes:
+        - createTable:
+            schemaName: estoque
+            tableName: es_fornecedor
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: cpf_cnpj
+                  type: varchar(14)
+              - column:
+                  name: tipo_pessoa
+                  type: varchar(1)
+              - column:
+                  name: nome
+                  type: varchar(50)
+        - addColumn:
+            schemaName: estoque
+            tableName: es_evento_entrada
+            columns:
+              - column:
+                  name: fornecedor_id
+                  type: bigint
+        - addForeignKeyConstraint:
+            baseColumnNames: fornecedor_id
+            baseTableName: es_evento_entrada
+            baseTableSchemaName: estoque
+            constraintName: fk_es_evento_entrada_fornec
+            referencedColumnNames: id
+            referencedTableName: es_fornecedor
+            referencedTableSchemaName: estoque
+            validate: true

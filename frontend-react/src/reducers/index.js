@@ -1,10 +1,22 @@
 import EntradaActionTypes from "../constants/EntradaActionTypes";
+import FornecedorActionTypes from "../constants/FornecedorActionTypes";
 import ItemActionTypes from "../constants/ItemActionTypes";
 import EntradaReducer from "./EntradaReducer";
+import FornecedorReducer from "./FornecedorReducer";
 import ItemReducer from "./ItemReducer";
 
 const initialState = {
     appName: 'Controle de Estoque',
+    fornecedor: {
+        status: FornecedorActionTypes.STATUS_OCIOSO,
+        currentFornecedor: null,
+        list: [],
+        pageInfo: [],
+        page: 0,
+        size: 10,
+        error: null,
+        termo: ''
+    },
     item: {
         status: ItemActionTypes.STATUS_OCIOSO,
         currentItem: null,
@@ -21,6 +33,7 @@ const initialState = {
         currentEntrada: null,
         list: [],
         itemList: [],
+        fornecedoresList: [],
         pageInfo: [],
         page: 0,
         size: 10,
@@ -36,6 +49,9 @@ function rootReducer(state = initialState, action) {
     } else
     if (action.type.module && action.type.module === EntradaActionTypes.MODULE) {
         return EntradaReducer(state, action);
+    } else
+    if (action.type.module && action.type.module === FornecedorActionTypes.MODULE) {
+        return FornecedorReducer(state, action);
     } else {
         return state;
     }

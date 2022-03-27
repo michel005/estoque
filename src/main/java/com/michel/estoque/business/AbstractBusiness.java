@@ -3,16 +3,15 @@ package com.michel.estoque.business;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.michel.estoque.entity.AbstractEntity;
 import com.michel.estoque.exception.BusinessException;
 import com.michel.estoque.validation.AbstractValidation;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.transaction.annotation.Transactional;
 
 public abstract class AbstractBusiness<T extends AbstractEntity, R extends JpaRepository<T, Long>, V extends AbstractValidation<T, R>> {
 
@@ -44,7 +43,7 @@ public abstract class AbstractBusiness<T extends AbstractEntity, R extends JpaRe
         if (opt.isPresent()) {
             return opt.get();
         }
-        BusinessException.invocarExcecao("ERRO", "PADRAO-001");
+        BusinessException.invocarExcecao("ERRO", "PADRAO-001", id);
         return null;
     }
 

@@ -13,6 +13,7 @@ import JanelaStyled from "../../components/JanelaStyled";
 import ChoiceMessage from "../../components/ChoiceMessage";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck, faDotCircle, faPen, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { useState } from "react";
 
 const EntradaPageStyled = styled.div`
     width: 100%;
@@ -102,7 +103,14 @@ const EntradaPageStyled = styled.div`
     }
 `;
 
-function EntradaPage({ status, entradas, error, current, size, page, currentDate, itemList, pageInfo }) {
+function EntradaPage({ status, entradas, error, current, size, page, currentDate, itemList, fornecedorList, pageInfo }) {
+    const [constructorHasRun, setConstructorHasRun] = useState(false);
+
+    function constructor() {
+        if (constructorHasRun) return;
+        document.title = 'Controle de Estoque - Entradas';
+        setConstructorHasRun(true);
+    };
 
     function mostrarFormularioCadastrar() {
         store.dispatch(EntradaAction.statusCadastrar());
@@ -123,7 +131,18 @@ function EntradaPage({ status, entradas, error, current, size, page, currentDate
     function salvar() {
         var curr = current;
         curr.eventoEntrada.descricao = document.getElementById('descricaoEntrada').value;
-        curr.eventoEntrada.status = document.getElementById('listaStatus').value;
+        if (document.getElementById('listaStatus').value !== '') {
+            curr.eventoEntrada.status = document.getElementById('listaStatus').value;
+        } else {
+            curr.eventoEntrada.status = null;
+        }
+        if (document.getElementById('listaFornecedor').value !== '') {
+            curr.eventoEntrada.fornecedor = {
+                id: document.getElementById('listaFornecedor').value
+            };
+        } else {
+            curr.eventoEntrada.fornecedor = null;
+        }
 
         if (status === EntradaActionTypes.STATUS_CADASTRAR) {
             store.dispatch(EntradaAction.cadastrar(curr));
@@ -160,9 +179,15 @@ function EntradaPage({ status, entradas, error, current, size, page, currentDate
     function adicionarItem() {
         var item = document.getElementById('listaItens').value;
         var quantidade = document.getElementById('quantidade').value;
-        store.dispatch(EntradaAction.adicionaItemNoCurrentEntrada({ nomeItem: item, quantidade: quantidade }));
-        document.getElementById('listaItens').value = '';
-        document.getElementById('quantidade').value = '';
+        if (item.trim() !== '' && quantidade.trim() !== '') {
+            store.dispatch(EntradaAction.adicionaItemNoCurrentEntrada({ nomeItem: item, quantidade: quantidade }));
+            document.getElementById('listaItens').value = '';
+            document.getElementById('quantidade').value = '';
+        } else {
+            store.dispatch(EntradaAction.mostrarErro({
+                "ERRO": "Informe um item válido antes de prosseguir"
+            }));
+        }
     }
 
     function removerItem(item) {
@@ -174,11 +199,13 @@ function EntradaPage({ status, entradas, error, current, size, page, currentDate
         store.dispatch(EntradaAction.defineDataEntradaCalendar(x));
     }
 
+    constructor();
+
     return (
         <EntradaPageStyled>
             <h1>Entradas</h1>
             <div className="lead">
-                Efetue a baixa das entradas no seu estoque
+                Controle a entrada de itens no seu estoque
             </div>
 
             <div className="conteudo">
@@ -193,7 +220,8 @@ function EntradaPage({ status, entradas, error, current, size, page, currentDate
                         <thead>
                             <tr>
                                 <th width="15%">Data / Hora</th>
-                                <th width="100%">Descrição</th>
+                                <th width="60%">Descrição</th>
+                                <th width="25%">Fornecedor</th>
                                 <th>Status</th>
                                 <th>Comandos</th>
                             </tr>
@@ -204,28 +232,27 @@ function EntradaPage({ status, entradas, error, current, size, page, currentDate
                                 <tr key={index}>
                                     <td className="dataEntrada">{entrada.dataEntrada}</td>
                                     <td className="descricao">{entrada.descricao}</td>
+                                    <td className="descricao">{entrada.fornecedor !== null ? entrada.fornecedor.nome + ' (' + entrada.fornecedor.cpfCnpj + ')' : ''}</td>
                                     <td className="descricao">{entrada.status}</td>
                                     <td className="buttonCell">
                                         <ButtonStyled onClick={() => mostrarFormularioAlterar(entrada)} title="Alterar"><FontAwesomeIcon icon={faPen} /></ButtonStyled>
                                         <ButtonStyled className="alert" onClick={() => mostrarFormularioExcluir(entrada)} title="Excluir"><FontAwesomeIcon icon={faTrash} /></ButtonStyled>
-                                        <ButtonStyled className="success" title="Aprovar"><FontAwesomeIcon icon={faCheck} /></ButtonStyled>
-                                        <ButtonStyled title="Cancelar"><FontAwesomeIcon icon={faDotCircle} /></ButtonStyled>
                                     </td>
                                 </tr> );
                             })}
                             {currentDate === null ? 
                             <tr>
-                                <td colSpan={4}>Selecione uma data</td>
+                                <td colSpan={5}>Selecione uma data</td>
                             </tr> : 
                             entradas.length === 0 ?
                             <tr>
-                                <td colSpan={4}>Nenhum registro encontrado</td>
+                                <td colSpan={5}>Nenhum registro encontrado</td>
                             </tr> : <></>}
                         </tbody>
                         {entradas.length !== 0 ?
                         <tfoot>
                             <tr>
-                                <th colSpan={4}>
+                                <th colSpan={5}>
                                     <ButtonStyled disabled={page <= 0} onClick={() => buscarPagina(page)}>{'<'}</ButtonStyled>
                                     {pageInfo.map((value, index) => {
                                         return ( <ButtonStyled className={value.page === (page + 1) ? 'primary' : ''} key={index} onClick={() => buscarPagina(value.page)}>{value.page}</ButtonStyled> )
@@ -256,6 +283,8 @@ function EntradaPage({ status, entradas, error, current, size, page, currentDate
                                         {text: 'Aprovado', value: 'APROVADO'}, 
                                         {text: 'Cancelado', value: 'CANCELADO'} 
                                     ]} nativeSelect={true} label="Status" fieldID="listaStatus" defaultValue={current.eventoEntrada.status} nullable={false} />
+                                    <div className="space"></div>
+                                    <SelectField list={fornecedorList} nativeSelect={true} label="Fornecedor" fieldID="listaFornecedor" defaultValue={current.eventoEntrada.fornecedor === null || current.eventoEntrada.fornecedor === undefined ? null : current.eventoEntrada.fornecedor.id} nullable={false} />
                                     <div className="space"></div>
                                 </div>
                                 <div className="listaItensContainer">
@@ -315,6 +344,7 @@ const EntradaPageConnected = connect((state) => {
         page: state.entrada.page,
         currentDate: state.entrada.currentDate,
         itemList: state.entrada.itemList,
+        fornecedorList: state.entrada.fornecedoresList,
         pageInfo: state.entrada.pageInfo
     }
  })(EntradaPage);

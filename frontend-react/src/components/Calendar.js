@@ -220,7 +220,6 @@ export default function Calendar({ whenModifyCurrentDate = () => {}, setCurrentV
     }
 
     function mudarDiaAtual(data) {
-        console.log(data);
         setSelectedDate(data);
         whenModifyCurrentDate(data);
     }
@@ -234,13 +233,6 @@ export default function Calendar({ whenModifyCurrentDate = () => {}, setCurrentV
 
     return (
         <CalendarStyled className="calendario">
-            <div className="commands">
-                <button onClick={() => anterior(6)}>{'<<'}</button>
-                <button onClick={() => anterior(1)}>{'<'}</button>
-                <div className="currentMonth">{(current.getMonth() + 1).toString().padStart(2, '0') + '/' + current.getFullYear()}</div>
-                <button onClick={() => proximo(1)}>{'>'}</button>
-                <button onClick={() => proximo(6)}>{'>>'}</button>
-            </div>
             {selectedDate !== null ? 
             <div className="selectedDate">
                 <div className="date">
@@ -249,7 +241,14 @@ export default function Calendar({ whenModifyCurrentDate = () => {}, setCurrentV
                 <div className="espacador"></div>
                 <ButtonStyled className="transparent noHover" title="Desmarcar data atual" onClick={removerDataAtual}><FontAwesomeIcon icon={faTrash} /></ButtonStyled>
             </div>
-             : <></>}
+            : <></>}
+            <div className="commands">
+                <button onClick={() => anterior(6)}>{'<<'}</button>
+                <button onClick={() => anterior(1)}>{'<'}</button>
+                <div className="currentMonth">{(current.getMonth() + 1).toString().padStart(2, '0') + '/' + current.getFullYear()}</div>
+                <button onClick={() => proximo(1)}>{'>'}</button>
+                <button onClick={() => proximo(6)}>{'>>'}</button>
+            </div>
             <div className="calendarViewer">
                 <div className="weekLegend">
                     <div className="day">D</div>

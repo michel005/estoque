@@ -31,8 +31,7 @@ public class BusinessException extends RuntimeException {
         try(InputStream input = BusinessException.class.getResourceAsStream("/error.properties")) {
             assert input != null;
             props.load(new InputStreamReader(input, StandardCharsets.UTF_8));
-            erros.put(campo, codigo + ": " + String.format(props.getProperty(codigo, codigo), params));
-            erros.put("MSG_" + campo, String.format(props.getProperty(codigo, codigo), params));
+            erros.put(campo, String.format(props.getProperty(codigo, codigo), params));
         } catch(Exception ex) {
             erros.put(campo, ex.toString());
         }
