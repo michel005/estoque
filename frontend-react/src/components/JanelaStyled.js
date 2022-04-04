@@ -10,13 +10,17 @@ const JanelaStyled = styled.div`
     width: 100%;
     z-index: 50;
 
+    * {
+        transition: all 0.5s;
+    }
+
     &.esconder {
         display: none;
     }
 
     .content {
         background-color: #fff;
-        border-radius: 7px;
+        box-shadow: #999 0px 0px 7px;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
@@ -27,8 +31,9 @@ const JanelaStyled = styled.div`
         transform: translateX(-50%) translateY(-50%);
 
         .title {
-            background-color: #333;
-            color: #fff;
+            color: #000;
+            font-weight: bold;
+            font-size: 24px;
             padding: 14px;
             width: 100%;
         }

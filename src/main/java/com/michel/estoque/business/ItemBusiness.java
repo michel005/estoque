@@ -23,6 +23,11 @@ public class ItemBusiness extends AbstractBusiness<Item, ItemRepository, ItemVal
         }
     }
 
+    @Override
+    public List<Item> buscaTodos() {
+        return repo.findAll(Sort.by("nome"));
+    }
+
     public Page<Item> buscaPorTermo(int pagina, int tamanho, String termoBusca) {
         PageRequest pageRequest = PageRequest.of(pagina, tamanho, Sort.Direction.ASC, "nome");
         return repo.findByTermoBusca(pageRequest, termoBusca);

@@ -6,12 +6,12 @@ import ButtonStyled from './../../components/ButtonStyled';
 import styled from "styled-components";
 import TableStyled from "../../components/TableStyled";
 import Message from "../../components/Message";
-import JanelaStyled from "../../components/JanelaStyled";
 import ChoiceMessage from "../../components/ChoiceMessage";
 import ItemActionTypes from "../../constants/ItemActionTypes";
 import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPen, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faGlassCheers, faPen, faSave, faSitemap, faTable, faTimes, faTrash } from "@fortawesome/free-solid-svg-icons";
+import LightTableStyled from "../../components/LightTableStyled";
 
 const ItemPageStyled = styled.div`
     width: 100%;
@@ -20,8 +20,8 @@ const ItemPageStyled = styled.div`
         height: 10px;
     }
 
-    .lead {
-        color: #999;
+    table {
+        width: 100%;
     }
 
     .commandButtons {
@@ -39,30 +39,40 @@ const ItemPageStyled = styled.div`
         }
     }
 
-    table {
-        width: 100%;
-        flex-grow: 1;
-        max-height: 50vh !important;
+    tr {
+        .nomeItemTabela {
+            color: #333;
+            cursor: pointer;
+            font-weight: bold;
 
-        tbody {
-            tr {
-                td{
-                    .categoria {
-                        background-color: #cc3;
-                        border-radius: 7px;
-                        color: #fff;
-                        font-size: 12px;
-                        font-weight: normal;
-                        padding: 4px 7px 5px;
-                        transition: all 0.5s;
-
-                        &:hover {
-                            background-color: #111;
-                        }
-                    }
-                }
+            &:hover {
+                color: #3399ff;
             }
         }
+
+        .categoriaItemTabela {
+            cursor: pointer;
+            transition: all 0.25s;
+
+            .cont {
+                display: flex;
+            }
+
+            .categoria {
+                transition: all 0.25s;
+                background-color: #39f;
+                border-radius: 4px;
+                cursor: pointer;
+                padding: 7px 10px;
+                font-size: 10px;
+                font-weight: bold;
+                color: #fff;
+            }
+        }
+    }
+
+    #nomeItem, #categoriaItem {
+        text-transform: uppercase;
     }
 
     .contador {
@@ -71,6 +81,12 @@ const ItemPageStyled = styled.div`
         text-align: right;
         width: 100%;
     }
+
+    .font14 {
+        padding: 7px;
+        font-size: 12px !important;
+        text-transform: lowercase capitalize;
+    }
 `;
 
 function ItemPage({ status, itens, error, current, size, page, pageInfo }) {
@@ -78,8 +94,9 @@ function ItemPage({ status, itens, error, current, size, page, pageInfo }) {
 
     function constructor() {
         if (constructorHasRun) return;
-        document.title = 'Controle de Estoque - Itens';
+        document.title = store.getState().appName +  ' - Itens';
         atualizar();
+        store.dispatch(ItemAction.statusOcioso());
         setConstructorHasRun(true);
     };
 
@@ -137,37 +154,75 @@ function ItemPage({ status, itens, error, current, size, page, pageInfo }) {
 
     return (
         <ItemPageStyled>
-            <h1>Itens</h1>
-            <span className="lead">Gerencie os itens que serão manipulados dentro do seu controle de estoque</span>
+            <div className="cabecalho">
+                <h1><FontAwesomeIcon icon={faSitemap} />Itens</h1>
+            </div>
             
             <div className="commandButtons">
                 <ButtonStyled onClick={atualizar}>Buscar</ButtonStyled>
                 <TextField placeholder="Buscar pelo nome ou categoria" fieldID="termoBusca" />
-                <ButtonStyled className="primary" onClick={mostrarFormularioCadastrar}>Cadastrar</ButtonStyled>
             </div>
 
             <div className="containerTabela">
-                <TableStyled>
+                <LightTableStyled>
                     <thead>
                         <tr>
-                            <th width="80%">Nome do Item</th>
+                            <th width="65%">Nome do Item</th>
                             <th width="20%">Categoria</th>
-                            <th>Quantidade</th>
-                            <th>Ação</th>
+                            <th width="15%" className="alignRight">Quantidade</th>
                         </tr>
                     </thead>
                     <tbody>
+                        {status === ItemActionTypes.STATUS_OCIOSO || status === ItemActionTypes.STATUS_ALTERAR || status === ItemActionTypes.STATUS_EXCLUIR ?
+                        <tr className="nohover">
+                            <td colSpan={3}><ButtonStyled className="primary" onClick={mostrarFormularioCadastrar}>Novo Item</ButtonStyled></td>
+                        </tr>
+                        : <></>}
+                        {status === ItemActionTypes.STATUS_CADASTRAR ?
+                        <tr className="nohover">
+                            <td>
+                                <TextField placeholder="Nome do Item" fieldID="nomeItem" defaultValue={current.nome} nullable={false} />
+                            </td>
+                            <td>
+                                <TextField placeholder="Categoria" fieldID="categoriaItem" defaultValue={document.getElementById('termoBusca').value} />
+                            </td>
+                            <td className="buttonCell alignRight">
+                                <ButtonStyled className="primary" title="Salvar" onClick={salvar}><FontAwesomeIcon icon={faSave} /></ButtonStyled>
+                                <ButtonStyled onClick={fecharJanela} title="Cancelar"><FontAwesomeIcon icon={faTimes} /></ButtonStyled>
+                            </td>
+                        </tr>
+                        : <></>}
                         {itens.map((item, index) => {
-                            return (
-                                <tr key={index}>
-                                    <td>{item.item.nome}</td>
-                                    <td><ButtonStyled className="link" href="#" onClick={() => filtrar(item.item)}>{item.item.categoria}</ButtonStyled></td>
-                                    <td>{item.quantidade}</td>
-                                    <td className="buttonCell">
-                                        <ButtonStyled onClick={() => mostrarFormularioAlterar(item.item)} title="Alterar"><FontAwesomeIcon icon={faPen} /></ButtonStyled>
-                                        <ButtonStyled className="alert" onClick={() => mostrarFormularioExcluir(item.item)} title="Excluir"><FontAwesomeIcon icon={faTrash} /></ButtonStyled>
-                                    </td>
-                                </tr>);
+                            if ((status === ItemActionTypes.STATUS_ALTERAR || status === ItemActionTypes.STATUS_EXCLUIR) && current.id === item.item.id) {
+                                return (
+                                    <tr key={index} className="nohover">
+                                        <td>
+                                            <TextField placeholder="Nome do Item" fieldID="nomeItem" defaultValue={current.nome} nullable={false} />
+                                        </td>
+                                        <td>
+                                            <TextField placeholder="Categoria" fieldID="categoriaItem" defaultValue={current.categoria} />
+                                        </td>
+                                        <td className="buttonCell alignRight">
+                                            <ButtonStyled className="primary" title="Salvar" onClick={salvar}><FontAwesomeIcon icon={faSave} /></ButtonStyled>
+                                            <ButtonStyled className="alert" onClick={() => mostrarFormularioExcluir(item.item)} title="Excluir"><FontAwesomeIcon icon={faTrash} /></ButtonStyled>
+                                            <ButtonStyled onClick={fecharJanela} title="Cancelar"><FontAwesomeIcon icon={faTimes} /></ButtonStyled>
+                                        </td>
+                                    </tr>
+                                );
+                            } else {
+                                return (
+                                    <tr key={index}>
+                                        <td className="nomeItemTabela" onClick={() => mostrarFormularioAlterar(item.item)}>{item.item.nome}</td>
+                                        <td className="categoriaItemTabela">
+                                            <div className="cont">
+                                                <div className="categoria" title="Filtrar por esta categoria" onClick={() => filtrar(item.item)}>
+                                                    {item.item.categoria}
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className="alignRight">{item.quantidade}</td>
+                                    </tr>);
+                            }
                         })}
                     </tbody>
                     <tfoot>
@@ -181,34 +236,14 @@ function ItemPage({ status, itens, error, current, size, page, pageInfo }) {
                             </th>
                         </tr>
                     </tfoot>
-                </TableStyled>
+                </LightTableStyled>
             </div>
-
-            {status === ItemActionTypes.STATUS_CADASTRAR || status === ItemActionTypes.STATUS_ALTERAR ? <>
-                <JanelaStyled>
-                    <div className="content">
-                        <div className="title">Formulário de Item</div>
-                        <div className="innerContent">
-                            {status === ItemActionTypes.STATUS_ALTERAR ? <TextField label="ID do Item" fieldID="idItem" defaultValue={current.id} disabled={current.id !== null} /> : <></> }
-                            <div className="space"></div>
-                            <TextField label="Nome do Item" fieldID="nomeItem" defaultValue={current.nome} nullable={false} />
-                            <div className="space"></div>
-                            <TextField label="Categoria" fieldID="categoriaItem" defaultValue={current.categoria} />
-                            <div className="space"></div>
-                            <div className="commands">
-                                <ButtonStyled className="primary" onClick={salvar}>Salvar</ButtonStyled>
-                                <ButtonStyled onClick={fecharJanela}>Fechar</ButtonStyled>
-                            </div>
-                        </div>
-                    </div>
-                </JanelaStyled>
-            </> : <></>}
 
             {status === ItemActionTypes.STATUS_EXCLUIR ? <>
                 <ChoiceMessage title="Exclusão de item" text={'Deseja realmente excluir o item "' + current.nome + '"?'} choices={[ { name: 'Sim', command: excluir }, { name: 'Não, cancelar!', command: fecharJanela } ]} />
             </> : <></>}
 
-            {error !== null ? <Message text={error.toString()} closeEvent={fecharMensagemErro} /> : <></>}
+            {error !== null ? <Message title="Erro no Item" text={error.toString()} closeEvent={fecharMensagemErro} /> : <></>}
         </ItemPageStyled>
     );
 };

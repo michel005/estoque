@@ -19,6 +19,7 @@ export default function EntradaReducer(state, action) {
             var valores = Object.keys(response.data);
             valores.map((value) => {
                 itens.push(response.data[value].nome);
+                return value;
             });
             store.dispatch(EntradaAction.preencherListaItens(itens));
         });
@@ -27,6 +28,7 @@ export default function EntradaReducer(state, action) {
             var valores = Object.keys(response.data);
             valores.map((value) => {
                 fornecedores.push({ text: response.data[value].nome + ' (' + response.data[value].cpfCnpj + ')', value: response.data[value].id });
+                return value;
             });
             console.log(fornecedores);
             store.dispatch(EntradaAction.preencherListaFornecedores(fornecedores));
@@ -191,6 +193,7 @@ export default function EntradaReducer(state, action) {
                 value.quantidade = parseInt(value.quantidade) + parseInt(action.payload.quantidade);
                 itemEncontrado = true;
             }
+            return value;
         });
         return Object.assign({}, state, {
             entrada: {
@@ -203,21 +206,22 @@ export default function EntradaReducer(state, action) {
         });
     } else
     if (action.type === EntradaActionTypes.REMOVE_ITEM_CURRENT_ENTRADA) {
-        var itemEncontrado = null;
+        var temItem = null;
         state.entrada.currentEntrada.itens.map((value, index) => {
             if (value.nome === action.payload) {
-                itemEncontrado = index;
+                temItem = index;
             }
+            return value;
         });
-        if (itemEncontrado !== null) {
-            var valores = state.entrada.currentEntrada.itens;
-            valores.splice(itemEncontrado, 1);
+        if (temItem !== null) {
+            var valoresAux = state.entrada.currentEntrada.itens;
+            valoresAux.splice(temItem, 1);
             return Object.assign({}, state, {
                 entrada: {
                     ...state.entrada,
                     currentEntrada: {
                         ...state.entrada.currentEntrada,
-                        itens: valores
+                        itens: valoresAux
                     }
                 }
             });

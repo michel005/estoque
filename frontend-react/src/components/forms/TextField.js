@@ -20,6 +20,7 @@ const Style = styled.div`
         border-radius: 4px;
         border: 1px solid #aaa;
         margin: 0px;
+        max-height: 35px;
         outline: none;
         padding: 10px 7px;
         transition: all 0.5s;
@@ -117,7 +118,7 @@ const TextField = ( {
     return (
         <Style className={(error && error !== '' ? 'withError ' + fieldID : fieldID)}>
             {label !== '' ? <label htmlFor={fieldID}>{label} {nullable === false ? <span className="notNullable">(Obrigatório)</span> : <></>}</label> : <></>}
-            <input type={type} id={fieldID} defaultValue={defaultValue} onBlur={() => validate()} placeholder={placeholder} disabled={disabled} />
+            <input type={type} id={fieldID} defaultValue={defaultValue} onBlur={() => validate()} placeholder={placeholder + ((label === null || label === '') && nullable === false? ' (Obrigatório)' : '')} disabled={disabled} />
             <StyleError>{error}</StyleError>
         </Style>
     );

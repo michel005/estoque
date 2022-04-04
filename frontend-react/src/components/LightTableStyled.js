@@ -1,21 +1,23 @@
 import styled from "styled-components";
 
-const TableStyled = styled.table`
-    background-color: #f4f4f4;
+const LightTableStyled = styled.table`
+    background-color: #fff;
     border-collapse: collapse;
-    border-radius: 7px;
-    box-shadow: #CCC 0px 0px 7px;
-    overflow: hidden;
+    border-radius: 0px;
+    box-shadow: #ddd 0px 0px 7px;
     margin-bottom: 14px;
 
     thead {
-        background-color: #333;
-        color: #fff;
+        color: #000;
+        border-radius: 7px;
+        text-transform: uppercase;
         width: 100%;
 
         tr {
+            transition: all 0.25s;
+            
             th {
-                padding: 14px;
+                padding: 21px;
                 text-align: left;
 
                 &.alignRight {
@@ -31,18 +33,23 @@ const TableStyled = styled.table`
 
         tr {
             transition: 0.5s;
+            height: 63px;
             width: 100%;
 
-            &:nth-child(even) {
-                background-color: #fff;
+            &:hover {
+                background-color: #f4f4f4;
+                transform: translateX(7px);
+                box-shadow: #ccc 0px 0px 7px;
             }
 
-            &:hover {
-                background-color: #ddd;
+            &:hover.nohover {
+                background-color: transparent;
+                transform: none;
+                box-shadow: none;
             }
 
             td {
-                padding: 14px;
+                padding: 14px 21px;
 
                 &.alignRight {
                     text-align: right;
@@ -60,6 +67,7 @@ const TableStyled = styled.table`
 
                     button {
                         border-radius: 0px;
+                        min-width: 40px !important;
 
                         &:first-child {
                             border-top-left-radius: 7px;
@@ -75,6 +83,10 @@ const TableStyled = styled.table`
                     &.colSpan {
                         display: table-cell;
                     }
+                }
+                
+                &.buttonCell.alignRight {
+                    justify-content: flex-end;
                 }
             }
         }
@@ -93,4 +105,4 @@ const TableStyled = styled.table`
     }
 `;
 
-export default TableStyled;
+export default LightTableStyled;

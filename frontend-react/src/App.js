@@ -1,3 +1,5 @@
+import { faAddressBook, faArrowDown, faArrowUp, faBell, faBox, faHome, faSitemap } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
     Route,
     Routes,
@@ -6,77 +8,106 @@ import {
 import styled from 'styled-components';
 import './App.scss';
 import EntradaPageConnected from "./pages/entrada/EntradaPage";
-import EntradaPage from "./pages/entrada/EntradaPage";
 import FornecedorPageConnected from "./pages/fornecedor/FornecedorPage";
 import ItemPageConnected from "./pages/item/ItemPage";
-import store from './store';
 
 const DefaultMenuStyled = styled.div`
+    background-color: #fff;
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    position: fixed;
-    top: 0px;
-    width: 100%;
-    z-index: 100;
+    width: 300px;
 
     .appTitle {
-        background-color: #111;
-        color: #fff;
-        display: flex;
-        flex-direction: column;
-        font-size: 20px;
-        font-weight: bold;
-        padding: 14px;
-        justify-content: center;
-        transition: all 0.3s;
-    }
-
-    .menuOptions {
-        background-color: #3339;
-        backdrop-filter: blur(15px);
+        color: #000;
         display: flex;
         flex-direction: row;
-        flex-grow: 1;
+        font-size: 24px;
+        font-weight: bold;
+        padding: 21px;
         justify-content: flex-start;
+        word-wrap: break-word;
+        transition: all 0.3s;
 
         a {
             color: #fff;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            padding: 10px 14px;
             text-decoration: none;
-            transition: all 0.5s;
+        }
+
+        .logo {
+            background-color: #39f;
+            color: #fff;
+            border-radius: 7px;
+            font-size: 20px;
+            padding: 9px 12px 10px;
+        }
+    }
+
+    .menuOptions {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+
+        a {
+            border-radius: 7px;
+            color: #666;
+            display: flex;
+            flex-direction: row;
+            font-size: 18px;
+            font-weight: bold;
+            justify-content: flex-start;
+            padding: 10px 14px;
+            margin: 7px;
+            text-decoration: none;
+            transition: all 0.25s;
+
+            svg {
+                margin-right: 14px;
+                margin-top: 2px;
+                width: 20px;
+            }
 
             &:hover {
-                background-color: #39f;
+                color: #000;
             }
 
             &.active {
-                color: #111;
-                background-color: #ccc;
+                color: #3399ff;
             }
         }
     }
 `;
 
 const Content = styled.div`
-    position: fixed;
-    top: 0px;
     display: flex;
     flex-grow: 1;
-    margin-top: 96px;
     overflow: auto;
-    padding: 14px;
+    padding: 14px 21px;
     width: 100%;
-    height: calc(100% - 96px);
+    height: 100%;
     z-index: 0;
+
+    .cabecalho {
+        display: flex;
+        flex-direction: row;
+        width: 100%;
+
+        h1 {
+            font-weight: normal;
+            font-size: 36px;
+        }
+
+        svg {
+            margin-right: 14px;
+        }
+    }
 `;
 
 const AppStyled = styled.div`
     display: flex;
-    height: 100%;
+    flex-direction: row;
+    height: 100vh;
+    width: 100%;
 `;
 
 export default function App() {
@@ -84,13 +115,18 @@ export default function App() {
     return (
         <AppStyled>
             <DefaultMenuStyled>
-                <div className="appTitle">{store.getState().appName}</div>
+                <div className="appTitle">
+                    <div className="logo">
+                        <NavLink to="/"><FontAwesomeIcon icon={faBox} /></NavLink>
+                    </div>
+                </div>
                 <div className="menuOptions">
-                    <NavLink to="/">Início</NavLink>
-                    <NavLink to="/fornecedores">Fornecedores</NavLink>
-                    <NavLink to="/itens">Itens</NavLink>
-                    <NavLink to="/entradas">Entradas</NavLink>
-                    <NavLink to="/saidas">Saídas</NavLink>
+                    <NavLink to="/"><FontAwesomeIcon icon={faHome} /> Início</NavLink>
+                    <NavLink to="/fornecedores"><FontAwesomeIcon icon={faAddressBook} /> Fornecedores</NavLink>
+                    <NavLink to="/itens"><FontAwesomeIcon icon={faSitemap} /> Itens</NavLink>
+                    <NavLink to="/entradas"><FontAwesomeIcon icon={faArrowUp} /> Entradas</NavLink>
+                    <NavLink to="/saidas"><FontAwesomeIcon icon={faArrowDown} /> Saídas</NavLink>
+                    <NavLink to="/notificacoes"><FontAwesomeIcon icon={faBell} /> Notificações</NavLink>
                 </div>
             </DefaultMenuStyled>
             <Content>

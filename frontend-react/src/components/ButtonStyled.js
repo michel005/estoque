@@ -7,6 +7,7 @@ const ButtonStyled = styled.button`
     color: #fff;
     cursor: pointer;
     font-weight: bold;
+    max-height: 35px;
     padding: 10px 14px;
     outline: none;
     transition: all 0.25s;

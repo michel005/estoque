@@ -12,8 +12,9 @@ import TextField from "../../components/forms/TextField";
 import JanelaStyled from "../../components/JanelaStyled";
 import ChoiceMessage from "../../components/ChoiceMessage";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheck, faDotCircle, faPen, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faArrowUp, faPen, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { useState } from "react";
+import LightTableStyled from "../../components/LightTableStyled";
 
 const EntradaPageStyled = styled.div`
     width: 100%;
@@ -108,7 +109,7 @@ function EntradaPage({ status, entradas, error, current, size, page, currentDate
 
     function constructor() {
         if (constructorHasRun) return;
-        document.title = 'Controle de Estoque - Entradas';
+        document.title = store.getState().appName +  ' - Entradas';
         setConstructorHasRun(true);
     };
 
@@ -203,27 +204,26 @@ function EntradaPage({ status, entradas, error, current, size, page, currentDate
 
     return (
         <EntradaPageStyled>
-            <h1>Entradas</h1>
-            <div className="lead">
-                Controle a entrada de itens no seu estoque
+            <div className="cabecalho">
+                <h1><FontAwesomeIcon icon={faArrowUp} />Entradas</h1>
             </div>
 
             <div className="conteudo">
                 <div className="filtro">
-                    <Calendar whenModifyCurrentDate={(data) => atualizaFiltro(data) } setCurrentVariable={setCurrent}></Calendar>
+                    <Calendar whenModifyCurrentDate={(data) => atualizaFiltro(data) } setCurrentVariable={setCurrent} title="Data Base"></Calendar>
                     <ButtonStyled onClick={mostrarFormularioCadastrar} className="primary">Cadastrar</ButtonStyled>
                     <ButtonStyled disabled={currentDate === null} onClick={atualizar}>Atualizar</ButtonStyled>
                 </div>
 
                 <div className="tabela">
-                    <TableStyled>
+                    <LightTableStyled>
                         <thead>
                             <tr>
                                 <th width="15%">Data / Hora</th>
                                 <th width="60%">Descrição</th>
                                 <th width="25%">Fornecedor</th>
                                 <th>Status</th>
-                                <th>Comandos</th>
+                                <th></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -242,7 +242,7 @@ function EntradaPage({ status, entradas, error, current, size, page, currentDate
                             })}
                             {currentDate === null ? 
                             <tr>
-                                <td colSpan={5}>Selecione uma data</td>
+                                <td colSpan={5}>Selecione uma <b>Data Base</b></td>
                             </tr> : 
                             entradas.length === 0 ?
                             <tr>
@@ -261,7 +261,7 @@ function EntradaPage({ status, entradas, error, current, size, page, currentDate
                                 </th>
                             </tr>
                         </tfoot> : <></> }
-                    </TableStyled>
+                    </LightTableStyled>
                 </div>
             </div>
 
@@ -293,12 +293,12 @@ function EntradaPage({ status, entradas, error, current, size, page, currentDate
                                         <TextField type="number" label="Quantidade" fieldID="quantidade" />
                                         <div className="aux"><ButtonStyled onClick={adicionarItem} className="primary">Adicionar</ButtonStyled></div>
                                     </div>
-                                    <TableStyled>
+                                    <LightTableStyled>
                                         <thead>
                                             <tr>
                                                 <th width="100%">Nome Item</th>
                                                 <th>Quantidade</th>
-                                                <th>Comandos</th>
+                                                <th></th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -307,13 +307,13 @@ function EntradaPage({ status, entradas, error, current, size, page, currentDate
                                                     <tr key={index}>
                                                         <td>{value.nomeItem}</td>
                                                         <td>{value.quantidade}</td>
-                                                        <td><ButtonStyled onClick={() => removerItem(value)} className="alert">Remover</ButtonStyled></td>
+                                                        <td><ButtonStyled onClick={() => removerItem(value)} className="alert"><FontAwesomeIcon icon={faTrash} /></ButtonStyled></td>
                                                     </tr>
                                                 )
                                             })}
                                             {current.itens.length === 0 ? <tr><td colSpan={3}>Nenhum item adicionado</td></tr> : <></>}
                                         </tbody>
-                                    </TableStyled>
+                                    </LightTableStyled>
                                 </div>
                             </div>
                             <div className="commands">
@@ -329,7 +329,7 @@ function EntradaPage({ status, entradas, error, current, size, page, currentDate
                 <ChoiceMessage title="Exclusão de Evento de Entrada" text={'Deseja realmente excluir a entrada "' + current.descricao + '"?'} choices={[ { name: 'Sim', command: excluir }, { name: 'Não, cancelar!', command: fecharJanela } ]} />
             </> : <></>}
 
-            {error !== null ? <Message text={error.toString()} closeEvent={fecharMensagemErro} /> : <></>}
+            {error !== null ? <Message title="Erro na Entrada de Estoque" text={error.toString()} closeEvent={fecharMensagemErro} /> : <></>}
         </EntradaPageStyled>
     );
 };

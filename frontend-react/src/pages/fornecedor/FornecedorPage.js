@@ -12,7 +12,8 @@ import { useState } from "react";
 import FornecedorAction from "../../actions/FornecedorAction";
 import FornecedorActionTypes from "../../constants/FornecedorActionTypes";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPen, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faAddressBook, faPen, faTrash } from "@fortawesome/free-solid-svg-icons";
+import LightTableStyled from "../../components/LightTableStyled";
 
 const FornecedorPageStyled = styled.div`
     width: 100%;
@@ -66,6 +67,29 @@ const FornecedorPageStyled = styled.div`
         }
     }
 
+    tr {
+        .nomeTabela {
+            display: flex;
+            flex-direction: row;
+
+            .icone {
+                cursor: pointer;
+                margin-left: 14px;
+                opacity: 0.0;
+                transition: all 0.5s;
+            }
+        }
+
+        &:hover {
+            .nomeTabela {
+
+                .icone {
+                    opacity: 1.0;
+                }
+            }
+        }
+    }
+
     .contador {
         color: #AAA;
         padding: 0px 14px 14px;
@@ -79,7 +103,7 @@ function FornecedorPage({ status, fornecedores, error, current, size, page, page
 
     function constructor() {
         if (constructorHasRun) return;
-        document.title = 'Controle de Estoque - Fornecedores';
+        document.title = store.getState().appName +  ' - Fornecedores';
         atualizar();
         setConstructorHasRun(true);
     }
@@ -138,8 +162,9 @@ function FornecedorPage({ status, fornecedores, error, current, size, page, page
 
     return (
         <FornecedorPageStyled>
-            <h1>Fornecedores</h1>
-            <span className="lead">Cadastro de todos os fornecedores que dão entrada no estoque</span>
+            <div className="cabecalho">
+                <h1><FontAwesomeIcon icon={faAddressBook} />Fornecedores</h1>
+            </div>
             
             <div className="commandButtons">
                 <ButtonStyled onClick={atualizar}>Buscar</ButtonStyled>
@@ -148,24 +173,23 @@ function FornecedorPage({ status, fornecedores, error, current, size, page, page
             </div>
 
             <div className="containerTabela">
-                <TableStyled>
+                <LightTableStyled>
                     <thead>
                         <tr>
                             <th width="80%">Nome do Fornecedor</th>
                             <th width="20%">Tipo Pessoa</th>
-                            <th width="20%">CPF/CNPJ</th>
-                            <th>Ação</th>
+                            <th width="20%" className="alignRight">CPF/CNPJ</th>
+                            <th></th>
                         </tr>
                     </thead>
                     <tbody>
                         {fornecedores.map((fornecedor, index) => {
                             return (
                                 <tr key={index}>
-                                    <td>{fornecedor.nome}</td>
+                                    <td className="nomeTabela">{fornecedor.nome} <div className="icone"><FontAwesomeIcon onClick={() => mostrarFormularioAlterar(fornecedor)} title="Alterar" icon={faPen} /></div></td>
                                     <td>{fornecedor.tipoPessoa === 'F' ? 'Física' : 'Juridica'}</td>
-                                    <td>{fornecedor.cpfCnpj}</td>
+                                    <td className="alignRight">{fornecedor.cpfCnpj}</td>
                                     <td className="buttonCell">
-                                        <ButtonStyled onClick={() => mostrarFormularioAlterar(fornecedor)} title="Alterar"><FontAwesomeIcon icon={faPen} /></ButtonStyled>
                                         <ButtonStyled className="alert" onClick={() => mostrarFormularioExcluir(fornecedor)} title="Excluir"><FontAwesomeIcon icon={faTrash} /></ButtonStyled>
                                     </td>
                                 </tr>);
@@ -182,7 +206,7 @@ function FornecedorPage({ status, fornecedores, error, current, size, page, page
                             </th>
                         </tr>
                     </tfoot>
-                </TableStyled>
+                </LightTableStyled>
             </div>
 
             {status === FornecedorActionTypes.STATUS_CADASTRAR || status === FornecedorActionTypes.STATUS_ALTERAR ? <>
@@ -211,7 +235,7 @@ function FornecedorPage({ status, fornecedores, error, current, size, page, page
                 <ChoiceMessage title="Exclusão de fornecedor" text={'Deseja realmente excluir o fornecedor "' + current.nome + '"?'} choices={[ { name: 'Sim', command: excluir }, { name: 'Não, cancelar!', command: fecharJanela } ]} />
             </> : <></>}
 
-            {error !== null ? <Message text={error.toString()} closeEvent={fecharMensagemErro} /> : <></>}
+            {error !== null ? <Message title="Erro no Fornecedor" text={error.toString()} closeEvent={fecharMensagemErro} /> : <></>}
         </FornecedorPageStyled>
     );
 };

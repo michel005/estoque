@@ -18,14 +18,21 @@ const MessageStyled = styled.div`
 
     .content {
         background-color: #fff;
-        border-radius: 7px;
         padding: 14px;
         position:fixed;
         top: 50%;
         left: 50%;
         transform: translate(-50%);
 
+        .title {
+            padding: 0px 0px 14px;
+            font-weight: bold;
+            font-size: 24px;
+            width: 100%;
+        }
+
         .textContent {
+            padding: 14px;
             width: 100%;
         }
 
@@ -37,11 +44,12 @@ const MessageStyled = styled.div`
     }
 `;
 
-export default function Message({text, closeEvent = () => {}}) {
+export default function Message({title, text, closeEvent = () => {}}) {
 
     return (
         <MessageStyled id="message_box">
             <div className="content">
+                {title === null ? <></> : <div className="title">{title}</div>}
                 <div className="textContent">{text}</div>
                 <div className="commands"><ButtonStyled onClick={closeEvent}>Fechar</ButtonStyled></div>
             </div>

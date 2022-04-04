@@ -46,21 +46,24 @@ export default function ItemReducer(state, action) {
     } else
     if (action.type === ItemActionTypes.CADASTRAR) {
         API.post('/item/cadastrar', action.payload).then(() => {
-            store.dispatch(ItemAction.buscarTodos({termo: state.item.termo}));
+            store.dispatch(ItemAction.buscarPagina({pagina: state.item.page}));
+            store.dispatch(ItemAction.statusOcioso());
         }).catch((error) => {
             store.dispatch(ItemAction.mostrarErro(error.response.data));
         });
     } else
     if (action.type === ItemActionTypes.ALTERAR) {
         API.post('/item/alterar?id=' + action.payload.id, action.payload).then(() => {
-            store.dispatch(ItemAction.buscarTodos({termo: state.item.termo}));
+            store.dispatch(ItemAction.buscarPagina({pagina: state.item.page}));
+            store.dispatch(ItemAction.statusOcioso());
         }).catch((error) => {
             store.dispatch(ItemAction.mostrarErro(error.response.data));
         });
     } else
     if (action.type === ItemActionTypes.EXCLUIR) {
         API.post('/item/excluir?id=' + action.payload.id).then(() => {
-            store.dispatch(ItemAction.buscarTodos({termo: state.item.termo}));
+            store.dispatch(ItemAction.buscarPagina({pagina: state.item.page}));
+            store.dispatch(ItemAction.statusOcioso());
         }).catch((error) => {
             store.dispatch(ItemAction.mostrarErro(error.response.data));
         });
@@ -78,14 +81,19 @@ export default function ItemReducer(state, action) {
     } else
     if (action.type === ItemActionTypes.BUSCAR_PAGINA) {
         API.get('/item/buscaTudoComQuantidade?pagina=' + action.payload.pagina + '&tamanho=' + state.item.size + '&termo=' + state.item.termo).then((response) => {
-            store.dispatch(ItemAction.preencherConsulta({ result: response.data.content, pageInfo: state.item.pageInfo, page: action.payload.pagina, termo: state.item.termo }));
+            var x = 1;
+            var pages = [];
+            while (x <= response.data.totalPages) {
+                pages.push({ page: x })
+                x++;
+            }
+            store.dispatch(ItemAction.preencherConsulta({ result: response.data.content, pageInfo: pages, page: action.payload.pagina, termo: state.item.termo }));
         });
     } else
     if (action.type === ItemActionTypes.PREENCHER_CONSULTA) {
         return Object.assign({}, state, {
             item: {
                 ...state.item,
-                status: ItemActionTypes.STATUS_OCIOSO,
                 list: action.payload.result,
                 page: action.payload.page,
                 pageInfo: action.payload.pageInfo,

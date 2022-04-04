@@ -18,7 +18,6 @@ const ChoiceMessageStyled = styled.div`
 
     .content {
         background-color: #fff;
-        border-radius: 7px;
         position:fixed;
         top: 50%;
         left: 50%;
@@ -26,8 +25,9 @@ const ChoiceMessageStyled = styled.div`
         overflow: hidden;
 
         .title {
-            background-color: #333;
-            color: #fff;
+            color: #000;
+            font-weight: bold;
+            font-size: 24px;
             padding: 14px;
             width: 100%;
         }
