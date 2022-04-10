@@ -3,6 +3,7 @@ package com.michel.estoque.business;
 import java.util.List;
 
 import com.michel.estoque.entity.Item;
+import com.michel.estoque.model.FiltroItemModel;
 import com.michel.estoque.model.QuantidadeItemModel;
 import com.michel.estoque.repository.ItemRepository;
 import com.michel.estoque.validation.ItemValidation;
@@ -33,9 +34,13 @@ public class ItemBusiness extends AbstractBusiness<Item, ItemRepository, ItemVal
         return repo.findByTermoBusca(pageRequest, termoBusca);
     }
 
-    public Page<QuantidadeItemModel> buscaTudoComQuantidade(int pagina, int tamanho, String termoBusca) {
+    public Page<QuantidadeItemModel> buscaTudoComQuantidade(int pagina, int tamanho, FiltroItemModel filtro) {
         PageRequest pageRequest = PageRequest.of(pagina, tamanho, Sort.Direction.ASC, "item.nome");
-        return repo.findAllComQuantidade(pageRequest, termoBusca);
+        return repo.findAllComQuantidade(pageRequest, filtro.getNome(), filtro.getCategoria());
+    }
+
+    public List<String> buscaCategorias() {
+        return repo.findCategorias();
     }
 
 }

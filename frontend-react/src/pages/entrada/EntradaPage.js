@@ -2,7 +2,6 @@ import { connect } from "react-redux";
 import styled from "styled-components";
 import EntradaAction from "../../actions/EntradaAction";
 import Calendar from "../../components/Calendar";
-import TableStyled from "../../components/TableStyled";
 import SelectField from "../../components/forms/SelectField";
 import Message from "../../components/Message";
 import store from "../../store";
@@ -19,14 +18,6 @@ import LightTableStyled from "../../components/LightTableStyled";
 const EntradaPageStyled = styled.div`
     width: 100%;
 
-    .space {
-        height: 10px;
-    }
-
-    .lead {
-        color: #999;
-    }
-
     .form {
         display: flex;
         flex-direction: row;
@@ -41,6 +32,7 @@ const EntradaPageStyled = styled.div`
         display: flex;
         flex-direction: row;
         margin-top: 14px;
+        height: calc(100% - 70px);
 
         .filtro {
 
@@ -51,29 +43,12 @@ const EntradaPageStyled = styled.div`
 
         }
 
-        .tabela {
+        table {
             margin-left: 14px;
-            width: 100%;
             height: 100%;
 
-            .comandos {
-                display: flex;
-                flex-direction: row;
-                justify-content: flex-end;
-                margin-bottom: 14px;
-
-                .termoBusca {
-                    margin-left: 14px;
-                    width: 350px;
-                }
-
-                button {
-                    margin-left: 14px;
-                }
-            }
-
-            table {
-                width: 100%;
+            tbody {
+                height: calc(100% - 64px);
             }
         }
     }
@@ -99,6 +74,11 @@ const EntradaPageStyled = styled.div`
 
         table {
             width: 100%;
+            height: 500px;
+
+            tbody {
+                height: calc(100% - 62px);
+            }
         }
 
     }
@@ -210,59 +190,54 @@ function EntradaPage({ status, entradas, error, current, size, page, currentDate
 
             <div className="conteudo">
                 <div className="filtro">
-                    <Calendar whenModifyCurrentDate={(data) => atualizaFiltro(data) } setCurrentVariable={setCurrent} title="Data Base"></Calendar>
+                    <Calendar reduced={true} whenModifyCurrentDate={(data) => atualizaFiltro(data) } setCurrentVariable={setCurrent} title="Data Base"></Calendar>
                     <ButtonStyled onClick={mostrarFormularioCadastrar} className="primary">Cadastrar</ButtonStyled>
                     <ButtonStyled disabled={currentDate === null} onClick={atualizar}>Atualizar</ButtonStyled>
                 </div>
 
-                <div className="tabela">
-                    <LightTableStyled>
-                        <thead>
-                            <tr>
-                                <th width="15%">Data / Hora</th>
-                                <th width="60%">Descrição</th>
-                                <th width="25%">Fornecedor</th>
-                                <th>Status</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {entradas.map((entrada, index) => {
-                                return ( 
-                                <tr key={index}>
-                                    <td className="dataEntrada">{entrada.dataEntrada}</td>
-                                    <td className="descricao">{entrada.descricao}</td>
-                                    <td className="descricao">{entrada.fornecedor !== null ? entrada.fornecedor.nome + ' (' + entrada.fornecedor.cpfCnpj + ')' : ''}</td>
-                                    <td className="descricao">{entrada.status}</td>
-                                    <td className="buttonCell">
-                                        <ButtonStyled onClick={() => mostrarFormularioAlterar(entrada)} title="Alterar"><FontAwesomeIcon icon={faPen} /></ButtonStyled>
-                                        <ButtonStyled className="alert" onClick={() => mostrarFormularioExcluir(entrada)} title="Excluir"><FontAwesomeIcon icon={faTrash} /></ButtonStyled>
-                                    </td>
-                                </tr> );
-                            })}
-                            {currentDate === null ? 
-                            <tr>
-                                <td colSpan={5}>Selecione uma <b>Data Base</b></td>
-                            </tr> : 
-                            entradas.length === 0 ?
-                            <tr>
-                                <td colSpan={5}>Nenhum registro encontrado</td>
-                            </tr> : <></>}
-                        </tbody>
-                        {entradas.length !== 0 ?
-                        <tfoot>
-                            <tr>
-                                <th colSpan={5}>
-                                    <ButtonStyled disabled={page <= 0} onClick={() => buscarPagina(page)}>{'<'}</ButtonStyled>
-                                    {pageInfo.map((value, index) => {
-                                        return ( <ButtonStyled className={value.page === (page + 1) ? 'primary' : ''} key={index} onClick={() => buscarPagina(value.page)}>{value.page}</ButtonStyled> )
-                                    })}
-                                    <ButtonStyled disabled={((page + 1) === pageInfo.length) || pageInfo.length === 0} onClick={() => buscarPagina(page + 2)}>{'>'}</ButtonStyled>
-                                </th>
-                            </tr>
-                        </tfoot> : <></> }
-                    </LightTableStyled>
-                </div>
+                <LightTableStyled>
+                    <thead>
+                        <tr>
+                            <th width="15%">Data / Hora</th>
+                            <th width="50%">Descrição</th>
+                            <th width="25%">Fornecedor</th>
+                            <th width="10%">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {entradas.map((entrada, index) => {
+                            return ( 
+                            <tr key={index}>
+                                <td width="15%" className="dataEntrada">{entrada.dataEntrada}</td>
+                                <td width="50%">
+                                    <ButtonStyled onClick={() => mostrarFormularioAlterar(entrada)} className="link">{entrada.descricao}</ButtonStyled>
+                                </td>
+                                <td width="25%" className="fornecedor">{entrada.fornecedor !== null ? entrada.fornecedor.nome + ' (' + entrada.fornecedor.cpfCnpj + ')' : ''}</td>
+                                <td width="10%" className="status">{entrada.status}</td>
+                            </tr> );
+                        })}
+                        {currentDate === null ? 
+                        <tr>
+                            <td colSpan={4}>Selecione uma <b>Data Base</b></td>
+                        </tr> : 
+                        entradas.length === 0 ?
+                        <tr className="nohover">
+                            <td colSpan={4}>Nenhum registro encontrado</td>
+                        </tr> : <></>}
+                    </tbody>
+                    {entradas.length !== 0 ?
+                    <tfoot>
+                        <tr>
+                            <th colSpan={4}>
+                                <ButtonStyled disabled={page <= 0} onClick={() => buscarPagina(page)}>{'<'}</ButtonStyled>
+                                {pageInfo.map((value, index) => {
+                                    return ( <ButtonStyled className={value.page === (page + 1) ? 'primary' : ''} key={index} onClick={() => buscarPagina(value.page)}>{value.page}</ButtonStyled> )
+                                })}
+                                <ButtonStyled disabled={((page + 1) === pageInfo.length) || pageInfo.length === 0} onClick={() => buscarPagina(page + 2)}>{'>'}</ButtonStyled>
+                            </th>
+                        </tr>
+                    </tfoot> : <></> }
+                </LightTableStyled>
             </div>
 
             {status === EntradaActionTypes.STATUS_CADASTRAR || status === EntradaActionTypes.STATUS_ALTERAR ? <>
@@ -296,28 +271,29 @@ function EntradaPage({ status, entradas, error, current, size, page, currentDate
                                     <LightTableStyled>
                                         <thead>
                                             <tr>
-                                                <th width="100%">Nome Item</th>
-                                                <th>Quantidade</th>
-                                                <th></th>
+                                                <th width="70%">Nome Item</th>
+                                                <th width="20%" className="alignRight">Quantidade</th>
+                                                <th width="10%"></th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             {current.itens.map((value, index) => {
                                                 return (
                                                     <tr key={index}>
-                                                        <td>{value.nomeItem}</td>
-                                                        <td>{value.quantidade}</td>
-                                                        <td><ButtonStyled onClick={() => removerItem(value)} className="alert"><FontAwesomeIcon icon={faTrash} /></ButtonStyled></td>
+                                                        <td width="70%">{value.nomeItem}</td>
+                                                        <td width="20%" className="alignRight">{value.quantidade}</td>
+                                                        <td width="10%" className="buttonCell"><ButtonStyled onClick={() => removerItem(value)} className="alert"><FontAwesomeIcon icon={faTrash} /></ButtonStyled></td>
                                                     </tr>
                                                 )
                                             })}
-                                            {current.itens.length === 0 ? <tr><td colSpan={3}>Nenhum item adicionado</td></tr> : <></>}
+                                            {current.itens.length === 0 ? <tr className="nohover"><td colSpan={3}>Nenhum item adicionado</td></tr> : <></>}
                                         </tbody>
                                     </LightTableStyled>
                                 </div>
                             </div>
                             <div className="commands">
                                 <ButtonStyled className="primary" onClick={salvar}>Salvar</ButtonStyled>
+                                {current.eventoEntrada.id === null ? <></> : <ButtonStyled className="alert" onClick={() => mostrarFormularioExcluir(current.eventoEntrada)}>Excluir</ButtonStyled>}
                                 <ButtonStyled onClick={fecharJanela}>Fechar</ButtonStyled>
                             </div>
                         </div>

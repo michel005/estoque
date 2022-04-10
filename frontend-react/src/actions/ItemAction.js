@@ -46,12 +46,20 @@ class ItemAction {
         return { type: ItemActionTypes.PREENCHER_CONSULTA, payload };
     };
 
+    static preencherCategorias = (payload) => {
+        return { type: ItemActionTypes.PREENCHER_CATEGORIAS, payload };
+    };
+
     static mostrarErro = (payload) => {
         return { type: ItemActionTypes.MOSTRAR_ERRO, payload };
     };
 
     static resetarErro = (payload) => {
         return { type: ItemActionTypes.RESETAR_ERRO, payload };
+    };
+
+    static preencherTamanhoPagina = (payload) => {
+        return { type: ItemActionTypes.PREENCHER_TAMANHO_PAGINA, payload };
     };
 
 }

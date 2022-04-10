@@ -30,7 +30,6 @@ export default function EntradaReducer(state, action) {
                 fornecedores.push({ text: response.data[value].nome + ' (' + response.data[value].cpfCnpj + ')', value: response.data[value].id });
                 return value;
             });
-            console.log(fornecedores);
             store.dispatch(EntradaAction.preencherListaFornecedores(fornecedores));
         });
     }

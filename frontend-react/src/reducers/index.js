@@ -15,10 +15,15 @@ const initialState = {
         page: 0,
         size: 10,
         error: null,
-        termo: ''
+        termo: {
+            nome: '',
+            cpfCnpj: '',
+            tipoPessoa: ''
+        }
     },
     item: {
         status: ItemActionTypes.STATUS_OCIOSO,
+        categorias: [],
         currentItem: null,
         list: [],
         pageInfo: [],

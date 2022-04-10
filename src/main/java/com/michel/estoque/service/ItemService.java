@@ -2,6 +2,7 @@ package com.michel.estoque.service;
 
 import com.michel.estoque.business.ItemBusiness;
 import com.michel.estoque.entity.Item;
+import com.michel.estoque.model.FiltroItemModel;
 import com.michel.estoque.model.QuantidadeItemModel;
 import com.michel.estoque.utils.CharUtils;
 
@@ -31,8 +32,12 @@ public class ItemService extends AbstractService<Item, ItemBusiness> {
         return ServiceResponse.callback(() -> negocio.buscaPorTermo(pagina, tamanho, termo));
     }
 
-    public ServiceResponse<Page<QuantidadeItemModel>> buscaTudoComQuantidade(int pagina, int tamanho, String termo) {
-        return ServiceResponse.callback(() -> negocio.buscaTudoComQuantidade(pagina, tamanho, termo));
+    public ServiceResponse<Page<QuantidadeItemModel>> buscaTudoComQuantidade(int pagina, int tamanho, FiltroItemModel filtro) {
+        return ServiceResponse.callback(() -> negocio.buscaTudoComQuantidade(pagina, tamanho, filtro));
+    }
+
+    public ServiceResponse<?> buscaCategorias() {
+        return ServiceResponse.callback(() -> negocio.buscaCategorias());
     }
 
 }

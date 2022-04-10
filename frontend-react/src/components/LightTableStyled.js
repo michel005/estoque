@@ -3,18 +3,23 @@ import styled from "styled-components";
 const LightTableStyled = styled.table`
     background-color: #fff;
     border-collapse: collapse;
-    border-radius: 0px;
     box-shadow: #ddd 0px 0px 7px;
     margin-bottom: 14px;
+    width: 100%;
 
     thead {
         color: #000;
         border-radius: 7px;
         text-transform: uppercase;
-        width: 100%;
+        display: table;
+        width: calc(100% - 17px);
+        table-layout: fixed;
 
         tr {
             transition: all 0.25s;
+            table-layout: fixed;
+            display: table;
+            width: 100%;
             
             th {
                 padding: 21px;
@@ -28,18 +33,19 @@ const LightTableStyled = styled.table`
     }
 
     tbody {
-        width: 100%;
-        height: 100%;
+        display: block;
+        height: auto;
+        overflow-y: scroll;
 
         tr {
-            transition: 0.5s;
+            transition: 0.25s;
             height: 63px;
+            table-layout: fixed;
+            display: table;
             width: 100%;
 
             &:hover {
-                background-color: #f4f4f4;
-                transform: translateX(7px);
-                box-shadow: #ccc 0px 0px 7px;
+                background-color: #eee;
             }
 
             &:hover.nohover {
@@ -57,36 +63,24 @@ const LightTableStyled = styled.table`
 
                 a {
                     color: #39f;
+                    cursor: pointer;
                     font-weight: bold;
                     text-decoration: none;
                 }
 
-                &.buttonCell {
-                    display: flex;
-                    flex-direction: row;
+                button {
+                    border-radius: 0px;
+                    min-width: 40px !important;
 
-                    button {
-                        border-radius: 0px;
-                        min-width: 40px !important;
-
-                        &:first-child {
-                            border-top-left-radius: 7px;
-                            border-bottom-left-radius: 7px;
-                        }
-
-                        &:last-child {
-                            border-top-right-radius: 7px;
-                            border-bottom-right-radius: 7px;
-                        }
+                    &:first-child {
+                        border-top-left-radius: 7px;
+                        border-bottom-left-radius: 7px;
                     }
 
-                    &.colSpan {
-                        display: table-cell;
+                    &:last-child {
+                        border-top-right-radius: 7px;
+                        border-bottom-right-radius: 7px;
                     }
-                }
-                
-                &.buttonCell.alignRight {
-                    justify-content: flex-end;
                 }
             }
         }
@@ -95,9 +89,11 @@ const LightTableStyled = styled.table`
     tfoot {
         tr {
             th {
+                display: flex;
+                justify-content: center;
                 padding: 14px;
 
-                button {
+                button, select {
                     margin-right: 7px;
                 }
             }

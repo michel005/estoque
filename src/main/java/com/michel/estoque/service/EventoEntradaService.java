@@ -10,6 +10,7 @@ import com.michel.estoque.business.ItemEventoEntradaBusiness;
 import com.michel.estoque.entity.EventoEntrada;
 import com.michel.estoque.entity.Item;
 import com.michel.estoque.entity.ItemEventoEntrada;
+import com.michel.estoque.exception.BusinessException;
 import com.michel.estoque.model.EventoEntradaAnaliticoModel;
 import com.michel.estoque.model.EventoEntradaModel;
 import com.michel.estoque.model.ItemEventoEntradaModel;
@@ -40,6 +41,9 @@ public class EventoEntradaService extends AbstractService<EventoEntrada, EventoE
     public ServiceResponse<EventoEntrada> cadastrar(EventoEntradaAnaliticoModel model) {
         return ServiceResponse.callback(() -> {
             model.getEventoEntrada().setDataEntrada(LocalDateTime.now());
+
+            BusinessException.invocarExcecao(model.getItens().isEmpty(), "ERRO", "EVENTO-ENTRADA-005");
+
             EventoEntrada eventoEntrada = negocio.cadastrar(model.getEventoEntrada());
 
             List<ItemEventoEntradaModel> itens = model.getItens();
@@ -57,6 +61,7 @@ public class EventoEntradaService extends AbstractService<EventoEntrada, EventoE
 
     public ServiceResponse<EventoEntrada> alterar(EventoEntradaAnaliticoModel model) {
         return ServiceResponse.callback(() -> {
+            BusinessException.invocarExcecao(model.getItens().isEmpty(), "ERRO", "EVENTO-ENTRADA-005");
             EventoEntrada eventoEntrada = negocio.alterar(model.getEventoEntrada());
 
             List<ItemEventoEntradaModel> itens = model.getItens();

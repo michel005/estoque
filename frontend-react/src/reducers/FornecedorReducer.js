@@ -66,7 +66,7 @@ export default function FornecedorReducer(state, action) {
         });
     } else
     if (action.type === FornecedorActionTypes.BUSCAR_TODOS) {
-        API.get('/fornecedor/buscaPaginada?pagina=0&tamanho=' + state.fornecedor.size + '&termo=' + action.payload.termo).then((response) => {
+        API.post('/fornecedor/buscaPaginadaPorTermos?pagina=0&tamanho=' + state.fornecedor.size, action.payload.termo).then((response) => {
             var x = 1;
             var pages = [];
             while (x <= response.data.totalPages) {
@@ -77,7 +77,7 @@ export default function FornecedorReducer(state, action) {
         });
     } else
     if (action.type === FornecedorActionTypes.BUSCAR_PAGINA) {
-        API.get('/fornecedor/buscaPaginada?pagina=' + action.payload.pagina + '&tamanho=' + state.fornecedor.size + '&termo=' + state.fornecedor.termo).then((response) => {
+        API.post('/fornecedor/buscaPaginadaPorTermos?pagina=' + action.payload.pagina + '&tamanho=' + state.fornecedor.size, state.fornecedor.termo).then((response) => {
             store.dispatch(FornecedorAction.preencherConsulta({ result: response.data.content, pageInfo: state.fornecedor.pageInfo, page: action.payload.pagina, termo: state.fornecedor.termo }));
         });
     } else

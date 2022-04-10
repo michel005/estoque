@@ -3,8 +3,17 @@ import API from "../API";
 import ItemActionTypes from "../constants/ItemActionTypes";
 import store from "../store";
 
+function buscarCategorias() {
+    API.get('/item/buscaCategorias').then((response) => {
+        store.dispatch(ItemAction.preencherCategorias(response.data));
+    }).catch((error) => {
+        store.dispatch(ItemAction.mostrarErro(error.response.data));
+    });
+}
+
 export default function ItemReducer(state, action) {
     if (action.type === ItemActionTypes.STATUS_CADASTRAR) {
+        buscarCategorias();
         return Object.assign({}, state, {
             item: {
                 ...state.item,
@@ -15,6 +24,7 @@ export default function ItemReducer(state, action) {
         });
     } else
     if (action.type === ItemActionTypes.STATUS_ALTERAR) {
+        buscarCategorias();
         return Object.assign({}, state, {
             item: {
                 ...state.item,
@@ -68,19 +78,31 @@ export default function ItemReducer(state, action) {
             store.dispatch(ItemAction.mostrarErro(error.response.data));
         });
     } else
+    if (action.type === ItemActionTypes.PREENCHER_TAMANHO_PAGINA) {
+        return Object.assign({}, state, {
+            item: {
+                ...state.item,
+                size: action.payload
+            }
+        });
+    } else
     if (action.type === ItemActionTypes.BUSCAR_TODOS) {
-        API.get('/item/buscaTudoComQuantidade?pagina=0&tamanho=' + state.item.size + '&termo=' + action.payload.termo).then((response) => {
+        buscarCategorias();
+        API.post('/item/buscaTudoComQuantidade?pagina=0&tamanho=' + state.item.size, action.payload).then((response) => {
             var x = 1;
             var pages = [];
             while (x <= response.data.totalPages) {
                 pages.push({ page: x })
                 x++;
             }
-            store.dispatch(ItemAction.preencherConsulta({ result: response.data.content, pageInfo: pages, page: 0, termo: action.payload.termo }));
+            store.dispatch(ItemAction.preencherConsulta({ result: response.data.content, pageInfo: pages, page: 0, termo: action.payload }));
+        }).catch((error) => {
+            store.dispatch(ItemAction.mostrarErro(error.response.data));
         });
     } else
     if (action.type === ItemActionTypes.BUSCAR_PAGINA) {
-        API.get('/item/buscaTudoComQuantidade?pagina=' + action.payload.pagina + '&tamanho=' + state.item.size + '&termo=' + state.item.termo).then((response) => {
+        buscarCategorias();
+        API.post('/item/buscaTudoComQuantidade?pagina=' + action.payload.pagina + '&tamanho=' + state.item.size, state.item.termo).then((response) => {
             var x = 1;
             var pages = [];
             while (x <= response.data.totalPages) {
@@ -88,6 +110,8 @@ export default function ItemReducer(state, action) {
                 x++;
             }
             store.dispatch(ItemAction.preencherConsulta({ result: response.data.content, pageInfo: pages, page: action.payload.pagina, termo: state.item.termo }));
+        }).catch((error) => {
+            store.dispatch(ItemAction.mostrarErro(error.response.data));
         });
     } else
     if (action.type === ItemActionTypes.PREENCHER_CONSULTA) {
@@ -98,6 +122,14 @@ export default function ItemReducer(state, action) {
                 page: action.payload.page,
                 pageInfo: action.payload.pageInfo,
                 termo: action.payload.termo
+            }
+        });
+    } else
+    if (action.type === ItemActionTypes.PREENCHER_CATEGORIAS) {
+        return Object.assign({}, state, {
+            item: {
+                ...state.item,
+                categorias: action.payload
             }
         });
     } else

@@ -32,7 +32,7 @@ const MessageStyled = styled.div`
         }
 
         .textContent {
-            padding: 14px;
+            padding: 14px 0px;
             width: 100%;
         }
 

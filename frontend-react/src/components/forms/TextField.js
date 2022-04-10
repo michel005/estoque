@@ -69,7 +69,8 @@ const TextField = ( {
     nullable = true, 
     defaultValue, 
     placeholder = '',
-    disabled = false
+    disabled = false,
+    enterEvent = () => {}
 } ) => {
 
     const [error, setError] = useState(externalError);
@@ -115,10 +116,17 @@ const TextField = ( {
         showError(erro);
     };
 
+    function enterEventInner(event) {
+        if (event.charCode === 13) {
+            event.preventDefault();
+            enterEvent();
+        }
+    }
+
     return (
         <Style className={(error && error !== '' ? 'withError ' + fieldID : fieldID)}>
             {label !== '' ? <label htmlFor={fieldID}>{label} {nullable === false ? <span className="notNullable">(Obrigatório)</span> : <></>}</label> : <></>}
-            <input type={type} id={fieldID} defaultValue={defaultValue} onBlur={() => validate()} placeholder={placeholder + ((label === null || label === '') && nullable === false? ' (Obrigatório)' : '')} disabled={disabled} />
+            <input autoComplete="false" onKeyPress={enterEventInner} type={type} id={fieldID} name={fieldID} defaultValue={defaultValue} onBlur={() => validate()} placeholder={placeholder + ((label === null || label === '') && nullable === false? ' (Obrigatório)' : '')} disabled={disabled} />
             <StyleError>{error}</StyleError>
         </Style>
     );

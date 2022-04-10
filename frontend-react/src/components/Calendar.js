@@ -1,4 +1,4 @@
-import { faArrowCircleLeft, faArrowCircleRight, faArrowLeft, faArrowRight, faCalendar, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faArrowCircleLeft, faArrowCircleRight, faArrowLeft, faArrowRight, faCalendar, faLock, faLockOpen, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
 import ButtonStyled from './ButtonStyled';
@@ -13,8 +13,28 @@ width: 290px;
 
 .title {
     color: #000;
+    cursor: pointer;
     padding: 10px 10px 4px;
     font-weight: bold;
+    transition: all 0.25s;
+
+    &:hover {
+        color: #39f;
+    }
+
+    .cont {
+        display: flex;
+
+        .text {
+            display: flex;
+
+            svg {
+                margin-top: 2px;
+                margin-left: 4px;
+                font-size: 8px;
+            }
+        }
+    }
 }
 
 .commands {
@@ -134,13 +154,32 @@ width: 290px;
         }
     }
 }
+
+&.reduzido {
+    .calendarViewer {
+        display: none;
+    }
+    .commands {
+        display: none;
+    }
+
+    &:hover {
+        .calendarViewer {
+            display: inline;
+        }
+        .commands {
+            display: flex;
+        }
+    }
+}
 `;
 
-export default function Calendar({ whenModifyCurrentDate = () => {}, setCurrentVariable = () => {}, title = null }) {
+export default function Calendar({ whenModifyCurrentDate = () => {}, setCurrentVariable = () => {}, title = null, reduced = false, defaultReduced = false }) {
     const [current, setCurrent] = useState(new Date());
     const [selectedDate, setSelectedDate] = useState(null);
     const [dayList, setDayList] = useState([]);
     const [constructorHasRun, setConstructorHasRun] = useState(false);
+    const [reduzido, setReduzido] = useState(defaultReduced);
 
     var weekCount = [ 1, 2, 3, 4, 5, 6, 7 ];
     var weekMonthCount = [ 1, 2, 3, 4, 5, 6 ];
@@ -228,10 +267,17 @@ export default function Calendar({ whenModifyCurrentDate = () => {}, setCurrentV
     constructor();
 
     return (
-        <AlternativeCalendarStyled className="calendario">
+        <AlternativeCalendarStyled className={'calendario' + (reduzido === true ? ' reduzido' : '')}>
             {title !== null ? 
-            <div className="title">
-                {title}
+            <div className="title" onClick={() => { setReduzido(!reduzido) }}>
+                <div className="cont">
+                    <div className="text">
+                        <div>
+                            {title}
+                        </div>
+                        {reduzido !== true ? <FontAwesomeIcon icon={faLock} /> : <FontAwesomeIcon icon={faLockOpen} />}
+                    </div>
+                </div>
             </div> : <></>}
             {selectedDate !== null ? 
             <div className="selectedDate">
@@ -242,7 +288,13 @@ export default function Calendar({ whenModifyCurrentDate = () => {}, setCurrentV
                 <div className="espacador"></div>
                 <ButtonStyled className="transparent noHover" title="Desmarcar data atual" onClick={removerDataAtual}><FontAwesomeIcon icon={faTrash} /></ButtonStyled>
             </div>
-            : <></>}
+            : 
+            <div className="selectedDate">
+                <div className="date" title="Data selecionada">
+                    <FontAwesomeIcon icon={faCalendar} />
+                    Nenhuma Data Selecionada
+                </div>
+            </div>}
             <div className="commands">
                 <button title="Voltar 6 meses" onClick={() => anterior(6)}><FontAwesomeIcon icon={faArrowCircleLeft} /></button>
                 <button title="Voltar 1 mês" onClick={() => anterior(1)}><FontAwesomeIcon icon={faArrowLeft} /></button>

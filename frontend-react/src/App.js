@@ -81,10 +81,10 @@ const DefaultMenuStyled = styled.div`
 const Content = styled.div`
     display: flex;
     flex-grow: 1;
-    overflow: auto;
+    overflow: hidden;
     padding: 14px 21px;
     width: 100%;
-    height: 100%;
+    max-height: 100%;
     z-index: 0;
 
     .cabecalho {

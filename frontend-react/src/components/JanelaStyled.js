@@ -24,7 +24,6 @@ const JanelaStyled = styled.div`
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-        overflow: hidden;
         position:fixed;
         top: 50%;
         left: 50%;
@@ -34,17 +33,20 @@ const JanelaStyled = styled.div`
             color: #000;
             font-weight: bold;
             font-size: 24px;
-            padding: 14px;
+            padding: 21px;
             width: 100%;
         }
 
         .innerContent {
-            padding: 14px;
+            padding: 21px;
             width: 100%;
         }
 
         .commands {
-            margin-top: 14px;
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-end;
+            margin-top: 21px;
             text-align: left;
             width: 100%;
 

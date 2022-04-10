@@ -19,7 +19,9 @@ public class ItemEventoEntradaModel {
     }
 
     public ItemEventoEntradaModel(ItemEventoEntrada itemEventoEntrada) {
-        this.nomeItem = itemEventoEntrada.getItem().getNome();
+        if (itemEventoEntrada.getItem() != null) {
+            this.nomeItem = itemEventoEntrada.getItem().getNome();
+        }
         this.quantidade = itemEventoEntrada.getQuantidade();
     }
 

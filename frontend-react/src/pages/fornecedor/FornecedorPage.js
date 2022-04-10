@@ -4,7 +4,6 @@ import SelectField from "../../components/forms/SelectField";
 import store from "../../store";
 import ButtonStyled from './../../components/ButtonStyled';
 import styled from "styled-components";
-import TableStyled from "../../components/TableStyled";
 import Message from "../../components/Message";
 import JanelaStyled from "../../components/JanelaStyled";
 import ChoiceMessage from "../../components/ChoiceMessage";
@@ -12,93 +11,46 @@ import { useState } from "react";
 import FornecedorAction from "../../actions/FornecedorAction";
 import FornecedorActionTypes from "../../constants/FornecedorActionTypes";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faAddressBook, faPen, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faAddressBook } from "@fortawesome/free-solid-svg-icons";
 import LightTableStyled from "../../components/LightTableStyled";
 
 const FornecedorPageStyled = styled.div`
     width: 100%;
 
-    .space {
-        height: 10px;
-    }
-
-    .lead {
-        color: #999;
-    }
-
     .commandButtons {
         display: flex;
-        flex-direction: row-reverse;
+        flex-direction: row;
         margin: 14px 0px;
 
-        .termoBusca {
-            margin-left: 14px;
+        .nomeBusca, .tipoPessoaBusca, .cpfCnpjBusca {
+            margin-right: 14px;
+        }
+
+        .nomeBusca {
             width: 350px;
         }
 
+        .commands {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+        }
+
         button {
-            margin-left: 14px;
+            margin-right: 14px;
         }
     }
 
     table {
-        width: 100%;
-        flex-grow: 1;
-        max-height: 50vh !important;
+        height: calc(100% - 140px);
 
         tbody {
-            tr {
-                td{
-                    .categoria {
-                        background-color: #cc3;
-                        border-radius: 7px;
-                        color: #fff;
-                        font-size: 12px;
-                        font-weight: normal;
-                        padding: 4px 7px 5px;
-                        transition: all 0.5s;
-
-                        &:hover {
-                            background-color: #111;
-                        }
-                    }
-                }
-            }
+            height: calc(100% - 64px);
         }
-    }
-
-    tr {
-        .nomeTabela {
-            display: flex;
-            flex-direction: row;
-
-            .icone {
-                cursor: pointer;
-                margin-left: 14px;
-                opacity: 0.0;
-                transition: all 0.5s;
-            }
-        }
-
-        &:hover {
-            .nomeTabela {
-
-                .icone {
-                    opacity: 1.0;
-                }
-            }
-        }
-    }
-
-    .contador {
-        color: #AAA;
-        padding: 0px 14px 14px;
-        text-align: right;
-        width: 100%;
     }
 `;
 
-function FornecedorPage({ status, fornecedores, error, current, size, page, pageInfo }) {
+function FornecedorPage({ status, fornecedores, error, current, page, pageInfo }) {
     const [constructorHasRun, setConstructorHasRun] = useState(false);
 
     function constructor() {
@@ -137,13 +89,23 @@ function FornecedorPage({ status, fornecedores, error, current, size, page, page
             store.dispatch(FornecedorAction.alterar(curr));
         }
     }
+
+    function getTermos() {
+        return {
+            termo: {
+                nome: document.getElementById('nomeBusca') === null ? '' : document.getElementById('nomeBusca').value,
+                cpfCnpj: document.getElementById('cpfCnpjBusca') === null ? '' : document.getElementById('cpfCnpjBusca').value,
+                tipoPessoa: document.getElementById('tipoPessoaBusca') === null ? '' : document.getElementById('tipoPessoaBusca').value
+            }
+        };
+    }
     
     function excluir() {
         store.dispatch(FornecedorAction.excluir(current));
     }
 
     function atualizar() {
-        store.dispatch(FornecedorAction.buscarTodos({ termo: document.getElementById('termoBusca') ? document.getElementById('termoBusca').value : '' }));
+        store.dispatch(FornecedorAction.buscarTodos(getTermos()));
     }
 
     function buscarPagina(pagina) {
@@ -167,47 +129,49 @@ function FornecedorPage({ status, fornecedores, error, current, size, page, page
             </div>
             
             <div className="commandButtons">
-                <ButtonStyled onClick={atualizar}>Buscar</ButtonStyled>
-                <TextField placeholder="Buscar pelo nome ou CPF/CNPJ" fieldID="termoBusca" />
-                <ButtonStyled className="primary" onClick={mostrarFormularioCadastrar}>Cadastrar</ButtonStyled>
+                <TextField label="Nome" placeholder="Todos os nomes" fieldID="nomeBusca" />
+                <TextField label="CPF/CNPJ" placeholder="Todos os CPF/CNPJ" fieldID="cpfCnpjBusca" />
+                <SelectField label="Tipo Pessoa" placeholder="Tipo de Pessoa" list={[ {text: 'Física', value: 'F'}, {text: 'Juridica', value: 'J'} ]} nativeSelect={true} nullableOptionValue="" nullableOptionText="Fisica e Jurídica" fieldID="tipoPessoaBusca" />
+                <div className="commands">
+                    <div>
+                        <ButtonStyled onClick={atualizar}>Buscar</ButtonStyled>
+                        <ButtonStyled className="primary" onClick={mostrarFormularioCadastrar}>Cadastrar</ButtonStyled>
+                    </div>
+                </div>
             </div>
 
-            <div className="containerTabela">
-                <LightTableStyled>
-                    <thead>
-                        <tr>
-                            <th width="80%">Nome do Fornecedor</th>
-                            <th width="20%">Tipo Pessoa</th>
-                            <th width="20%" className="alignRight">CPF/CNPJ</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {fornecedores.map((fornecedor, index) => {
-                            return (
-                                <tr key={index}>
-                                    <td className="nomeTabela">{fornecedor.nome} <div className="icone"><FontAwesomeIcon onClick={() => mostrarFormularioAlterar(fornecedor)} title="Alterar" icon={faPen} /></div></td>
-                                    <td>{fornecedor.tipoPessoa === 'F' ? 'Física' : 'Juridica'}</td>
-                                    <td className="alignRight">{fornecedor.cpfCnpj}</td>
-                                    <td className="buttonCell">
-                                        <ButtonStyled className="alert" onClick={() => mostrarFormularioExcluir(fornecedor)} title="Excluir"><FontAwesomeIcon icon={faTrash} /></ButtonStyled>
-                                    </td>
-                                </tr>);
-                        })}
-                    </tbody>
-                    <tfoot>
-                        <tr>
-                            <th colSpan="3">
-                                <ButtonStyled disabled={page <= 0} onClick={() => buscarPagina(page)}>{'<'}</ButtonStyled>
-                                {pageInfo.map((value, index) => {
-                                    return ( <ButtonStyled className={value.page === (page + 1) ? 'primary' : ''} key={index} onClick={() => buscarPagina(value.page)}>{value.page}</ButtonStyled> )
-                                })}
-                                <ButtonStyled disabled={((page + 1) === pageInfo.length) || pageInfo.length === 0} onClick={() => buscarPagina(page + 2)}>{'>'}</ButtonStyled>
-                            </th>
-                        </tr>
-                    </tfoot>
-                </LightTableStyled>
-            </div>
+            <LightTableStyled>
+                <thead>
+                    <tr>
+                        <th width="60%">Nome do Fornecedor</th>
+                        <th width="20%">Tipo Pessoa</th>
+                        <th width="20%">CPF/CNPJ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {fornecedores.map((fornecedor, index) => {
+                        return (
+                            <tr key={index}>
+                                <td width="60%">
+                                    <ButtonStyled onClick={() => mostrarFormularioAlterar(fornecedor)} className="link">{fornecedor.nome}</ButtonStyled>
+                                </td>
+                                <td width="20%">{fornecedor.tipoPessoa === 'F' ? 'Física' : 'Juridica'}</td>
+                                <td width="20%">{fornecedor.cpfCnpj}</td>
+                            </tr>);
+                    })}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th colSpan="3">
+                            <ButtonStyled disabled={page <= 0} onClick={() => buscarPagina(page)}>{'<'}</ButtonStyled>
+                            {pageInfo.map((value, index) => {
+                                return ( <ButtonStyled className={value.page === (page + 1) ? 'primary' : ''} key={index} onClick={() => buscarPagina(value.page)}>{value.page}</ButtonStyled> )
+                            })}
+                            <ButtonStyled disabled={((page + 1) === pageInfo.length) || pageInfo.length === 0} onClick={() => buscarPagina(page + 2)}>{'>'}</ButtonStyled>
+                        </th>
+                    </tr>
+                </tfoot>
+            </LightTableStyled>
 
             {status === FornecedorActionTypes.STATUS_CADASTRAR || status === FornecedorActionTypes.STATUS_ALTERAR ? <>
                 <JanelaStyled>
@@ -224,6 +188,7 @@ function FornecedorPage({ status, fornecedores, error, current, size, page, page
                             <div className="space"></div>
                             <div className="commands">
                                 <ButtonStyled className="primary" onClick={salvar}>Salvar</ButtonStyled>
+                                {current.id !== null ? <ButtonStyled className="alert" onClick={() => mostrarFormularioExcluir(current)}>Excluir</ButtonStyled> : <></> }
                                 <ButtonStyled onClick={fecharJanela}>Fechar</ButtonStyled>
                             </div>
                         </div>
@@ -246,7 +211,6 @@ const FornecedorPageConnected = connect((state) => {
         fornecedores: state.fornecedor.list,
         error: state.fornecedor.error,
         current: state.fornecedor.currentFornecedor,
-        size: state.fornecedor.size,
         page: state.fornecedor.page,
         pageInfo: state.fornecedor.pageInfo
     }
