@@ -8,6 +8,7 @@ const Style = styled.div`
     label {
         font-weight: bold;
         margin-bottom: 4px;
+        color: #999;
 
         .notNullable {
             color: #CCC;
@@ -116,7 +117,7 @@ const SelectField = ( {
     }
 
     return (
-        <Style className={(error && error !== '' ? 'withError ' + fieldID : fieldID)}>
+        <Style className={'campo ' + (error && error !== '' ? 'withError ' + fieldID : fieldID)}>
             {label === '' ? <></> : <label htmlFor={fieldID}>{label} {nullable === false ? <span className="notNullable">(Obrigatório)</span> : <></>}</label>}
             { nativeSelect === false ?
             <>

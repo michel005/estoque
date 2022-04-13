@@ -71,9 +71,10 @@ const ButtonStyled = styled.button`
         }
 
         &:disabled {
+            background-color: transparent;
 
             &:hover {
-                background-color: #39f;
+                background-color: transparent;
             }
         }
     }
@@ -89,9 +90,10 @@ const ButtonStyled = styled.button`
         }
 
         &:disabled {
+            background-color: transparent;
 
             &:hover {
-                background-color: #39f;
+                background-color: transparent;
             }
         }
     }
@@ -108,6 +110,36 @@ const ButtonStyled = styled.button`
 
             &:hover {
                 background-color: #ff7575;
+            }
+        }
+    }
+
+    &.menuPrincipal {
+        border: none;
+        background-color: transparent;
+        border-radius: 200px;
+        color: #fff6;
+        border: 2px dashed #fff2;
+        transition: all 0.5s;
+        padding: 0px;
+        padding-top: 3px;
+        width: 36px;
+
+        &:hover {
+            color: #fffa;
+            border: 2px dashed #fff6;
+        }
+
+        &.inverso {
+            color: #fff9;
+            border: none;
+            background-color: #fff3;
+            padding-top: 2px;
+            font-size: 16px;
+
+            &:hover {
+                color: #fff;
+                background-color: #fff6;
             }
         }
     }

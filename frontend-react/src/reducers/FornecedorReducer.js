@@ -40,40 +40,56 @@ export default function FornecedorReducer(state, action) {
                 ...state.fornecedor,
                 status: FornecedorActionTypes.STATUS_OCIOSO,
                 error: null,
-                currentFornecedor: null
+                currentFornecedor: null,
+                selecionados: []
             }
         });
     } else
     if (action.type === FornecedorActionTypes.CADASTRAR) {
         API.post('/fornecedor/cadastrar', action.payload).then(() => {
-            store.dispatch(FornecedorAction.buscarTodos({termo: state.fornecedor.termo}));
+            store.dispatch(FornecedorAction.buscarTodos(state.fornecedor.termo));
         }).catch((error) => {
             store.dispatch(FornecedorAction.mostrarErro(error.response.data));
         });
     } else
+    if (action.type === FornecedorActionTypes.SELECIONADOS) {
+        var list = state.fornecedor.list;
+        list = list.map((value, index) => {
+            if (value.id === action.payload.fornecedor.id) {
+                value.selecionado = action.payload.selecionado;
+            }
+            return value;
+        });
+        return Object.assign({}, state, {
+            fornecedor: {
+                ...state.fornecedor,
+                list: list
+            }
+        });
+    } else
     if (action.type === FornecedorActionTypes.ALTERAR) {
         API.post('/fornecedor/alterar?id=' + action.payload.id, action.payload).then(() => {
-            store.dispatch(FornecedorAction.buscarTodos({termo: state.fornecedor.termo}));
+            store.dispatch(FornecedorAction.buscarTodos(state.fornecedor.termo));
         }).catch((error) => {
             store.dispatch(FornecedorAction.mostrarErro(error.response.data));
         });
     } else
     if (action.type === FornecedorActionTypes.EXCLUIR) {
         API.post('/fornecedor/excluir?id=' + action.payload.id).then(() => {
-            store.dispatch(FornecedorAction.buscarTodos({termo: state.fornecedor.termo}));
+            store.dispatch(FornecedorAction.buscarTodos(state.fornecedor.termo));
         }).catch((error) => {
             store.dispatch(FornecedorAction.mostrarErro(error.response.data));
         });
     } else
     if (action.type === FornecedorActionTypes.BUSCAR_TODOS) {
-        API.post('/fornecedor/buscaPaginadaPorTermos?pagina=0&tamanho=' + state.fornecedor.size, action.payload.termo).then((response) => {
+        API.post('/fornecedor/buscaPaginadaPorTermos?pagina=0&tamanho=' + state.fornecedor.size, action.payload).then((response) => {
             var x = 1;
             var pages = [];
             while (x <= response.data.totalPages) {
                 pages.push({ page: x })
                 x++;
             }
-            store.dispatch(FornecedorAction.preencherConsulta({ result: response.data.content, pageInfo: pages, page: 0, termo: action.payload.termo }));
+            store.dispatch(FornecedorAction.preencherConsulta({ result: response.data.content, pageInfo: pages, page: 0, termo: action.payload }));
         });
     } else
     if (action.type === FornecedorActionTypes.BUSCAR_PAGINA) {
@@ -82,6 +98,12 @@ export default function FornecedorReducer(state, action) {
         });
     } else
     if (action.type === FornecedorActionTypes.PREENCHER_CONSULTA) {
+        action.payload.result = action.payload.result.map((value) => {
+            if (value.selecionado === undefined) {
+                value.selecionado = false;
+            }
+            return value;
+        });
         return Object.assign({}, state, {
             fornecedor: {
                 ...state.fornecedor,

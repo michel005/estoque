@@ -54,6 +54,10 @@ class FornecedorAction {
         return { type: FornecedorActionTypes.RESETAR_ERRO, payload };
     };
 
+    static selecionados = (payload) => {
+        return { type: FornecedorActionTypes.SELECIONADOS, payload };
+    };
+
 }
 
 export default FornecedorAction;

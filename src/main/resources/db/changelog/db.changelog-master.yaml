@@ -134,3 +134,50 @@ databaseChangeLog:
             referencedTableName: es_fornecedor
             referencedTableSchemaName: estoque
             validate: true
+  - changeSet:
+      id: '5.0'
+      author: Michel Douglas Grigoli
+      changes:
+        - addColumn:
+            schemaName: estoque
+            tableName: es_fornecedor
+            columns:
+              - column:
+                  name: email
+                  type: varchar(50)
+            validate: true
+  - changeSet:
+      id: '6.0'
+      author: Michel Douglas Grigoli
+      changes:
+        - addColumn:
+            schemaName: estoque
+            tableName: es_fornecedor
+            columns:
+              - column:
+                  name: telefone
+                  type: varchar(20)
+              - column:
+                  name: cidade
+                  type: varchar(50)
+              - column:
+                  name: estado
+                  type: varchar(50)
+              - column:
+                  name: pais
+                  type: varchar(50)
+              - column:
+                  name: cep
+                  type: varchar(50)
+              - column:
+                  name: rua
+                  type: varchar(50)
+              - column:
+                  name: numero
+                  type: varchar(50)
+              - column:
+                  name: bairro
+                  type: varchar(50)
+              - column:
+                  name: complemento
+                  type: varchar(50)

@@ -6,7 +6,9 @@ const Style = styled.div`
     flex-direction: column;
 
     label {
+        font-weight: bold;
         margin-bottom: 4px;
+        color: #999;
     }
 
     input {
@@ -44,47 +46,28 @@ const Style = styled.div`
     }
 `;
 
-const StyleError = styled.span`
-    color: red;
-    font-size: 12px;
-    display: block;
-`;
-
 const CheckboxField = ( {
     error = '', 
     value = false, 
     fieldID = '', 
-    validation = () => { return ''; }, 
+    validation = () => { }, 
     label = ''
 }) => {
     const [errorMSG, setErrorMSG] = useState(error);
-    const [internalValue, setInternalValue] = useState(value);
 
     const validate = () => {
         if (validation !== undefined) {
-            var rootComponent = document.getElementsByClassName(fieldID)[0];
-            var erro = (validation === undefined ? '' : validation());
-            rootComponent.classList.remove('withError');
-            if (erro !== '') {
-                rootComponent.classList.add('withError');
-                setErrorMSG(erro);
-            } else {
-                setErrorMSG('');
-                setInternalValue(!internalValue);
-            }
-        } else {
-            setErrorMSG('');
-            setInternalValue(!internalValue);
+            validation(!value, fieldID);
         }
+        value = (!value);
     };
 
     return (
-        <Style className={(errorMSG === '' ? fieldID : 'withError ' + fieldID)}>
+        <Style className={'campo checkbox ' + (errorMSG === '' ? fieldID : 'withError ' + fieldID)}>
             <div>
-                <input type='checkbox' id={fieldID} checked={internalValue} onChange={validate} />
+                <input type='checkbox' id={fieldID} checked={value} onChange={validate} />
                 <label htmlFor={fieldID}>{label}</label>
             </div>
-            <StyleError>{errorMSG}</StyleError>
         </Style>
     );
 };

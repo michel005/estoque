@@ -26,5 +26,35 @@ public class Fornecedor extends AbstractEntity {
 
     @Column(name = "nome", length = 50, nullable = false)
     private String nome;
+
+    @Column(name = "email", length = 50)
+    private String email;
+
+    @Column(name = "telefone", length = 50)
+    private String telefone;
+
+    @Column(name = "cidade", length = 50)
+    private String cidade;
+
+    @Column(name = "estado", length = 50)
+    private String estado;
+
+    @Column(name = "pais", length = 50)
+    private String pais;
+
+    @Column(name = "cep", length = 50)
+    private String cep;
+
+    @Column(name = "rua", length = 50)
+    private String rua;
+
+    @Column(name = "numero", length = 50)
+    private String numero;
+
+    @Column(name = "bairro", length = 50)
+    private String bairro;
+
+    @Column(name = "complemento", length = 50)
+    private String complemento;
     
 }

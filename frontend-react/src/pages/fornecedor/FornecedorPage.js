@@ -1,57 +1,257 @@
 import { connect } from "react-redux";
-import TextField from "../../components/forms/TextField";
-import SelectField from "../../components/forms/SelectField";
 import store from "../../store";
-import ButtonStyled from './../../components/ButtonStyled';
 import styled from "styled-components";
-import Message from "../../components/Message";
-import JanelaStyled from "../../components/JanelaStyled";
-import ChoiceMessage from "../../components/ChoiceMessage";
+import FornecedorActionTypes from '../../constants/FornecedorActionTypes';
 import { useState } from "react";
 import FornecedorAction from "../../actions/FornecedorAction";
-import FornecedorActionTypes from "../../constants/FornecedorActionTypes";
+import TextField from "../../components/forms/TextField";
+import SelectField from "../../components/forms/SelectField";
+import ButtonStyled from "../../components/ButtonStyled";
+import ChoiceMessage from "../../components/ChoiceMessage";
+import Message from "../../components/Message";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faAddressBook } from "@fortawesome/free-solid-svg-icons";
-import LightTableStyled from "../../components/LightTableStyled";
+import { faArrowLeft, faArrowRight, faAudioDescription, faCarSide, faCommentDots, faEllipsisH, faEllipsisV, faFile, faFlag, faIdBadge, faIdCard, faLocationArrow, faMailBulk, faMap, faMapSigns, faPhone, faSortNumericDown, faStreetView, faSuitcaseRolling, faTransgender, faUser } from "@fortawesome/free-solid-svg-icons";
+import ButtonOptions from "../../components/forms/ButtonOptions";
 
 const FornecedorPageStyled = styled.div`
     width: 100%;
 
-    .commandButtons {
+    .filtros {
         display: flex;
-        flex-direction: row;
-        margin: 14px 0px;
+        flex-direction: column;
+        margin-bottom: 14px;
 
-        .nomeBusca, .tipoPessoaBusca, .cpfCnpjBusca {
-            margin-right: 14px;
-        }
-
-        .nomeBusca {
-            width: 350px;
-        }
-
-        .commands {
+        .linha {
             display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
+            flex-direction: row;
+
+            & > * {
+                margin-right: 14px;
+                width: 100%;
+            }
+
+            &.noFullWidth {
+                & > * {
+                    width: auto;
+                }
+            }
+
+            .filtroNome {
+                width: 60%;
+            }
+
+            .filtroCpfCnpj {
+                width: 250px;
+            }
+
+            .comandos {
+                display: flex;
+                flex-direction: column;
+                justify-content: flex-end;
+                margin-right: 0px;
+                width: auto;
+
+                div {
+                    display: flex;
+                    flex-direction: row;
+
+                    button {
+                        margin-right: 7px;
+
+                        &:last-child {
+                            margin-right: 0px;
+                        }
+                    }
+                }
+            }
         }
 
-        button {
-            margin-right: 14px;
+        & > * {
+            margin-bottom: 7px;
         }
     }
 
-    table {
-        height: calc(100% - 140px);
+    .lista {
+        margin-bottom: 14px;
 
-        tbody {
-            height: calc(100% - 64px);
+        .fornecedor {
+            background-color: #fff;
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 7px;
+            transition: all 0.25s;
+            overflow: hidden;
+
+            &:hover, &.nohover {
+                box-shadow: #3333 0px 0px 7px;
+
+                .nome button {
+                    color: #000;
+                }
+            }
+
+            .linha {
+                padding: 14px 21px;
+                display: flex;
+                flex-direction: row;
+                justify-content: flex-start;
+            }
+
+            .separador {
+                display: flex;
+                flex-direction: row;
+                margin-top: 14px;
+                margin-bottom: 21px;
+
+                &:first-child {
+                    margin-top: 7px;
+                }
+
+                .titulo {
+                    color: #aaa;
+                    font-weight: bold;
+                    font-size: 20px;
+                    white-space: nowrap;
+                }
+
+                .barra {
+                    background-color: #ddd;
+                    flex-grow: 1;
+                    height: 2px;
+                    width: 100%;
+                    margin-top: 15px;
+                    margin-left: 14px;
+                }
+            }
+
+            .nome button {
+                color: #999;
+                cursor: pointer;
+                transition: all 0.25s;
+            }
+
+            .email {
+                color: #ccc;
+                display: flex;
+                flex-direction: row;
+                justify-content: flex-end;
+                margin-left: 7px;
+                margin-bottom: 2px;
+                flex-grow: 1;
+            }
+
+            .botaoDetalhes {
+                margin-left: 14px;
+
+                .opcoesNotificacao {
+                    background-color: #3339;
+                    border-radius: 4px;
+                    box-shadow: #3333 0px 0px 7px;
+                    display: flex;
+                    opacity: 0;
+                    flex-direction: column;
+                    position: fixed;
+                    width: 100px;
+                    transition: all 0.25s;
+                    transform: translate(-40%, -30%) scale(0);
+                    overflow: hidden;
+                    z-index: 1;
+
+                    button {
+                        background-color: transparent;
+                        color: #fff;
+                        border-radius: 0px;
+
+                        &:hover {
+                            color: #fff;
+                            background-color: #3339;
+                        }
+                    }
+                }
+
+                &:hover {
+                    .opcoesNotificacao {
+                        transform: translate(-50px, 0px) scale(1);
+                        display: flex;
+                        z-index: 100;
+                        opacity: 1;
+                    }
+                }
+
+                button {
+                    color: #aaa;
+
+                    &:hover {
+                        color: #666;
+                    }
+                }
+            }
+
+            .detalhes {
+                border: 1px solid #ccc;
+                border-width: 1px 0px 0px 0px;
+                background-color: #f3f3f3;
+                padding: 14px 21px;
+                width: 100%;
+
+                .campo {
+                    margin-bottom: 14px;
+                }
+
+                .linha {
+                    padding: 0px;
+                    display: flex;
+                    flex-direction: row;
+                    
+                    .campo {
+                        width: 100%;
+                        margin-right: 14px;
+
+                        &:last-child {
+                            margin-right: 0px;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    .paginacao {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        width: 100%;
+
+        button {
+            margin-right: 7px;
+        }
+    }
+
+    @media print {
+        .filtros {
+            display: none;
+        }
+
+        .lista .fornecedor {
+            display: none;
+        }
+
+        .lista .fornecedor.nohover {
+            display: flex;
+        }
+
+        .paginacao {
+            display: none;
         }
     }
 `;
 
-function FornecedorPage({ status, fornecedores, error, current, page, pageInfo }) {
+function FornecedorPage({ fornecedor }) {
     const [constructorHasRun, setConstructorHasRun] = useState(false);
+    const [selecionado, setSelecionado] = useState(null);
+    const tipoPessoaType = [ {text: 'Física', value: 'F'}, {text: 'Jurídica', value: 'J'} ];
+    const tipoPessoaWithNullType = [ ...tipoPessoaType, {text: 'Ambas', value: ''} ];
 
     function constructor() {
         if (constructorHasRun) return;
@@ -59,160 +259,118 @@ function FornecedorPage({ status, fornecedores, error, current, page, pageInfo }
         atualizar();
         setConstructorHasRun(true);
     }
-
-    function mostrarFormularioCadastrar() {
-        store.dispatch(FornecedorAction.statusCadastrar());
-    }
-
-    function mostrarFormularioAlterar(fornecedor) {
-        store.dispatch(FornecedorAction.statusAlterar(fornecedor));
-    }
-
-    function mostrarFormularioExcluir(fornecedor) {
-        store.dispatch(FornecedorAction.statusExcluir(fornecedor));
-    }
-
-    function salvar() {
-        var curr = current;
-        curr.nome = document.getElementById('nomeFornecedor').value;
-        if (document.getElementById('tipoPessoa').value !== '') {
-            curr.tipoPessoa = document.getElementById('tipoPessoa').value;
-        } else {
-            curr.tipoPessoa = null;
-        }
-        curr.cpfCnpj = document.getElementById('cpfCnpjFornecedor').value;
-
-        if (status === FornecedorActionTypes.STATUS_CADASTRAR) {
-            store.dispatch(FornecedorAction.cadastrar(curr));
-        } else
-        if (status === FornecedorActionTypes.STATUS_ALTERAR) {
-            store.dispatch(FornecedorAction.alterar(curr));
-        }
-    }
-
-    function getTermos() {
-        return {
-            termo: {
-                nome: document.getElementById('nomeBusca') === null ? '' : document.getElementById('nomeBusca').value,
-                cpfCnpj: document.getElementById('cpfCnpjBusca') === null ? '' : document.getElementById('cpfCnpjBusca').value,
-                tipoPessoa: document.getElementById('tipoPessoaBusca') === null ? '' : document.getElementById('tipoPessoaBusca').value
-            }
-        };
-    }
     
-    function excluir() {
-        store.dispatch(FornecedorAction.excluir(current));
+    function atualizar() {
+        setSelecionado(null);
+        store.dispatch(FornecedorAction.buscarTodos({
+            nome: document.getElementById('filtroNome') ? document.getElementById('filtroNome').value : '',
+            tipoPessoa: document.getElementById('filtroTipoPessoa') ? document.getElementById('filtroTipoPessoa').value : '',
+            cpfCnpj: document.getElementById('filtroCpfCnpj') ? document.getElementById('filtroCpfCnpj').value : ''
+        }));
     }
 
-    function atualizar() {
-        store.dispatch(FornecedorAction.buscarTodos(getTermos()));
+    function selecionar(forn) {
+        setSelecionado(selecionado === null || selecionado.id !== forn.id ? forn : null);
     }
 
     function buscarPagina(pagina) {
-        store.dispatch(FornecedorAction.buscarPagina({ pagina: pagina - 1 }));
+        store.dispatch(FornecedorAction.buscarPagina({
+            pagina: pagina
+        }));
     }
 
-    function fecharJanela() {
-        store.dispatch(FornecedorAction.statusOcioso());
-    }
-
-    function fecharMensagemErro() {
-        store.dispatch(FornecedorAction.resetarErro());
+    function limpar() {
+        document.getElementById('filtroNome').value = '';
+        document.getElementById('filtroTipoPessoa').value = '';
+        document.getElementById('filtroCpfCnpj').value = '';
     }
 
     constructor();
 
     return (
         <FornecedorPageStyled>
-            <div className="cabecalho">
-                <h1><FontAwesomeIcon icon={faAddressBook} />Fornecedores</h1>
-            </div>
-            
-            <div className="commandButtons">
-                <TextField label="Nome" placeholder="Todos os nomes" fieldID="nomeBusca" />
-                <TextField label="CPF/CNPJ" placeholder="Todos os CPF/CNPJ" fieldID="cpfCnpjBusca" />
-                <SelectField label="Tipo Pessoa" placeholder="Tipo de Pessoa" list={[ {text: 'Física', value: 'F'}, {text: 'Juridica', value: 'J'} ]} nativeSelect={true} nullableOptionValue="" nullableOptionText="Fisica e Jurídica" fieldID="tipoPessoaBusca" />
-                <div className="commands">
-                    <div>
-                        <ButtonStyled onClick={atualizar}>Buscar</ButtonStyled>
-                        <ButtonStyled className="primary" onClick={mostrarFormularioCadastrar}>Cadastrar</ButtonStyled>
+            <div className="filtros">
+                <div className="linha noFullWidth">
+                    <TextField fieldID="filtroNome" label="Nome" placeholder="Ex: %da Silva%" />
+                    <TextField fieldID="filtroCpfCnpj" label="CPF/CNPJ" placeholder="Sem pontuação" />
+                    <ButtonOptions fieldID="filtroTipoPessoa" label="Tipo Pessoa" list={tipoPessoaWithNullType} />
+                    <div className="comandos">
+                        <div>
+                            <ButtonStyled onClick={atualizar} className="primary">Buscar</ButtonStyled>
+                            <ButtonStyled onClick={limpar}>Limpar</ButtonStyled>
+                        </div>
                     </div>
                 </div>
             </div>
-
-            <LightTableStyled>
-                <thead>
-                    <tr>
-                        <th width="60%">Nome do Fornecedor</th>
-                        <th width="20%">Tipo Pessoa</th>
-                        <th width="20%">CPF/CNPJ</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {fornecedores.map((fornecedor, index) => {
-                        return (
-                            <tr key={index}>
-                                <td width="60%">
-                                    <ButtonStyled onClick={() => mostrarFormularioAlterar(fornecedor)} className="link">{fornecedor.nome}</ButtonStyled>
-                                </td>
-                                <td width="20%">{fornecedor.tipoPessoa === 'F' ? 'Física' : 'Juridica'}</td>
-                                <td width="20%">{fornecedor.cpfCnpj}</td>
-                            </tr>);
-                    })}
-                </tbody>
-                <tfoot>
-                    <tr>
-                        <th colSpan="3">
-                            <ButtonStyled disabled={page <= 0} onClick={() => buscarPagina(page)}>{'<'}</ButtonStyled>
-                            {pageInfo.map((value, index) => {
-                                return ( <ButtonStyled className={value.page === (page + 1) ? 'primary' : ''} key={index} onClick={() => buscarPagina(value.page)}>{value.page}</ButtonStyled> )
-                            })}
-                            <ButtonStyled disabled={((page + 1) === pageInfo.length) || pageInfo.length === 0} onClick={() => buscarPagina(page + 2)}>{'>'}</ButtonStyled>
-                        </th>
-                    </tr>
-                </tfoot>
-            </LightTableStyled>
-
-            {status === FornecedorActionTypes.STATUS_CADASTRAR || status === FornecedorActionTypes.STATUS_ALTERAR ? <>
-                <JanelaStyled>
-                    <div className="content">
-                        <div className="title">Formulário de Fornecedor</div>
-                        <div className="innerContent">
-                            {status === FornecedorActionTypes.STATUS_ALTERAR ? <TextField label="ID do Fornecedor" fieldID="idFornecedor" defaultValue={current.id} disabled={current.id !== null} /> : <></> }
-                            {status === FornecedorActionTypes.STATUS_ALTERAR ? <div className="space"></div> : <></> }
-                            <TextField label="Nome do Fornecedor" fieldID="nomeFornecedor" defaultValue={current.nome} nullable={false} />
-                            <div className="space"></div>
-                            <SelectField label="Tipo Pessoa" fieldID="tipoPessoa" nullable={false} defaultValue={current.tipoPessoa} nativeSelect={true} list={[ { text: 'Física', value: 'F' }, { text: 'Juridica', value: 'J' } ]} />
-                            <div className="space"></div>
-                            <TextField label="CPF/CNPJ" fieldID="cpfCnpjFornecedor" defaultValue={current.cpfCnpj} nullable={false} />
-                            <div className="space"></div>
-                            <div className="commands">
-                                <ButtonStyled className="primary" onClick={salvar}>Salvar</ButtonStyled>
-                                {current.id !== null ? <ButtonStyled className="alert" onClick={() => mostrarFormularioExcluir(current)}>Excluir</ButtonStyled> : <></> }
-                                <ButtonStyled onClick={fecharJanela}>Fechar</ButtonStyled>
+            <div className="lista">
+                {fornecedor.list.map((value, index) => {
+                    return (
+                        <div className={'fornecedor ' + (selecionado !== null && selecionado.id === value.id ? 'nohover' : '')} key={index}>
+                            <div className="linha">
+                                <div className="nome" onClick={() => selecionar(value)}>
+                                    <ButtonStyled className="link">{value.nome}</ButtonStyled>
+                                </div>
+                                <div className="email">{value.email === '' ? 'Sem e-mail' : value.email}</div>
+                                <div className="botaoDetalhes">
+                                    <ButtonStyled title="Detalhes" className="link"><FontAwesomeIcon icon={faEllipsisV} /></ButtonStyled>
+                                    <div className="opcoesNotificacao">
+                                        <ButtonStyled>Imprimir</ButtonStyled>
+                                        <ButtonStyled>Alterar</ButtonStyled>
+                                        <ButtonStyled>Excluir</ButtonStyled>
+                                    </div>
+                                </div>
                             </div>
+                            {selecionado !== null && selecionado.id === value.id ?
+                            <div className="detalhes">
+                                <div className="separador">
+                                    <div className="titulo">Dados pessoais</div>
+                                    <div className="barra"></div>
+                                </div>
+                                <div className="linha">
+                                    <TextField readonlyIcon={<FontAwesomeIcon icon={faUser} />} readonly={true} label="Nome" defaultValue={value.nome} />
+                                    <TextField readonlyIcon={<FontAwesomeIcon icon={faIdBadge} />} readonly={true} label="Tipo Pessoa" defaultValue={value.tipoPessoa} convertValueToText={tipoPessoaType} />
+                                    <TextField readonlyIcon={<FontAwesomeIcon icon={faIdCard} />} readonly={true} label="CPF/CNPJ" defaultValue={value.cpfCnpj} />
+                                    <TextField readonlyIcon={<FontAwesomeIcon icon={faPhone} />} readonly={true} label="Telefone" defaultValue={value.telefone === null ? 'Sem telefone' : value.telefone} />
+                                </div>
+                                <div className="linha">
+                                    <TextField readonlyIcon={<FontAwesomeIcon icon={faMailBulk} />} readonly={true} label="E-mail" defaultValue={value.email === '' ? 'Sem e-mail' : value.email} />
+                                    <div className="campo"></div>
+                                </div>
+                                <div className="separador">
+                                    <div className="titulo">Endereço</div>
+                                    <div className="barra"></div>
+                                </div>
+                                <div className="linha">
+                                    <TextField readonlyIcon={<FontAwesomeIcon icon={faLocationArrow} />} readonly={true} label="Cidade" defaultValue={value.cidade === null ? 'Sem cidade' : value.cidade} />
+                                    <TextField readonlyIcon={<FontAwesomeIcon icon={faSuitcaseRolling} />} readonly={true} label="Estado" defaultValue={value.estado === null ? 'Sem estado' : value.estado} />
+                                    <TextField readonlyIcon={<FontAwesomeIcon icon={faFlag} />} readonly={true} label="País" defaultValue={value.pais === null ? 'Sem país' : value.pais} />
+                                    <TextField readonlyIcon={<FontAwesomeIcon icon={faMapSigns} />} readonly={true} label="CEP" defaultValue={value.cep === null ? 'Sem CEP' : value.cep} />
+                                </div>
+                                <div className="linha">
+                                    <TextField readonlyIcon={<FontAwesomeIcon icon={faStreetView} />} readonly={true} label="Rua" defaultValue={value.rua === null ? 'Sem rua' : value.rua} />
+                                    <TextField readonlyIcon={<FontAwesomeIcon icon={faSortNumericDown} />} readonly={true} label="Número" defaultValue={value.numero === null ? 'Sem número' : value.numero} />
+                                    <TextField readonlyIcon={<FontAwesomeIcon icon={faMap} />} readonly={true} label="Bairro" defaultValue={value.bairro === null ? 'Sem bairro' : value.bairro} />
+                                    <TextField readonlyIcon={<FontAwesomeIcon icon={faFile} />} readonly={true} label="Complemento" defaultValue={value.complemento === null ? 'Sem complemento' : value.complemento} />
+                                </div>
+                            </div>:<></>}
                         </div>
-                    </div>
-                </JanelaStyled>
-            </> : <></>}
-
-            {status === FornecedorActionTypes.STATUS_EXCLUIR ? <>
-                <ChoiceMessage title="Exclusão de fornecedor" text={'Deseja realmente excluir o fornecedor "' + current.nome + '"?'} choices={[ { name: 'Sim', command: excluir }, { name: 'Não, cancelar!', command: fecharJanela } ]} />
-            </> : <></>}
-
-            {error !== null ? <Message title="Erro no Fornecedor" text={error.toString()} closeEvent={fecharMensagemErro} /> : <></>}
+                    );
+                })}
+            </div>
+            <div className="paginacao">
+                <ButtonStyled className="transparent" disabled={fornecedor.page <= 0} onClick={() => buscarPagina(fornecedor.page - 1)}><FontAwesomeIcon icon={faArrowLeft} /></ButtonStyled>
+                {fornecedor.pageInfo.map((value, index) => {
+                    return ( <ButtonStyled className={value.page === (fornecedor.page + 1) ? 'primary' : ''} key={index} onClick={() => buscarPagina(value.page - 1)}>{value.page}</ButtonStyled> )
+                })}
+                <ButtonStyled className="transparent" disabled={((fornecedor.page + 1) === fornecedor.pageInfo.length) || fornecedor.pageInfo.length === 0} onClick={() => buscarPagina(fornecedor.page + 1)}><FontAwesomeIcon icon={faArrowRight} /></ButtonStyled>
+            </div>
         </FornecedorPageStyled>
     );
 };
 
 const FornecedorPageConnected = connect((state) => { 
     return {
-        status: state.fornecedor.status,
-        fornecedores: state.fornecedor.list,
-        error: state.fornecedor.error,
-        current: state.fornecedor.currentFornecedor,
-        page: state.fornecedor.page,
-        pageInfo: state.fornecedor.pageInfo
+        fornecedor: state.fornecedor
     }
  })(FornecedorPage);
 

@@ -15,6 +15,7 @@ class FornecedorActionTypes {
     static PREENCHER_CONSULTA = { module: this.MODULE, step: 'PREENCHER_CONSULTA' };
     static MOSTRAR_ERRO = { module: this.MODULE, step: 'MOSTRAR_ERRO' };
     static RESETAR_ERRO = { module: this.MODULE, step: 'RESETAR_ERRO' };
+    static SELECIONADOS = { module: this.MODULE, step: 'SELECIONADOS' };
 }
 
 export default FornecedorActionTypes;

@@ -6,7 +6,10 @@ import FornecedorReducer from "./FornecedorReducer";
 import ItemReducer from "./ItemReducer";
 
 const initialState = {
-    appName: 'Estoque',
+    appName: 'App4Store',
+    inicio: {
+
+    },
     fornecedor: {
         status: FornecedorActionTypes.STATUS_OCIOSO,
         currentFornecedor: null,
