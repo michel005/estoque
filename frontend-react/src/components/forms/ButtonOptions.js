@@ -53,11 +53,12 @@ export default function ButtonOptions ({
     label = null,
     list = [],
     fieldID = '',
+    defaultValue = null
 }) {
-    const [selecionado, setSelecionado] = useState('');
+    const [selecionado, setSelecionado] = useState(defaultValue);
 
     return (
-        <Style>
+        <Style className="campo">
             {label === null ? <></> : <label>{label}</label>}
             <div className="opcoes">
                 {Object.keys(list).map((val, index) => {

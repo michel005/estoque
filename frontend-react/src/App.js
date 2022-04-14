@@ -1,15 +1,18 @@
-import { faAddressBook, faArrowDown, faArrowUp, faBell, faBellSlash, faBox, faDoorClosed, faExpand, faHome, faPlus, faSearch, faSitemap } from "@fortawesome/free-solid-svg-icons";
+import { faBell, faBox, faPlus, faSearch } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
 import {
     Route,
     Routes,
-    NavLink
+    NavLink,
+    useNavigate
 } from "react-router-dom";
 import styled from 'styled-components';
+import FornecedorAction from "./actions/FornecedorAction";
 import ButtonStyled from "./components/ButtonStyled";
 import TextField from "./components/forms/TextField";
 import EntradaPageConnected from "./pages/entrada/EntradaPage";
+import FornecedorFormularioConnect from "./pages/fornecedor/FornecedorFormularioPage";
 import FornecedorPageConnected from "./pages/fornecedor/FornecedorPage";
 import InicioPageConnected from "./pages/inicio/InicioPage";
 import ItemPageConnected from "./pages/item/ItemPage";
@@ -312,6 +315,13 @@ export default function App() {
 
     const [fixarCadastrar, setFixarCadastrar] = useState(false);
     const [fixarNotificacoes, setFixarNotificacoes] = useState(false);
+    const navigate = useNavigate();
+
+    function cadastrarFornecedor() {
+        store.dispatch(FornecedorAction.statusCadastrar());
+        navigate('/fornecedores/form');
+        setFixarCadastrar(false);
+    }
 
     return (
         <AppStyled>
@@ -324,19 +334,19 @@ export default function App() {
                         </div>
                         <div className="menuUsuario">
                             <div className={'menuCadastrar ' + (fixarCadastrar === true ? 'fixar' : '')}>
-                                <ButtonStyled className="menuPrincipal" onClick={() => { setFixarCadastrar(!fixarCadastrar); setFixarNotificacoes(false); console.log(fixarCadastrar); }}>
+                                <ButtonStyled className="menuPrincipal" onClick={() => { setFixarCadastrar(!fixarCadastrar); setFixarNotificacoes(false); }}>
                                     <FontAwesomeIcon icon={faPlus} />
                                 </ButtonStyled>
                                 <div className="opcoesCadastrar">
                                     <div className="titulo">Cadastrar</div>
-                                    <ButtonStyled className="link">Fornecedor</ButtonStyled>
+                                    <ButtonStyled className="link" onClick={cadastrarFornecedor}>Fornecedor</ButtonStyled>
                                     <ButtonStyled className="link">Item</ButtonStyled>
                                     <ButtonStyled className="link">Entrada</ButtonStyled>
                                     <ButtonStyled className="link">Saída</ButtonStyled>
                                 </div>
                             </div>
                             <div className={'menuNotificacao ' + (fixarNotificacoes === true ? 'fixar' : '')}>
-                                <ButtonStyled className="menuPrincipal inverso" onClick={() => { setFixarNotificacoes(!fixarNotificacoes); setFixarCadastrar(false); console.log(fixarNotificacoes); }}>
+                                <ButtonStyled className="menuPrincipal inverso" onClick={() => { setFixarNotificacoes(!fixarNotificacoes); setFixarCadastrar(false); }}>
                                     <FontAwesomeIcon icon={faBell} />
                                 </ButtonStyled>
                                 <div className="opcoesNotificacao">
@@ -383,6 +393,7 @@ export default function App() {
                     <Routes>
                         <Route exact path='/' element={<InicioPageConnected />} />
                         <Route path='/fornecedores' element={<FornecedorPageConnected />} />
+                        <Route path='/fornecedores/form' element={<FornecedorFormularioConnect />} />
                         <Route path='/itens' element={<ItemPageConnected />} />
                         <Route path='/entradas' element={<EntradaPageConnected />} />
                         <Route path='/saidas' element={<h1>Saídas</h1>} />

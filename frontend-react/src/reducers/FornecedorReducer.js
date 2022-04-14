@@ -4,13 +4,14 @@ import FornecedorActionTypes from "../constants/FornecedorActionTypes";
 import store from "../store";
 
 export default function FornecedorReducer(state, action) {
+
     if (action.type === FornecedorActionTypes.STATUS_CADASTRAR) {
         return Object.assign({}, state, {
             fornecedor: {
                 ...state.fornecedor,
                 status: FornecedorActionTypes.STATUS_CADASTRAR,
                 error: null,
-                currentFornecedor: { id: null, nome: 'Novo Fornecedor' }
+                currentFornecedor: { id: null, nome: 'Novo Fornecedor', tipoPessoa: 'F' }
             }
         });
     } else
@@ -46,8 +47,8 @@ export default function FornecedorReducer(state, action) {
         });
     } else
     if (action.type === FornecedorActionTypes.CADASTRAR) {
-        API.post('/fornecedor/cadastrar', action.payload).then(() => {
-            store.dispatch(FornecedorAction.buscarTodos(state.fornecedor.termo));
+        API.post('/fornecedor/cadastrar', action.payload).then((response) => {
+            store.dispatch(FornecedorAction.statusAlterar(response.data));
         }).catch((error) => {
             store.dispatch(FornecedorAction.mostrarErro(error.response.data));
         });

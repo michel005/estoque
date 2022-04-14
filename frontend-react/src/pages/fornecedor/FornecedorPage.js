@@ -1,17 +1,15 @@
 import { connect } from "react-redux";
 import store from "../../store";
 import styled from "styled-components";
-import FornecedorActionTypes from '../../constants/FornecedorActionTypes';
 import { useState } from "react";
 import FornecedorAction from "../../actions/FornecedorAction";
 import TextField from "../../components/forms/TextField";
-import SelectField from "../../components/forms/SelectField";
 import ButtonStyled from "../../components/ButtonStyled";
-import ChoiceMessage from "../../components/ChoiceMessage";
-import Message from "../../components/Message";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowLeft, faArrowRight, faAudioDescription, faCarSide, faCommentDots, faEllipsisH, faEllipsisV, faFile, faFlag, faIdBadge, faIdCard, faLocationArrow, faMailBulk, faMap, faMapSigns, faPhone, faSortNumericDown, faStreetView, faSuitcaseRolling, faTransgender, faUser } from "@fortawesome/free-solid-svg-icons";
+import { faArrowLeft, faArrowRight, faEllipsisV, faFile, faFlag, faIdBadge, faIdCard, faLocationArrow, faMailBulk, faMap, faMapSigns, faPhone, faSortNumericDown, faStreetView, faSuitcaseRolling, faUser } from "@fortawesome/free-solid-svg-icons";
 import ButtonOptions from "../../components/forms/ButtonOptions";
+import FornecedorActionTypes from "../../constants/FornecedorActionTypes";
+import FornecedorFormularioConnect from "./FornecedorFormularioPage";
 
 const FornecedorPageStyled = styled.div`
     width: 100%;
@@ -229,7 +227,7 @@ const FornecedorPageStyled = styled.div`
     }
 
     @media print {
-        .filtros {
+        .filtros, .botaoDetalhes {
             display: none;
         }
 
@@ -285,87 +283,101 @@ function FornecedorPage({ fornecedor }) {
         document.getElementById('filtroCpfCnpj').value = '';
     }
 
+    function mostrarFormularioAlterar(forn) {
+        store.dispatch(FornecedorAction.statusAlterar(forn));
+    }
+
+    function mostrarFormularioExclusao(forn) {
+        store.dispatch(FornecedorAction.statusExcluir(forn));
+    }
+
     constructor();
 
-    return (
-        <FornecedorPageStyled>
-            <div className="filtros">
-                <div className="linha noFullWidth">
-                    <TextField fieldID="filtroNome" label="Nome" placeholder="Ex: %da Silva%" />
-                    <TextField fieldID="filtroCpfCnpj" label="CPF/CNPJ" placeholder="Sem pontuação" />
-                    <ButtonOptions fieldID="filtroTipoPessoa" label="Tipo Pessoa" list={tipoPessoaWithNullType} />
-                    <div className="comandos">
-                        <div>
-                            <ButtonStyled onClick={atualizar} className="primary">Buscar</ButtonStyled>
-                            <ButtonStyled onClick={limpar}>Limpar</ButtonStyled>
+    return ( 
+        <>
+        {
+            (fornecedor.status === FornecedorActionTypes.STATUS_CADASTRAR || fornecedor.status === FornecedorActionTypes.STATUS_ALTERAR || fornecedor.status === FornecedorActionTypes.STATUS_EXCLUIR) ?
+            <FornecedorFormularioConnect fornecedor={fornecedor.currentFornecedor} status={fornecedor.status} error={fornecedor.error} /> :
+            <FornecedorPageStyled>
+                <div className="filtros">
+                    <div className="linha noFullWidth">
+                        <TextField fieldID="filtroNome" label="Nome" placeholder="Ex: %da Silva%" />
+                        <TextField fieldID="filtroCpfCnpj" label="CPF/CNPJ" placeholder="Sem pontuação" />
+                        <ButtonOptions fieldID="filtroTipoPessoa" label="Tipo Pessoa" list={tipoPessoaWithNullType} defaultValue="" />
+                        <div className="comandos">
+                            <div>
+                                <ButtonStyled onClick={atualizar} className="primary">Buscar</ButtonStyled>
+                                <ButtonStyled onClick={limpar}>Limpar</ButtonStyled>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div className="lista">
-                {fornecedor.list.map((value, index) => {
-                    return (
-                        <div className={'fornecedor ' + (selecionado !== null && selecionado.id === value.id ? 'nohover' : '')} key={index}>
-                            <div className="linha">
-                                <div className="nome" onClick={() => selecionar(value)}>
-                                    <ButtonStyled className="link">{value.nome}</ButtonStyled>
-                                </div>
-                                <div className="email">{value.email === '' ? 'Sem e-mail' : value.email}</div>
-                                <div className="botaoDetalhes">
-                                    <ButtonStyled title="Detalhes" className="link"><FontAwesomeIcon icon={faEllipsisV} /></ButtonStyled>
-                                    <div className="opcoesNotificacao">
-                                        <ButtonStyled>Imprimir</ButtonStyled>
-                                        <ButtonStyled>Alterar</ButtonStyled>
-                                        <ButtonStyled>Excluir</ButtonStyled>
+                <div className="lista">
+                    {fornecedor.list.map((value, index) => {
+                        return (
+                            <div className={'fornecedor ' + (selecionado !== null && selecionado.id === value.id ? 'nohover' : '')} key={index}>
+                                <div className="linha">
+                                    <div className="nome" onClick={() => selecionar(value)}>
+                                        <ButtonStyled className="link">{value.nome}</ButtonStyled>
+                                    </div>
+                                    <div className="email">{value.email === '' ? 'Sem e-mail' : value.email}</div>
+                                    <div className="botaoDetalhes">
+                                        <ButtonStyled title="Detalhes" className="link"><FontAwesomeIcon icon={faEllipsisV} /></ButtonStyled>
+                                        <div className="opcoesNotificacao">
+                                            <ButtonStyled onClick={() => { window.print() }}>Imprimir</ButtonStyled>
+                                            <ButtonStyled onClick={() => mostrarFormularioAlterar(value)}>Alterar</ButtonStyled>
+                                            <ButtonStyled onClick={() => mostrarFormularioExclusao(value)}>Excluir</ButtonStyled>
+                                        </div>
                                     </div>
                                 </div>
+                                {selecionado !== null && selecionado.id === value.id ?
+                                <div className="detalhes">
+                                    <div className="separador">
+                                        <div className="titulo">Dados pessoais</div>
+                                        <div className="barra"></div>
+                                    </div>
+                                    <div className="linha">
+                                        <TextField readonlyIcon={<FontAwesomeIcon icon={faUser} />} readonly={true} label="Nome" defaultValue={value.nome} />
+                                        <TextField readonlyIcon={<FontAwesomeIcon icon={faIdBadge} />} readonly={true} label="Tipo Pessoa" defaultValue={value.tipoPessoa} convertValueToText={tipoPessoaType} />
+                                        <TextField readonlyIcon={<FontAwesomeIcon icon={faIdCard} />} readonly={true} label="CPF/CNPJ" defaultValue={value.cpfCnpj} />
+                                        <TextField readonlyIcon={<FontAwesomeIcon icon={faPhone} />} readonly={true} label="Telefone" defaultValue={value.telefone === null ? 'Sem telefone' : value.telefone} />
+                                    </div>
+                                    <div className="linha">
+                                        <TextField readonlyIcon={<FontAwesomeIcon icon={faMailBulk} />} readonly={true} label="E-mail" defaultValue={value.email === '' ? 'Sem e-mail' : value.email} />
+                                        <div className="campo"></div>
+                                    </div>
+                                    <div className="separador">
+                                        <div className="titulo">Endereço</div>
+                                        <div className="barra"></div>
+                                    </div>
+                                    <div className="linha">
+                                        <TextField readonlyIcon={<FontAwesomeIcon icon={faLocationArrow} />} readonly={true} label="Cidade" defaultValue={value.cidade === null ? 'Sem cidade' : value.cidade} />
+                                        <TextField readonlyIcon={<FontAwesomeIcon icon={faSuitcaseRolling} />} readonly={true} label="Estado" defaultValue={value.estado === null ? 'Sem estado' : value.estado} />
+                                        <TextField readonlyIcon={<FontAwesomeIcon icon={faFlag} />} readonly={true} label="País" defaultValue={value.pais === null ? 'Sem país' : value.pais} />
+                                        <TextField readonlyIcon={<FontAwesomeIcon icon={faMapSigns} />} readonly={true} label="CEP" defaultValue={value.cep === null ? 'Sem CEP' : value.cep} />
+                                    </div>
+                                    <div className="linha">
+                                        <TextField readonlyIcon={<FontAwesomeIcon icon={faStreetView} />} readonly={true} label="Rua" defaultValue={value.rua === null ? 'Sem rua' : value.rua} />
+                                        <TextField readonlyIcon={<FontAwesomeIcon icon={faSortNumericDown} />} readonly={true} label="Número" defaultValue={value.numero === null ? 'Sem número' : value.numero} />
+                                        <TextField readonlyIcon={<FontAwesomeIcon icon={faMap} />} readonly={true} label="Bairro" defaultValue={value.bairro === null ? 'Sem bairro' : value.bairro} />
+                                        <TextField readonlyIcon={<FontAwesomeIcon icon={faFile} />} readonly={true} label="Complemento" defaultValue={value.complemento === null ? 'Sem complemento' : value.complemento} />
+                                    </div>
+                                </div>:<></>}
                             </div>
-                            {selecionado !== null && selecionado.id === value.id ?
-                            <div className="detalhes">
-                                <div className="separador">
-                                    <div className="titulo">Dados pessoais</div>
-                                    <div className="barra"></div>
-                                </div>
-                                <div className="linha">
-                                    <TextField readonlyIcon={<FontAwesomeIcon icon={faUser} />} readonly={true} label="Nome" defaultValue={value.nome} />
-                                    <TextField readonlyIcon={<FontAwesomeIcon icon={faIdBadge} />} readonly={true} label="Tipo Pessoa" defaultValue={value.tipoPessoa} convertValueToText={tipoPessoaType} />
-                                    <TextField readonlyIcon={<FontAwesomeIcon icon={faIdCard} />} readonly={true} label="CPF/CNPJ" defaultValue={value.cpfCnpj} />
-                                    <TextField readonlyIcon={<FontAwesomeIcon icon={faPhone} />} readonly={true} label="Telefone" defaultValue={value.telefone === null ? 'Sem telefone' : value.telefone} />
-                                </div>
-                                <div className="linha">
-                                    <TextField readonlyIcon={<FontAwesomeIcon icon={faMailBulk} />} readonly={true} label="E-mail" defaultValue={value.email === '' ? 'Sem e-mail' : value.email} />
-                                    <div className="campo"></div>
-                                </div>
-                                <div className="separador">
-                                    <div className="titulo">Endereço</div>
-                                    <div className="barra"></div>
-                                </div>
-                                <div className="linha">
-                                    <TextField readonlyIcon={<FontAwesomeIcon icon={faLocationArrow} />} readonly={true} label="Cidade" defaultValue={value.cidade === null ? 'Sem cidade' : value.cidade} />
-                                    <TextField readonlyIcon={<FontAwesomeIcon icon={faSuitcaseRolling} />} readonly={true} label="Estado" defaultValue={value.estado === null ? 'Sem estado' : value.estado} />
-                                    <TextField readonlyIcon={<FontAwesomeIcon icon={faFlag} />} readonly={true} label="País" defaultValue={value.pais === null ? 'Sem país' : value.pais} />
-                                    <TextField readonlyIcon={<FontAwesomeIcon icon={faMapSigns} />} readonly={true} label="CEP" defaultValue={value.cep === null ? 'Sem CEP' : value.cep} />
-                                </div>
-                                <div className="linha">
-                                    <TextField readonlyIcon={<FontAwesomeIcon icon={faStreetView} />} readonly={true} label="Rua" defaultValue={value.rua === null ? 'Sem rua' : value.rua} />
-                                    <TextField readonlyIcon={<FontAwesomeIcon icon={faSortNumericDown} />} readonly={true} label="Número" defaultValue={value.numero === null ? 'Sem número' : value.numero} />
-                                    <TextField readonlyIcon={<FontAwesomeIcon icon={faMap} />} readonly={true} label="Bairro" defaultValue={value.bairro === null ? 'Sem bairro' : value.bairro} />
-                                    <TextField readonlyIcon={<FontAwesomeIcon icon={faFile} />} readonly={true} label="Complemento" defaultValue={value.complemento === null ? 'Sem complemento' : value.complemento} />
-                                </div>
-                            </div>:<></>}
-                        </div>
-                    );
-                })}
-            </div>
-            <div className="paginacao">
-                <ButtonStyled className="transparent" disabled={fornecedor.page <= 0} onClick={() => buscarPagina(fornecedor.page - 1)}><FontAwesomeIcon icon={faArrowLeft} /></ButtonStyled>
-                {fornecedor.pageInfo.map((value, index) => {
-                    return ( <ButtonStyled className={value.page === (fornecedor.page + 1) ? 'primary' : ''} key={index} onClick={() => buscarPagina(value.page - 1)}>{value.page}</ButtonStyled> )
-                })}
-                <ButtonStyled className="transparent" disabled={((fornecedor.page + 1) === fornecedor.pageInfo.length) || fornecedor.pageInfo.length === 0} onClick={() => buscarPagina(fornecedor.page + 1)}><FontAwesomeIcon icon={faArrowRight} /></ButtonStyled>
-            </div>
-        </FornecedorPageStyled>
-    );
+                        );
+                    })}
+                </div>
+                <div className="paginacao">
+                    <ButtonStyled className="transparent" disabled={fornecedor.page <= 0} onClick={() => buscarPagina(fornecedor.page - 1)}><FontAwesomeIcon icon={faArrowLeft} /></ButtonStyled>
+                    {fornecedor.pageInfo.map((value, index) => {
+                        return ( <ButtonStyled className={value.page === (fornecedor.page + 1) ? 'primary' : ''} key={index} onClick={() => buscarPagina(value.page - 1)}>{value.page}</ButtonStyled> )
+                    })}
+                    <ButtonStyled className="transparent" disabled={((fornecedor.page + 1) === fornecedor.pageInfo.length) || fornecedor.pageInfo.length === 0} onClick={() => buscarPagina(fornecedor.page + 1)}><FontAwesomeIcon icon={faArrowRight} /></ButtonStyled>
+                </div>
+            </FornecedorPageStyled>
+        }
+        </>
+        );
 };
 
 const FornecedorPageConnected = connect((state) => { 
