@@ -12,7 +12,6 @@ import FornecedorAction from "./actions/FornecedorAction";
 import ButtonStyled from "./components/ButtonStyled";
 import TextField from "./components/forms/TextField";
 import EntradaPageConnected from "./pages/entrada/EntradaPage";
-import FornecedorFormularioConnect from "./pages/fornecedor/FornecedorFormularioPage";
 import FornecedorPageConnected from "./pages/fornecedor/FornecedorPage";
 import InicioPageConnected from "./pages/inicio/InicioPage";
 import ItemPageConnected from "./pages/item/ItemPage";
@@ -318,9 +317,8 @@ export default function App() {
     const navigate = useNavigate();
 
     function cadastrarFornecedor() {
-        store.dispatch(FornecedorAction.statusCadastrar());
-        navigate('/fornecedores/form');
         setFixarCadastrar(false);
+        store.dispatch(FornecedorAction.statusCadastrar());
     }
 
     return (
@@ -393,7 +391,6 @@ export default function App() {
                     <Routes>
                         <Route exact path='/' element={<InicioPageConnected />} />
                         <Route path='/fornecedores' element={<FornecedorPageConnected />} />
-                        <Route path='/fornecedores/form' element={<FornecedorFormularioConnect />} />
                         <Route path='/itens' element={<ItemPageConnected />} />
                         <Route path='/entradas' element={<EntradaPageConnected />} />
                         <Route path='/saidas' element={<h1>Saídas</h1>} />

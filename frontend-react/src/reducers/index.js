@@ -16,12 +16,14 @@ const initialState = {
         list: [],
         pageInfo: [],
         page: 0,
-        size: 10,
+        size: 5,
         error: null,
         termo: {
             nome: '',
             cpfCnpj: '',
-            tipoPessoa: ''
+            tipoPessoa: '',
+            orderBy: 'nome',
+            orderByDirection: 'asc'
         }
     },
     item: {

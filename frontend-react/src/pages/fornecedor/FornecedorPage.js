@@ -6,7 +6,7 @@ import FornecedorAction from "../../actions/FornecedorAction";
 import TextField from "../../components/forms/TextField";
 import ButtonStyled from "../../components/ButtonStyled";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowLeft, faArrowRight, faEllipsisV, faFile, faFlag, faIdBadge, faIdCard, faLocationArrow, faMailBulk, faMap, faMapSigns, faPhone, faSortNumericDown, faStreetView, faSuitcaseRolling, faUser } from "@fortawesome/free-solid-svg-icons";
+import { faEllipsisV, faFile, faFlag, faIdBadge, faArrowDown, faEraser, faIdCard, faLocationArrow, faSearch, faMailBulk, faMap, faMapSigns, faPhone, faSortNumericDown, faStreetView, faSuitcaseRolling, faUser, faChevronDown, faFastForward, faForward, faFastBackward, faBackward, faPrint, faPencilAlt, faTrash } from "@fortawesome/free-solid-svg-icons";
 import ButtonOptions from "../../components/forms/ButtonOptions";
 import FornecedorActionTypes from "../../constants/FornecedorActionTypes";
 import FornecedorFormularioConnect from "./FornecedorFormularioPage";
@@ -17,29 +17,17 @@ const FornecedorPageStyled = styled.div`
     .filtros {
         display: flex;
         flex-direction: column;
-        margin-bottom: 14px;
+        margin-bottom: 21px;
 
         .linha {
             display: flex;
             flex-direction: row;
 
-            & > * {
-                margin-right: 14px;
-                width: 100%;
-            }
-
             &.noFullWidth {
-                & > * {
-                    width: auto;
+                .campo {
+                    margin-right: 14px;
+                    width: 100%;
                 }
-            }
-
-            .filtroNome {
-                width: 60%;
-            }
-
-            .filtroCpfCnpj {
-                width: 250px;
             }
 
             .comandos {
@@ -49,165 +37,294 @@ const FornecedorPageStyled = styled.div`
                 margin-right: 0px;
                 width: auto;
 
-                div {
+                .botoes {
                     display: flex;
                     flex-direction: row;
 
                     button {
-                        margin-right: 7px;
+                        min-width: 40px;
+                        border-radius: 0px;
+
+                        &:first-child {
+                            border-top-left-radius: 4px;
+                            border-bottom-left-radius: 4px;
+                        }
 
                         &:last-child {
-                            margin-right: 0px;
+                            border-top-right-radius: 4px;
+                            border-bottom-right-radius: 4px;
                         }
                     }
                 }
             }
-        }
-
-        & > * {
-            margin-bottom: 7px;
         }
     }
 
     .lista {
-        margin-bottom: 14px;
-
         .fornecedor {
             background-color: #fff;
-            border-radius: 4px;
             display: flex;
             flex-direction: column;
-            margin-bottom: 7px;
+            width: 100%;
             transition: all 0.25s;
-            overflow: hidden;
+            border: 2px solid #fff;
 
-            &:hover, &.nohover {
-                box-shadow: #3333 0px 0px 7px;
+            &:hover {
+                border: 2px solid #39f;
+            }
 
-                .nome button {
-                    color: #000;
-                }
+            &.nohover {
+                background-color: transparent;
+                border: 2px solid transparent;
+            }
+
+            &.nohover:hover {
+                background-color: transparent;
+                border: 2px solid transparent;
             }
 
             .linha {
-                padding: 14px 21px;
                 display: flex;
                 flex-direction: row;
-                justify-content: flex-start;
-            }
-
-            .separador {
-                display: flex;
-                flex-direction: row;
-                margin-top: 14px;
-                margin-bottom: 21px;
-
-                &:first-child {
-                    margin-top: 7px;
-                }
-
-                .titulo {
-                    color: #aaa;
-                    font-weight: bold;
-                    font-size: 20px;
-                    white-space: nowrap;
-                }
-
-                .barra {
-                    background-color: #ddd;
-                    flex-grow: 1;
-                    height: 2px;
-                    width: 100%;
-                    margin-top: 15px;
-                    margin-left: 14px;
-                }
-            }
-
-            .nome button {
-                color: #999;
-                cursor: pointer;
+                flex-flow: row;
+                width: 100%;
                 transition: all 0.25s;
-            }
 
-            .email {
-                color: #ccc;
-                display: flex;
-                flex-direction: row;
-                justify-content: flex-end;
-                margin-left: 7px;
-                margin-bottom: 2px;
-                flex-grow: 1;
-            }
+                &:hover {
+                    background-color: #f4f4f4;
+                }
 
-            .botaoDetalhes {
-                margin-left: 14px;
-
-                .opcoesNotificacao {
-                    background-color: #3339;
-                    border-radius: 4px;
-                    box-shadow: #3333 0px 0px 7px;
+                .coluna {
+                    color: #999;
                     display: flex;
-                    opacity: 0;
-                    flex-direction: column;
-                    position: fixed;
-                    width: 100px;
-                    transition: all 0.25s;
-                    transform: translate(-40%, -30%) scale(0);
+                    flex-direction: row;
+                    text-align: left;
+                    padding: 14px;
+                    width: calc((100% - 80px) / 4);
                     overflow: hidden;
-                    z-index: 1;
+                    text-overflow: ellipsis;
+                    word-wrap: break-word;
+                    word-break: break-all;
 
-                    button {
-                        background-color: transparent;
-                        color: #fff;
-                        border-radius: 0px;
+                    &.nome {
+                        font-weight: bold;
+                        flex-grow: 1;
+                    }
 
-                        &:hover {
-                            color: #fff;
-                            background-color: #3339;
+                    &.tipoPessoa {
+                        width: 150px;
+                    }
+
+                    &.cpfCnpj {
+                        width: 200px;
+                    }
+
+                    &.email {
+                        width: 30%;
+                    }
+
+                    &.comandoslinha {
+                        width: 70px;
+
+                        .botaoDetalhes {
+                            margin-right: 21px;
+
+                            & > button {
+                                color: #999;
+                            }
+
+                            .opcoesNotificacao {
+                                background-color: #3339;
+                                backdrop-filter: blur(5px);
+                                border-radius: 4px;
+                                padding: 7px;
+                                display: flex;
+                                flex-direction: column;
+                                position: absolute;
+                                transform: scale(0);
+                                transition: all 0.25s;
+                                z-index: 100;
+
+                                button {
+                                    width: 100px;
+                                    background-color: transparent;
+
+                                    .text {
+                                        display: block;
+                                    }
+
+                                    svg {
+                                        display: none;
+                                    }
+
+                                    &:hover {
+                                        background-color: #3339;
+                                    }
+                                }
+                            }
+
+                            &.mostrar {
+                                .opcoesNotificacao {
+                                    transform: scale(1);
+                                }
+                            }
+                        }
+
+                        .botaoSelecionar {
+                            color: #999;
+                            transition: all 0.25s;
+
+                            &.selecionado {
+                                transform: rotate(180deg);
+                            }
                         }
                     }
                 }
 
-                &:hover {
-                    .opcoesNotificacao {
-                        transform: translate(-50px, 0px) scale(1);
-                        display: flex;
-                        z-index: 100;
-                        opacity: 1;
-                    }
-                }
+                &.cabecalho {
+                    background-color: transparent;
 
-                button {
-                    color: #aaa;
-
-                    &:hover {
+                    .coluna {
                         color: #666;
+                        cursor: pointer;
+                        font-weight: bold;
+                        transition: all 0.25s;
+
+                        .orderBy {
+                            margin-left: 4px;
+                            transition: all 0.25s;
+
+                            &.orderByDesc {
+                                transform: rotate(180deg);
+                            }
+                        }
                     }
                 }
             }
 
             .detalhes {
-                border: 1px solid #ccc;
-                border-width: 1px 0px 0px 0px;
-                background-color: #f3f3f3;
-                padding: 14px 21px;
-                width: 100%;
+                background-color: #f4f4f4;
+                padding: 0px 14px 14px;
 
-                .campo {
-                    margin-bottom: 14px;
-                }
-
-                .linha {
-                    padding: 0px;
+                .separador {
                     display: flex;
                     flex-direction: row;
-                    
-                    .campo {
-                        width: 100%;
-                        margin-right: 14px;
+                    margin-top: 14px;
+                    margin-bottom: 14px;
+                    width: 100%;
 
-                        &:last-child {
-                            margin-right: 0px;
+                    .tituloSeparador {
+                        color: #aaa;
+                        font-weight: bold;
+                        font-size: 20px;
+                        display: flex;
+                        margin-right: 14px;
+                        width: auto;
+                    }
+
+                    .barraSeparador {
+                        display: flex;
+                        background-color: #ddd;
+                        height: 2px;
+                        flex-grow: 1;
+                        transform: translateY(15px);
+                    }
+                }
+
+                .linhaDetalhe {
+                    display: flex;
+                    flex-direction: row;
+
+                    .campo {
+                        flex-grow: 1;
+                        margin-bottom: 14px;
+                        width: 25%;
+                    }
+                }
+            }
+
+            &.selecionado {
+                transform: scale(1.025);
+                z-index: 100;
+                border: 2px solid #39f;
+
+                .linha {
+                    background-color: #f4f4f4;
+
+                    .coluna {
+                        display: none;
+                    }
+
+                    .coluna.nome {
+                        color: #3339;
+                        display: flex;
+                        font-size: 30px;
+                        flex-grow: 1;
+                    }
+
+                    .comandoslinha {
+                        display: flex;
+                        width: auto;
+
+                        .botaoDetalhes {
+                            margin-right: 21px;
+                            display: flex;
+                            flex-direction: column;
+                            justify-content: center;
+
+                            & > button {
+                                display: none;
+                            }
+
+                            .opcoesNotificacao {
+                                background-color: transparent;
+                                backdrop-filter: unset;
+                                padding: 0px;
+                                display: flex;
+                                flex-direction: row;
+                                transform: none;
+                                position: static;
+                                transition: none;
+
+                                button {
+                                    width: 100px;
+                                    padding: 0px;
+                                    color: #3339;
+                                    font-size: 18px;
+                                    width: auto;
+                                    margin-right: 14px;
+                                    transition: none;
+                                    display: flex;
+                                    flex-direction: row;
+
+                                    .text {
+                                        display: none;
+                                    }
+
+                                    svg {
+                                        display: block;
+                                    }
+
+                                    &:hover {
+                                        background-color: transparent;
+                                        color: #39f;
+                                    }
+                                }
+                            }
+                        }
+
+                        .botaoSelecionar {
+                            color: #999;
+                            transition: all 0.25s;
+                            margin-right: 4px;
+
+                            &.selecionado {
+                                transform: rotate(180deg);
+                            }
+                        }
+
+                        .botaoSelecionar {
+                            height: 100%;
                         }
                     }
                 }
@@ -218,16 +335,26 @@ const FornecedorPageStyled = styled.div`
     .paginacao {
         display: flex;
         flex-direction: row;
-        justify-content: center;
+        justify-content: flex-end;
         width: 100%;
+        padding: 14px;
+        background-color: #fff;
 
         button {
             margin-right: 7px;
+
+            &:last-child {
+                margin-right: 0px;
+            }
+
+            &:disabled {
+                opacity: 0.2;
+            }
         }
     }
 
     @media print {
-        .filtros, .botaoDetalhes {
+        .filtros, .comandoslinha {
             display: none;
         }
 
@@ -235,8 +362,19 @@ const FornecedorPageStyled = styled.div`
             display: none;
         }
 
-        .lista .fornecedor.nohover {
+        .lista .fornecedor.selecionado {
+            box-shadow: none;
             display: flex;
+
+            .coluna {
+                display: none;
+            }
+
+            .coluna.nome {
+                display: flex;
+                font-weight: bold;
+                font-size: 36px;
+            }
         }
 
         .paginacao {
@@ -248,6 +386,8 @@ const FornecedorPageStyled = styled.div`
 function FornecedorPage({ fornecedor }) {
     const [constructorHasRun, setConstructorHasRun] = useState(false);
     const [selecionado, setSelecionado] = useState(null);
+    const [mostrarMenu, setMostrarMenu] = useState(null);
+    const [sortType, setSortType] = useState({field: 'nome', direction: 'asc'});
     const tipoPessoaType = [ {text: 'Física', value: 'F'}, {text: 'Jurídica', value: 'J'} ];
     const tipoPessoaWithNullType = [ ...tipoPessoaType, {text: 'Ambas', value: ''} ];
 
@@ -258,20 +398,30 @@ function FornecedorPage({ fornecedor }) {
         setConstructorHasRun(true);
     }
     
-    function atualizar() {
+    function atualizar(sortInfo = sortType) {
         setSelecionado(null);
+        setMostrarMenu(null);
         store.dispatch(FornecedorAction.buscarTodos({
             nome: document.getElementById('filtroNome') ? document.getElementById('filtroNome').value : '',
             tipoPessoa: document.getElementById('filtroTipoPessoa') ? document.getElementById('filtroTipoPessoa').value : '',
-            cpfCnpj: document.getElementById('filtroCpfCnpj') ? document.getElementById('filtroCpfCnpj').value : ''
+            cpfCnpj: document.getElementById('filtroCpfCnpj') ? document.getElementById('filtroCpfCnpj').value : '',
+            orderBy: sortInfo.field,
+            orderByDirection: sortInfo.direction
         }));
     }
 
     function selecionar(forn) {
         setSelecionado(selecionado === null || selecionado.id !== forn.id ? forn : null);
+        setMostrarMenu(null);
+    }
+
+    function eventoMostrarMenu(value) {
+        setMostrarMenu(mostrarMenu === null || mostrarMenu.id !== value.id ? value : null);
     }
 
     function buscarPagina(pagina) {
+        setSelecionado(null);
+        setMostrarMenu(null);
         store.dispatch(FornecedorAction.buscarPagina({
             pagina: pagina
         }));
@@ -284,11 +434,36 @@ function FornecedorPage({ fornecedor }) {
     }
 
     function mostrarFormularioAlterar(forn) {
+        eventoMostrarMenu(forn);
         store.dispatch(FornecedorAction.statusAlterar(forn));
     }
 
     function mostrarFormularioExclusao(forn) {
+        eventoMostrarMenu(forn);
         store.dispatch(FornecedorAction.statusExcluir(forn));
+    }
+
+    function imprimir(forn) {
+        eventoMostrarMenu(forn);
+        if (selecionado === null || selecionado.id !== forn.id) {
+            selecionar(forn); 
+        }
+        setTimeout(() => {
+            window.print();
+        }, 100)
+    }
+
+    function order(field) {
+        if (sortType.field === field) {
+            return (<div className={'orderBy ' + (sortType.direction === 'desc' ? 'orderByDesc' : '')}><FontAwesomeIcon icon={faArrowDown} /></div>);
+        }
+        return <></>;
+    }
+
+    function mudarOrder(fd) {
+        var dir = ( sortType.field === fd ) ? ( sortType.direction === 'asc' ? 'desc' : 'asc' ) : 'asc';
+        setSortType({field: fd, direction: dir });
+        atualizar({field: fd, direction: dir });
     }
 
     constructor();
@@ -297,66 +472,80 @@ function FornecedorPage({ fornecedor }) {
         <>
         {
             (fornecedor.status === FornecedorActionTypes.STATUS_CADASTRAR || fornecedor.status === FornecedorActionTypes.STATUS_ALTERAR || fornecedor.status === FornecedorActionTypes.STATUS_EXCLUIR) ?
-            <FornecedorFormularioConnect fornecedor={fornecedor.currentFornecedor} status={fornecedor.status} error={fornecedor.error} /> :
+            <FornecedorFormularioConnect /> :
             <FornecedorPageStyled>
                 <div className="filtros">
                     <div className="linha noFullWidth">
-                        <TextField fieldID="filtroNome" label="Nome" placeholder="Ex: %da Silva%" />
+                        <TextField fieldID="filtroNome" label="Nome" />
                         <TextField fieldID="filtroCpfCnpj" label="CPF/CNPJ" placeholder="Sem pontuação" />
                         <ButtonOptions fieldID="filtroTipoPessoa" label="Tipo Pessoa" list={tipoPessoaWithNullType} defaultValue="" />
                         <div className="comandos">
-                            <div>
-                                <ButtonStyled onClick={atualizar} className="primary">Buscar</ButtonStyled>
-                                <ButtonStyled onClick={limpar}>Limpar</ButtonStyled>
+                            <div className="botoes">
+                                <ButtonStyled title="Buscar" className="primary" onClick={() => atualizar()}><FontAwesomeIcon icon={faSearch} /></ButtonStyled>
+                                <ButtonStyled title="Limpar filtros" onClick={() => limpar()}><FontAwesomeIcon icon={faEraser} /></ButtonStyled>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div className="lista">
+                    <div className="fornecedor nohover">
+                        <div className="linha cabecalho">
+                            <div className="coluna nome" onClick={() => mudarOrder('nome')}>Nome {order('nome')}</div>
+                            <div className="coluna tipoPessoa" onClick={() => mudarOrder('tipoPessoa')}>Tipo Pessoa {order('tipoPessoa')}</div>
+                            <div className="coluna cpfCnpj" onClick={() => mudarOrder('cpfCnpj')}>CPF/CNPJ {order('cpfCnpj')}</div>
+                            <div className="coluna email" onClick={() => mudarOrder('email')}>E-mail {order('email')}</div>
+                            <div className="coluna comandoslinha"></div>
+                        </div>
+                    </div>
                     {fornecedor.list.map((value, index) => {
                         return (
-                            <div className={'fornecedor ' + (selecionado !== null && selecionado.id === value.id ? 'nohover' : '')} key={index}>
+                            <div className={'fornecedor ' + (selecionado !== null && selecionado.id === value.id ? 'selecionado' : '')} key={index}>
                                 <div className="linha">
-                                    <div className="nome" onClick={() => selecionar(value)}>
-                                        <ButtonStyled className="link">{value.nome}</ButtonStyled>
-                                    </div>
-                                    <div className="email">{value.email === '' ? 'Sem e-mail' : value.email}</div>
-                                    <div className="botaoDetalhes">
-                                        <ButtonStyled title="Detalhes" className="link"><FontAwesomeIcon icon={faEllipsisV} /></ButtonStyled>
-                                        <div className="opcoesNotificacao">
-                                            <ButtonStyled onClick={() => { window.print() }}>Imprimir</ButtonStyled>
-                                            <ButtonStyled onClick={() => mostrarFormularioAlterar(value)}>Alterar</ButtonStyled>
-                                            <ButtonStyled onClick={() => mostrarFormularioExclusao(value)}>Excluir</ButtonStyled>
+                                    <div className="coluna nome">{value.nome}</div>
+                                    <div className="coluna tipoPessoa">{tipoPessoaType.filter((val) => val.value === value.tipoPessoa)[0].text}</div>
+                                    <div className="coluna cpfCnpj">{value.cpfCnpj}</div>
+                                    <div className="coluna email">{value.email=== null || value.email === '' ? 'Sem e-mail' : value.email}</div>
+                                    <div className="coluna comandoslinha">
+                                        <div className={'botaoDetalhes ' + (mostrarMenu !== null && mostrarMenu.id === value.id ? 'mostrar' : '')}>
+                                            <ButtonStyled title="Opções" className="link" onClick={() => eventoMostrarMenu(value)}><FontAwesomeIcon icon={faEllipsisV} /></ButtonStyled>
+                                            <div className="opcoesNotificacao">
+                                                <ButtonStyled title="Imprimir" onClick={() => imprimir(value)}><FontAwesomeIcon icon={faPrint} /> <div className="text">Imprimir</div></ButtonStyled>
+                                                <ButtonStyled title="Alterar" onClick={() => mostrarFormularioAlterar(value)}><FontAwesomeIcon icon={faPencilAlt} /> <div className="text">Alterar</div></ButtonStyled>
+                                                <ButtonStyled title="Excluir" onClick={() => mostrarFormularioExclusao(value)}><FontAwesomeIcon icon={faTrash} /> <div className="text">Excluir</div></ButtonStyled>
+                                            </div>
                                         </div>
+                                        <ButtonStyled title="Mostrar detalhes" className={'botaoSelecionar link ' + (selecionado !== null && selecionado.id === value.id ? 'selecionado' : '')} onClick={() => selecionar(value)}>
+                                            <FontAwesomeIcon icon={faChevronDown} />
+                                        </ButtonStyled>
                                     </div>
                                 </div>
                                 {selecionado !== null && selecionado.id === value.id ?
                                 <div className="detalhes">
                                     <div className="separador">
-                                        <div className="titulo">Dados pessoais</div>
-                                        <div className="barra"></div>
+                                        <div className="tituloSeparador">Dados pessoais</div>
+                                        <div className="barraSeparador"></div>
                                     </div>
-                                    <div className="linha">
+                                    <div className="linhaDetalhe">
                                         <TextField readonlyIcon={<FontAwesomeIcon icon={faUser} />} readonly={true} label="Nome" defaultValue={value.nome} />
                                         <TextField readonlyIcon={<FontAwesomeIcon icon={faIdBadge} />} readonly={true} label="Tipo Pessoa" defaultValue={value.tipoPessoa} convertValueToText={tipoPessoaType} />
                                         <TextField readonlyIcon={<FontAwesomeIcon icon={faIdCard} />} readonly={true} label="CPF/CNPJ" defaultValue={value.cpfCnpj} />
                                         <TextField readonlyIcon={<FontAwesomeIcon icon={faPhone} />} readonly={true} label="Telefone" defaultValue={value.telefone === null ? 'Sem telefone' : value.telefone} />
                                     </div>
-                                    <div className="linha">
-                                        <TextField readonlyIcon={<FontAwesomeIcon icon={faMailBulk} />} readonly={true} label="E-mail" defaultValue={value.email === '' ? 'Sem e-mail' : value.email} />
+                                    <div className="linhaDetalhe">
+                                        <TextField readonlyIcon={<FontAwesomeIcon icon={faMailBulk} />} readonly={true} label="E-mail" defaultValue={value.email === null ? 'Sem e-mail' : value.email} />
                                         <div className="campo"></div>
                                     </div>
                                     <div className="separador">
-                                        <div className="titulo">Endereço</div>
-                                        <div className="barra"></div>
+                                        <div className="tituloSeparador">Endereço</div>
+                                        <div className="barraSeparador"></div>
                                     </div>
-                                    <div className="linha">
+                                    <div className="linhaDetalhe">
                                         <TextField readonlyIcon={<FontAwesomeIcon icon={faLocationArrow} />} readonly={true} label="Cidade" defaultValue={value.cidade === null ? 'Sem cidade' : value.cidade} />
                                         <TextField readonlyIcon={<FontAwesomeIcon icon={faSuitcaseRolling} />} readonly={true} label="Estado" defaultValue={value.estado === null ? 'Sem estado' : value.estado} />
                                         <TextField readonlyIcon={<FontAwesomeIcon icon={faFlag} />} readonly={true} label="País" defaultValue={value.pais === null ? 'Sem país' : value.pais} />
                                         <TextField readonlyIcon={<FontAwesomeIcon icon={faMapSigns} />} readonly={true} label="CEP" defaultValue={value.cep === null ? 'Sem CEP' : value.cep} />
                                     </div>
-                                    <div className="linha">
+                                    <div className="linhaDetalhe">
                                         <TextField readonlyIcon={<FontAwesomeIcon icon={faStreetView} />} readonly={true} label="Rua" defaultValue={value.rua === null ? 'Sem rua' : value.rua} />
                                         <TextField readonlyIcon={<FontAwesomeIcon icon={faSortNumericDown} />} readonly={true} label="Número" defaultValue={value.numero === null ? 'Sem número' : value.numero} />
                                         <TextField readonlyIcon={<FontAwesomeIcon icon={faMap} />} readonly={true} label="Bairro" defaultValue={value.bairro === null ? 'Sem bairro' : value.bairro} />
@@ -368,11 +557,11 @@ function FornecedorPage({ fornecedor }) {
                     })}
                 </div>
                 <div className="paginacao">
-                    <ButtonStyled className="transparent" disabled={fornecedor.page <= 0} onClick={() => buscarPagina(fornecedor.page - 1)}><FontAwesomeIcon icon={faArrowLeft} /></ButtonStyled>
-                    {fornecedor.pageInfo.map((value, index) => {
-                        return ( <ButtonStyled className={value.page === (fornecedor.page + 1) ? 'primary' : ''} key={index} onClick={() => buscarPagina(value.page - 1)}>{value.page}</ButtonStyled> )
-                    })}
-                    <ButtonStyled className="transparent" disabled={((fornecedor.page + 1) === fornecedor.pageInfo.length) || fornecedor.pageInfo.length === 0} onClick={() => buscarPagina(fornecedor.page + 1)}><FontAwesomeIcon icon={faArrowRight} /></ButtonStyled>
+                    <ButtonStyled className="transparent" disabled={fornecedor.page <= 0} onClick={() => buscarPagina(0)}><FontAwesomeIcon icon={faFastBackward} /></ButtonStyled>
+                    <ButtonStyled className="transparent" disabled={fornecedor.page <= 0} onClick={() => buscarPagina(fornecedor.page - 1)}><FontAwesomeIcon icon={faBackward} /></ButtonStyled>
+                    {fornecedor.pageInfo.length === 0 ? <ButtonStyled className="nohover transparent">0</ButtonStyled> : <ButtonStyled className="nohover transparent">Página {fornecedor.page + 1} de { fornecedor.pageInfo.length }</ButtonStyled> }
+                    <ButtonStyled className="transparent" disabled={((fornecedor.page + 1) === fornecedor.pageInfo.length) || fornecedor.pageInfo.length === 0} onClick={() => buscarPagina(fornecedor.page + 1)}><FontAwesomeIcon icon={faForward} /></ButtonStyled>
+                    <ButtonStyled className="transparent" disabled={((fornecedor.page + 1) === fornecedor.pageInfo.length) || fornecedor.pageInfo.length === 0} onClick={() => buscarPagina(fornecedor.pageInfo.length - 1)}><FontAwesomeIcon icon={faFastForward} /></ButtonStyled>
                 </div>
             </FornecedorPageStyled>
         }

@@ -14,5 +14,7 @@ public class FiltroFornecedorModel {
     private String nome;
     private String cpfCnpj;
     private String tipoPessoa;
+    private String orderBy;
+    private String orderByDirection;
 
 }

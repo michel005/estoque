@@ -18,7 +18,7 @@ const StyledFormulario = styled.div`
 width: 100%;
 
 h1 {
-    color: #999;
+    color: #000;
     margin-bottom: 48px;
     width: 100%;
 }
@@ -55,7 +55,7 @@ a {
     }
 
     .titulo {
-        color: #aaa;
+        color: #666;
         font-weight: bold;
         font-size: 20px;
         white-space: nowrap;

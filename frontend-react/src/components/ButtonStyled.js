@@ -16,6 +16,11 @@ const ButtonStyled = styled.button`
         background-color: #333a;
     }
 
+    &:hover.nohover {
+        background-color: #333;
+        cursor: unset;
+    }
+
     &:disabled {
         opacity: 0.5;
 

@@ -48,24 +48,9 @@ export default function FornecedorReducer(state, action) {
     } else
     if (action.type === FornecedorActionTypes.CADASTRAR) {
         API.post('/fornecedor/cadastrar', action.payload).then((response) => {
-            store.dispatch(FornecedorAction.statusAlterar(response.data));
+            store.dispatch(FornecedorAction.buscarTodos(state.fornecedor.termo));
         }).catch((error) => {
             store.dispatch(FornecedorAction.mostrarErro(error.response.data));
-        });
-    } else
-    if (action.type === FornecedorActionTypes.SELECIONADOS) {
-        var list = state.fornecedor.list;
-        list = list.map((value, index) => {
-            if (value.id === action.payload.fornecedor.id) {
-                value.selecionado = action.payload.selecionado;
-            }
-            return value;
-        });
-        return Object.assign({}, state, {
-            fornecedor: {
-                ...state.fornecedor,
-                list: list
-            }
         });
     } else
     if (action.type === FornecedorActionTypes.ALTERAR) {
@@ -90,21 +75,15 @@ export default function FornecedorReducer(state, action) {
                 pages.push({ page: x })
                 x++;
             }
-            store.dispatch(FornecedorAction.preencherConsulta({ result: response.data.content, pageInfo: pages, page: 0, termo: action.payload }));
+            store.dispatch(FornecedorAction.preencherConsulta({ result: response.data.content, pageInfo: pages, page: 0, termo: action.payload, data: response.data}));
         });
     } else
     if (action.type === FornecedorActionTypes.BUSCAR_PAGINA) {
         API.post('/fornecedor/buscaPaginadaPorTermos?pagina=' + action.payload.pagina + '&tamanho=' + state.fornecedor.size, state.fornecedor.termo).then((response) => {
-            store.dispatch(FornecedorAction.preencherConsulta({ result: response.data.content, pageInfo: state.fornecedor.pageInfo, page: action.payload.pagina, termo: state.fornecedor.termo }));
+            store.dispatch(FornecedorAction.preencherConsulta({ result: response.data.content, pageInfo: state.fornecedor.pageInfo, page: action.payload.pagina, termo: state.fornecedor.termo, data: response.data }));
         });
     } else
     if (action.type === FornecedorActionTypes.PREENCHER_CONSULTA) {
-        action.payload.result = action.payload.result.map((value) => {
-            if (value.selecionado === undefined) {
-                value.selecionado = false;
-            }
-            return value;
-        });
         return Object.assign({}, state, {
             fornecedor: {
                 ...state.fornecedor,
@@ -112,7 +91,8 @@ export default function FornecedorReducer(state, action) {
                 list: action.payload.result,
                 page: action.payload.page,
                 pageInfo: action.payload.pageInfo,
-                termo: action.payload.termo
+                termo: action.payload.termo,
+                data: action.payload.data
             }
         });
     } else
