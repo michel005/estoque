@@ -10,6 +10,7 @@ import com.michel.estoque.validation.ItemValidation;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Order;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -35,7 +36,13 @@ public class ItemBusiness extends AbstractBusiness<Item, ItemRepository, ItemVal
     }
 
     public Page<QuantidadeItemModel> buscaTudoComQuantidade(int pagina, int tamanho, FiltroItemModel filtro) {
-        PageRequest pageRequest = PageRequest.of(pagina, tamanho, Sort.Direction.ASC, "item.nome");
+        PageRequest pageRequest = null;
+        if (filtro.getOrderBy() == null) {
+            pageRequest = PageRequest.of(pagina, tamanho);
+        } else {
+            Sort ordenacao = Sort.by((filtro.getOrderByDirection() != null && filtro.getOrderByDirection().equals("desc") ? Order.desc(filtro.getOrderBy()) : Order.asc(filtro.getOrderBy())));
+            pageRequest = PageRequest.of(pagina, tamanho, ordenacao);
+        }
         return repo.findAllComQuantidade(pageRequest, filtro.getNome(), filtro.getCategoria());
     }
 

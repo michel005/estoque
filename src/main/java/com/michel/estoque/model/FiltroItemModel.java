@@ -11,5 +11,7 @@ public class FiltroItemModel {
     
     private String nome;
     private String categoria;
+    private String orderBy;
+    private String orderByDirection;
 
 }

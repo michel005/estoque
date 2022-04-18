@@ -1,6 +1,7 @@
 import { faBell, faBox, faPlus, faSearch } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
+import { connect } from "react-redux";
 import {
     Route,
     Routes,
@@ -9,9 +10,12 @@ import {
 } from "react-router-dom";
 import styled from 'styled-components';
 import FornecedorAction from "./actions/FornecedorAction";
+import PaginaAction from "./actions/PaginaAction";
 import ButtonStyled from "./components/ButtonStyled";
 import TextField from "./components/forms/TextField";
+import SearchComponent from "./components/SearchComponent";
 import EntradaPageConnected from "./pages/entrada/EntradaPage";
+import FornecedorFormularioConnect from "./pages/fornecedor/FornecedorFormularioPage";
 import FornecedorPageConnected from "./pages/fornecedor/FornecedorPage";
 import InicioPageConnected from "./pages/inicio/InicioPage";
 import ItemPageConnected from "./pages/item/ItemPage";
@@ -41,11 +45,12 @@ const DefaultMenuStyled = styled.div`
             flex-direction: row;
             justify-content: flex-start;
             padding: 14px 0px;
-            transition: all 0.3s;
+            transition: all 0.25s;
             margin-bottom: -10px;
             width: 100%;
 
             a {
+                cursor: pointer;
                 display: flex;
                 flex-direction: row;
                 color: #fff;
@@ -54,28 +59,6 @@ const DefaultMenuStyled = styled.div`
                 font-size: 24px;
                 width: 260px;
                 max-width: 260px;
-            }
-
-            .busca {
-                display: flex;
-                flex-direction: row;
-                justify-content: center;
-                width: 100%;
-
-                button {
-                    padding-top: 8px;
-                    min-height: 100%;
-                }
-
-                #buscaGeral {
-                    padding: 21px 14px;
-                    width: 450px;
-                }
-
-                #buscaGeral:hover, #buscaGeral:focus {
-                    width: 600px;
-                }
-                
             }
 
             .menuUsuario {
@@ -260,13 +243,17 @@ const DefaultMenuStyled = styled.div`
             justify-content: center;
             width: 100%;
 
-            a {
+            a, button {
+                background-color: transparent;
                 border: 2px solid transparent;
+                border-radius: 0px;
                 border-width: 0px 0px 2px 0px;
                 color: #fff7;
+                cursor: pointer;
                 display: flex;
                 flex-direction: row;
                 font-size: 14px;
+                font-weight: normal;
                 justify-content: flex-start;
                 padding: 12px 19px;
                 text-decoration: none;
@@ -310,15 +297,28 @@ const AppStyled = styled.div`
     width: 100%;
 `;
 
-export default function App() {
+function App({ paginaAtual }) {
 
     const [fixarCadastrar, setFixarCadastrar] = useState(false);
     const [fixarNotificacoes, setFixarNotificacoes] = useState(false);
     const navigate = useNavigate();
 
     function cadastrarFornecedor() {
-        setFixarCadastrar(false);
         store.dispatch(FornecedorAction.statusCadastrar());
+        store.dispatch(PaginaAction.mudarPaginaAtual('novoFornecedor'));
+        navigate('/fornecedores');
+        setFixarCadastrar(false);
+    }
+
+    function navegar(link) {
+        store.dispatch(PaginaAction.mudarPaginaAtual('inicio'));
+        navigate(link);
+    }
+
+    function curentLink() {
+        var url = window.location.href;
+        url = url.replace(window.location.protocol, '').replace('/' + window.location.host + '/', '');
+        return url;
     }
 
     return (
@@ -326,10 +326,8 @@ export default function App() {
             <DefaultMenuStyled>
                 <div className="tamanhoTela">
                     <div className="appTitle noprint">
-                        <NavLink to="/">{store.getState().appName}</NavLink>
-                        <div className="busca">
-                            <TextField icon={<FontAwesomeIcon icon={faSearch} />} fieldID="buscaGeral" placeholder="Buscar" className="menuPrincipal" />
-                        </div>
+                        <a onClick={ () => navegar('/') }>{store.getState().appName}</a>
+                        <SearchComponent />
                         <div className="menuUsuario">
                             <div className={'menuCadastrar ' + (fixarCadastrar === true ? 'fixar' : '')}>
                                 <ButtonStyled className="menuPrincipal" onClick={() => { setFixarCadastrar(!fixarCadastrar); setFixarNotificacoes(false); }}>
@@ -376,30 +374,44 @@ export default function App() {
                         </div>
                     </div>
                     <div className="menuOptions">
-                        <NavLink to="/">Início</NavLink>
-                        <NavLink to="/fornecedores">Fornecedores</NavLink>
-                        <NavLink to="/itens">Itens</NavLink>
-                        <NavLink to="/entradas">Entradas</NavLink>
-                        <NavLink to="/saidas">Saídas</NavLink>
-                        <NavLink to="/inventario">Inventário</NavLink>
-                        <NavLink to="/faturamento">Faturamento</NavLink>
+                        <a type="button" className={curentLink() === '/' ? 'active' : ''} onClick={ () => navegar('/') }>Início</a>
+                        <a type="button" className={paginaAtual === 'novoFornecedor' || curentLink() === '/fornecedores' ? 'active' : ''} onClick={ () => navegar('/fornecedores') }>Fornecedores</a>
+                        <a type="button" className={curentLink() === '/itens' ? 'active' : ''} onClick={ () => navegar('/itens') }>Itens</a>
+                        <a type="button" className={curentLink() === '/entradas' ? 'active' : ''} onClick={ () => navegar('/entradas') }>Entradas</a>
+                        <a type="button" className={curentLink() === '/saidas' ? 'active' : ''} onClick={ () => navegar('/saidas') }>Saídas</a>
+                        <a type="button" className={curentLink() === '/inventario' ? 'active' : ''} onClick={ () => navegar('/inventario') }>Inventário</a>
+                        <a type="button" className={curentLink() === '/faturamento' ? 'active' : ''} onClick={ () => navegar('/faturamento') }>Faturamento</a>
                     </div>
                 </div>
             </DefaultMenuStyled>
             <Content>
                 <div className="tamanhoTela">
-                    <Routes>
-                        <Route exact path='/' element={<InicioPageConnected />} />
-                        <Route path='/fornecedores' element={<FornecedorPageConnected />} />
-                        <Route path='/itens' element={<ItemPageConnected />} />
-                        <Route path='/entradas' element={<EntradaPageConnected />} />
-                        <Route path='/saidas' element={<h1>Saídas</h1>} />
-                        <Route path='/inventario' element={<h1>Inventário</h1>} />
-                        <Route path='/faturamento' element={<h1>Faturamento</h1>} />
-                    </Routes>
+                    {
+                        paginaAtual === 'novoFornecedor'
+                        ? 
+                        <FornecedorFormularioConnect />
+                        :
+                        <Routes>
+                            <Route exact path='/' element={<InicioPageConnected />} />
+                            <Route path='/fornecedores' element={<FornecedorPageConnected />} />
+                            <Route path='/itens' element={<ItemPageConnected />} />
+                            <Route path='/entradas' element={<EntradaPageConnected />} />
+                            <Route path='/saidas' element={<h1>Saídas</h1>} />
+                            <Route path='/inventario' element={<h1>Inventário</h1>} />
+                            <Route path='/faturamento' element={<h1>Faturamento</h1>} />
+                        </Routes>
+                    }
                 </div>
             </Content>
         </AppStyled>
     );
 
 }
+
+const AppConnector = connect((state) => { 
+    return {
+        paginaAtual: state.pagina.atual
+    }
+ })(App);
+
+ export default AppConnector;

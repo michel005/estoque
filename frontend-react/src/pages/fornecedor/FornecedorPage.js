@@ -6,7 +6,7 @@ import FornecedorAction from "../../actions/FornecedorAction";
 import TextField from "../../components/forms/TextField";
 import ButtonStyled from "../../components/ButtonStyled";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEllipsisV, faFile, faFlag, faIdBadge, faArrowDown, faEraser, faIdCard, faLocationArrow, faSearch, faMailBulk, faMap, faMapSigns, faPhone, faSortNumericDown, faStreetView, faSuitcaseRolling, faUser, faChevronDown, faFastForward, faForward, faFastBackward, faBackward, faPrint, faPencilAlt, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faEllipsisV, faFile, faFlag, faIdBadge, faArrowDown, faEraser, faIdCard, faLocationArrow, faSearch, faMailBulk, faMap, faMapSigns, faPhone, faSortNumericDown, faStreetView, faSuitcaseRolling, faUser, faChevronDown, faFastForward, faForward, faFastBackward, faBackward, faPrint, faPencilAlt, faTrash, faHashtag } from "@fortawesome/free-solid-svg-icons";
 import ButtonOptions from "../../components/forms/ButtonOptions";
 import FornecedorActionTypes from "../../constants/FornecedorActionTypes";
 import FornecedorFormularioConnect from "./FornecedorFormularioPage";
@@ -68,17 +68,14 @@ const FornecedorPageStyled = styled.div`
             width: 100%;
             transition: all 0.25s;
             border: 2px solid #fff;
+            z-index: 10;
 
             &:hover {
                 border: 2px solid #39f;
+                background-color: #f4f4f4;
             }
 
-            &.nohover {
-                background-color: transparent;
-                border: 2px solid transparent;
-            }
-
-            &.nohover:hover {
+            &.nohover, &.nohover:hover {
                 background-color: transparent;
                 border: 2px solid transparent;
             }
@@ -89,10 +86,6 @@ const FornecedorPageStyled = styled.div`
                 flex-flow: row;
                 width: 100%;
                 transition: all 0.25s;
-
-                &:hover {
-                    background-color: #f4f4f4;
-                }
 
                 .coluna {
                     color: #999;
@@ -105,6 +98,10 @@ const FornecedorPageStyled = styled.div`
                     text-overflow: ellipsis;
                     word-wrap: break-word;
                     word-break: break-all;
+
+                    &.id {
+                        width: 80px;
+                    }
 
                     &.nome {
                         font-weight: bold;
@@ -124,50 +121,13 @@ const FornecedorPageStyled = styled.div`
                     }
 
                     &.comandoslinha {
+                        display: flex;
+                        flex-direction: row;
+                        justify-content: flex-end;
                         width: 70px;
 
-                        .botaoDetalhes {
-                            margin-right: 21px;
-
-                            & > button {
-                                color: #999;
-                            }
-
-                            .opcoesNotificacao {
-                                background-color: #3339;
-                                backdrop-filter: blur(5px);
-                                border-radius: 4px;
-                                padding: 7px;
-                                display: flex;
-                                flex-direction: column;
-                                position: absolute;
-                                transform: scale(0);
-                                transition: all 0.25s;
-                                z-index: 100;
-
-                                button {
-                                    width: 100px;
-                                    background-color: transparent;
-
-                                    .text {
-                                        display: block;
-                                    }
-
-                                    svg {
-                                        display: none;
-                                    }
-
-                                    &:hover {
-                                        background-color: #3339;
-                                    }
-                                }
-                            }
-
-                            &.mostrar {
-                                .opcoesNotificacao {
-                                    transform: scale(1);
-                                }
-                            }
+                        .opcoesNotificacao {
+                            display: none;
                         }
 
                         .botaoSelecionar {
@@ -244,8 +204,8 @@ const FornecedorPageStyled = styled.div`
             }
 
             &.selecionado {
-                transform: scale(1.025);
-                z-index: 100;
+                transform: scale(102.5%);
+                z-index: 25;
                 border: 2px solid #39f;
 
                 .linha {
@@ -265,50 +225,34 @@ const FornecedorPageStyled = styled.div`
                     .comandoslinha {
                         display: flex;
                         width: auto;
-
-                        .botaoDetalhes {
-                            margin-right: 21px;
+                        
+                        .opcoesNotificacao {
+                            background-color: transparent;
+                            backdrop-filter: unset;
+                            padding: 0px;
                             display: flex;
-                            flex-direction: column;
-                            justify-content: center;
+                            flex-direction: row;
+                            margin-right: 14px;
+                            transform: none;
+                            position: static;
+                            transition: none;
 
-                            & > button {
-                                display: none;
-                            }
-
-                            .opcoesNotificacao {
+                            button {
                                 background-color: transparent;
-                                backdrop-filter: unset;
+                                width: 100px;
                                 padding: 0px;
-                                display: flex;
-                                flex-direction: row;
-                                transform: none;
-                                position: static;
+                                color: #3339;
+                                font-size: 18px;
+                                width: auto;
+                                margin-right: 14px;
                                 transition: none;
+                                display: flex;
+                                flex-direction: column;
+                                justify-content: center;
 
-                                button {
-                                    width: 100px;
-                                    padding: 0px;
-                                    color: #3339;
-                                    font-size: 18px;
-                                    width: auto;
-                                    margin-right: 14px;
-                                    transition: none;
-                                    display: flex;
-                                    flex-direction: row;
-
-                                    .text {
-                                        display: none;
-                                    }
-
-                                    svg {
-                                        display: block;
-                                    }
-
-                                    &:hover {
-                                        background-color: transparent;
-                                        color: #39f;
-                                    }
+                                &:hover {
+                                    background-color: transparent;
+                                    color: #39f;
                                 }
                             }
                         }
@@ -490,6 +434,7 @@ function FornecedorPage({ fornecedor }) {
                 <div className="lista">
                     <div className="fornecedor nohover">
                         <div className="linha cabecalho">
+                            <div className="coluna id" onClick={() => mudarOrder('id')}># {order('id')}</div>
                             <div className="coluna nome" onClick={() => mudarOrder('nome')}>Nome {order('nome')}</div>
                             <div className="coluna tipoPessoa" onClick={() => mudarOrder('tipoPessoa')}>Tipo Pessoa {order('tipoPessoa')}</div>
                             <div className="coluna cpfCnpj" onClick={() => mudarOrder('cpfCnpj')}>CPF/CNPJ {order('cpfCnpj')}</div>
@@ -501,18 +446,16 @@ function FornecedorPage({ fornecedor }) {
                         return (
                             <div className={'fornecedor ' + (selecionado !== null && selecionado.id === value.id ? 'selecionado' : '')} key={index}>
                                 <div className="linha">
+                                    <div className="coluna id">{value.id}</div>
                                     <div className="coluna nome">{value.nome}</div>
                                     <div className="coluna tipoPessoa">{tipoPessoaType.filter((val) => val.value === value.tipoPessoa)[0].text}</div>
                                     <div className="coluna cpfCnpj">{value.cpfCnpj}</div>
                                     <div className="coluna email">{value.email=== null || value.email === '' ? 'Sem e-mail' : value.email}</div>
                                     <div className="coluna comandoslinha">
-                                        <div className={'botaoDetalhes ' + (mostrarMenu !== null && mostrarMenu.id === value.id ? 'mostrar' : '')}>
-                                            <ButtonStyled title="Opções" className="link" onClick={() => eventoMostrarMenu(value)}><FontAwesomeIcon icon={faEllipsisV} /></ButtonStyled>
-                                            <div className="opcoesNotificacao">
-                                                <ButtonStyled title="Imprimir" onClick={() => imprimir(value)}><FontAwesomeIcon icon={faPrint} /> <div className="text">Imprimir</div></ButtonStyled>
-                                                <ButtonStyled title="Alterar" onClick={() => mostrarFormularioAlterar(value)}><FontAwesomeIcon icon={faPencilAlt} /> <div className="text">Alterar</div></ButtonStyled>
-                                                <ButtonStyled title="Excluir" onClick={() => mostrarFormularioExclusao(value)}><FontAwesomeIcon icon={faTrash} /> <div className="text">Excluir</div></ButtonStyled>
-                                            </div>
+                                        <div className="opcoesNotificacao">
+                                            <ButtonStyled title="Imprimir" onClick={() => imprimir(value)}><FontAwesomeIcon icon={faPrint} /></ButtonStyled>
+                                            <ButtonStyled title="Alterar" onClick={() => mostrarFormularioAlterar(value)}><FontAwesomeIcon icon={faPencilAlt} /></ButtonStyled>
+                                            <ButtonStyled title="Excluir" onClick={() => mostrarFormularioExclusao(value)}><FontAwesomeIcon icon={faTrash} /></ButtonStyled>
                                         </div>
                                         <ButtonStyled title="Mostrar detalhes" className={'botaoSelecionar link ' + (selecionado !== null && selecionado.id === value.id ? 'selecionado' : '')} onClick={() => selecionar(value)}>
                                             <FontAwesomeIcon icon={faChevronDown} />
@@ -521,6 +464,13 @@ function FornecedorPage({ fornecedor }) {
                                 </div>
                                 {selecionado !== null && selecionado.id === value.id ?
                                 <div className="detalhes">
+                                    <div className="separador">
+                                        <div className="tituloSeparador">Administrativo</div>
+                                        <div className="barraSeparador"></div>
+                                    </div>
+                                    <div className="linhaDetalhe">
+                                        <TextField readonlyIcon={<FontAwesomeIcon icon={faHashtag} />} readonly={true} label="ID" defaultValue={value.id} />
+                                    </div>
                                     <div className="separador">
                                         <div className="tituloSeparador">Dados pessoais</div>
                                         <div className="barraSeparador"></div>

@@ -3,14 +3,12 @@ import ItemAction from "../../actions/ItemAction";
 import store from "../../store";
 import styled from "styled-components";
 import { useState } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faHome } from "@fortawesome/free-solid-svg-icons";
 
 const InicioPageStyle = styled.div`
     width: 100%;
 `;
 
-function InicioPage({ status, itens, error, current, page, pageInfo, categorias }) {
+function InicioPage({ inicio }) {
     const [constructorHasRun, setConstructorHasRun] = useState(false);
 
     function constructor() {
@@ -24,9 +22,6 @@ function InicioPage({ status, itens, error, current, page, pageInfo, categorias 
 
     return (
         <InicioPageStyle>
-            <div className="cabecalho">
-                <h1><FontAwesomeIcon icon={faHome} />Início</h1>
-            </div>
         </InicioPageStyle>
     );
 };

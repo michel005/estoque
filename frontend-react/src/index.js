@@ -5,12 +5,13 @@ import App from './App';
 import { Provider } from 'react-redux';
 import store from './store';
 import { BrowserRouter } from 'react-router-dom';
+import AppConnector from './App';
 
 ReactDOM.render(
     <Provider store={store}>
         <React.StrictMode>
             <BrowserRouter>
-                <App />
+                <AppConnector />
             </BrowserRouter>
         </React.StrictMode>
     </Provider>,

@@ -1,12 +1,17 @@
+import PaginaActionTypes from "../constants/PaginaActionTypes";
 import EntradaActionTypes from "../constants/EntradaActionTypes";
 import FornecedorActionTypes from "../constants/FornecedorActionTypes";
 import ItemActionTypes from "../constants/ItemActionTypes";
+import PaginaReducer from "./PaginaReducer";
 import EntradaReducer from "./EntradaReducer";
 import FornecedorReducer from "./FornecedorReducer";
 import ItemReducer from "./ItemReducer";
 
 const initialState = {
     appName: 'App4Store',
+    pagina: {
+        atual: 'inicio'
+    },
     inicio: {
 
     },
@@ -54,6 +59,9 @@ const initialState = {
 };
 
 function rootReducer(state = initialState, action) {
+    if (action.type.module && action.type.module === PaginaActionTypes.MODULE) {
+        return PaginaReducer(state, action);
+    } else
     if (action.type.module && action.type.module === ItemActionTypes.MODULE) {
         return ItemReducer(state, action);
     } else

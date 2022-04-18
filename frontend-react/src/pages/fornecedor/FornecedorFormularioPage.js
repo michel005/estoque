@@ -13,6 +13,7 @@ import {
     useNavigate
 } from "react-router-dom";
 import { useState } from "react";
+import PaginaAction from "../../actions/PaginaAction";
 
 const StyledFormulario = styled.div`
 width: 100%;
@@ -142,6 +143,7 @@ function FornecedorFormularioPage({ fornecedor, error, status }) {
 
     function cancelar() {
         store.dispatch(FornecedorAction.statusOcioso());
+        store.dispatch(PaginaAction.mudarPaginaAtual('inicio'));
         navigate('/fornecedores');
     }
 
