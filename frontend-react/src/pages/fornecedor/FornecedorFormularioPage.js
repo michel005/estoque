@@ -12,8 +12,8 @@ import {
     NavLink,
     useNavigate
 } from "react-router-dom";
-import { useState } from "react";
 import PaginaAction from "../../actions/PaginaAction";
+import SelectField from "../../components/forms/SelectField";
 
 const StyledFormulario = styled.div`
 width: 100%;
@@ -148,54 +148,44 @@ function FornecedorFormularioPage({ fornecedor, error, status }) {
     }
 
     return (
-        <>
-        {
-            fornecedor === null ? 
-            <StyledFormulario>
-                <h1>Nào é possível recarregar este formulário</h1>
-                <NavLink to={'/fornecedores'}>Voltar para <b>Fornecedores</b></NavLink>
-            </StyledFormulario>
-            :
-            <StyledFormulario>
-                <h1>Formulário de Fornecedor</h1>
-                <Separador titulo="Dados pessoais" />
-                <div className="linha">
-                    <TextField label="Nome Completo" defaultValue={fornecedor.nome} fieldID="fieldNome" nullable={false} />
-                    <ButtonOptions label="Tipo Pessoa" defaultValue={fornecedor.tipoPessoa === null ? 'F' : fornecedor.tipoPessoa} fieldID="fieldTipoPessoa" list={tipoPessoaType} />
-                    <TextField label="CPF/CNPJ" defaultValue={fornecedor.cpfCnpj} fieldID="fieldCpfCnpj" nullable={false} />
-                </div>
-                <div className="linha">
-                    <TextField label="Telefone" defaultValue={fornecedor.telefone} fieldID="fieldTelefone" />
-                    <TextField label="E-mail" defaultValue={fornecedor.email} fieldID="fieldEmail" />
-                    <div className="campo"></div>
-                </div>
-                <Separador titulo="Endereço" />
-                <div className="linha">
-                    <TextField label="Cidade" defaultValue={fornecedor.cidade} fieldID="fieldCidade" />
-                    <TextField label="Estado" defaultValue={fornecedor.estado} fieldID="fieldEstado" />
-                    <TextField label="País" defaultValue={fornecedor.pais} fieldID="fieldPais" />
-                    <TextField label="CEP" defaultValue={fornecedor.cep} fieldID="fieldCEP" />
-                </div>
-                <div className="linha">
-                    <TextField label="Rua" defaultValue={fornecedor.rua} fieldID="fieldRua" />
-                    <TextField label="Número" defaultValue={fornecedor.numero} fieldID="fieldNumero" />
-                    <TextField label="Bairro" defaultValue={fornecedor.bairro} fieldID="fieldBairro" />
-                    <TextField label="Complemento" defaultValue={fornecedor.complemento} fieldID="fieldComplemento" />
-                </div>
-                <div className="comandos">
-                    <ButtonStyled className="primary" onClick={salvar}>Salvar</ButtonStyled>
-                    {fornecedor.id === null ? <></> : <ButtonStyled className="alert" onClick={excluir}>Excluir</ButtonStyled>}
-                    <ButtonStyled onClick={cancelar}>Cancelar</ButtonStyled>
-                </div>
+        <StyledFormulario>
+            <h1>Formulário de Fornecedor</h1>
+            <Separador titulo="Dados pessoais" />
+            <div className="linha">
+                <TextField label="Nome Completo" defaultValue={fornecedor.nome} fieldID="fieldNome" nullable={false} />
+                <TextField label="Tipo Pessoa" defaultValue={fornecedor.tipoPessoa} fieldID="fieldTipoPessoa" nullable={false} />
+                <TextField label="CPF/CNPJ" defaultValue={fornecedor.cpfCnpj} fieldID="fieldCpfCnpj" nullable={false} />
+            </div>
+            <div className="linha">
+                <TextField label="Telefone" defaultValue={fornecedor.telefone} fieldID="fieldTelefone" />
+                <TextField label="E-mail" defaultValue={fornecedor.email} fieldID="fieldEmail" />
+                <div className="campo"></div>
+            </div>
+            <Separador titulo="Endereço" />
+            <div className="linha">
+                <TextField label="Cidade" defaultValue={fornecedor.cidade} fieldID="fieldCidade" />
+                <TextField label="Estado" defaultValue={fornecedor.estado} fieldID="fieldEstado" />
+                <TextField label="País" defaultValue={fornecedor.pais} fieldID="fieldPais" />
+                <TextField label="CEP" defaultValue={fornecedor.cep} fieldID="fieldCEP" />
+            </div>
+            <div className="linha">
+                <TextField label="Rua" defaultValue={fornecedor.rua} fieldID="fieldRua" />
+                <TextField label="Número" defaultValue={fornecedor.numero} fieldID="fieldNumero" />
+                <TextField label="Bairro" defaultValue={fornecedor.bairro} fieldID="fieldBairro" />
+                <TextField label="Complemento" defaultValue={fornecedor.complemento} fieldID="fieldComplemento" />
+            </div>
+            <div className="comandos">
+                <ButtonStyled className="primary" onClick={salvar}>Salvar</ButtonStyled>
+                {fornecedor.id === null ? <></> : <ButtonStyled className="alert" onClick={excluir}>Excluir</ButtonStyled>}
+                <ButtonStyled onClick={cancelar}>Cancelar</ButtonStyled>
+            </div>
 
-                {status === FornecedorActionTypes.STATUS_EXCLUIR ? <>
-                    <ChoiceMessage title="Exclusão de Fornecedor" text={'Deseja realmente excluir o fornecedor "' + fornecedor.nome + '"?'} choices={[ { name: 'Sim', command: acaoExcluir }, { name: 'Não, cancelar!', command: fecharExcluir } ]} />
-                </> : <></>}
+            {status === FornecedorActionTypes.STATUS_EXCLUIR ? <>
+                <ChoiceMessage title="Exclusão de Fornecedor" text={'Deseja realmente excluir o fornecedor "' + fornecedor.nome + '"?'} choices={[ { name: 'Sim', command: acaoExcluir }, { name: 'Não, cancelar!', command: fecharExcluir } ]} />
+            </> : <></>}
 
-                {error !== null ? <Message title="Erro no Fornecedor" text={error.toString()} closeEvent={fecharExcluir} /> : <></>}
-            </StyledFormulario>
-        }
-        </>
+            {error !== null ? <Message title="Erro no Fornecedor" text={error.toString()} closeEvent={fecharExcluir} /> : <></>}
+        </StyledFormulario>
     );
 }
 

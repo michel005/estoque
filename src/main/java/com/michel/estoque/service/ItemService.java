@@ -15,13 +15,17 @@ public class ItemService extends AbstractService<Item, ItemBusiness> {
     @Override
     public void antesCadastrar(Item entidade) {
         entidade.setNome(CharUtils.deAccent(entidade.getNome().toUpperCase()));
-        entidade.setCategoria(CharUtils.deAccent(entidade.getCategoria().toUpperCase()));
+        if (entidade.getCategoria() != null) {
+            entidade.setCategoria(CharUtils.deAccent(entidade.getCategoria().toUpperCase()));
+        }
     }
 
     @Override
     public void antesAlterar(Item entidade) {
         entidade.setNome(CharUtils.deAccent(entidade.getNome().toUpperCase()));
-        entidade.setCategoria(CharUtils.deAccent(entidade.getCategoria().toUpperCase()));
+        if (entidade.getCategoria() != null) {
+            entidade.setCategoria(CharUtils.deAccent(entidade.getCategoria().toUpperCase()));
+        }
     }
 
     public ServiceResponse<Item> buscaPorNome(String nome) {

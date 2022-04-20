@@ -1,5 +1,4 @@
 import { connect } from "react-redux";
-import ItemAction from "../../actions/ItemAction";
 import store from "../../store";
 import styled from "styled-components";
 import { useState } from "react";
@@ -14,7 +13,6 @@ function InicioPage({ inicio }) {
     function constructor() {
         if (constructorHasRun) return;
         document.title = store.getState().appName +  ' - Início';
-        store.dispatch(ItemAction.statusOcioso());
         setConstructorHasRun(true);
     };
 

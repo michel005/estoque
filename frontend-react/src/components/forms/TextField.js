@@ -222,7 +222,7 @@ const TextField = ( {
             <>
                 {label !== '' ? <label htmlFor={fieldID}>{label} {nullable === false ? <span className="notNullable">(Obrigatório)</span> : <></>}</label> : <></>}
                 <div className="iconContainer">
-                    <input autoComplete="false" onKeyPress={enterEventInner} type={type} id={fieldID} name={fieldID} defaultValue={defaultValue} onBlur={() => validate()} placeholder={placeholder + ((label === null || label === '') && nullable === false? ' (Obrigatório)' : '')} disabled={disabled} />
+                    <input autoComplete="false" onKeyPress={enterEventInner} type={type} id={fieldID} defaultValue={defaultValue} onBlur={() => validate()} placeholder={placeholder} disabled={disabled} />
                     {icon === null ? <></> : 
                     <ButtonStyled onClick={eventIcon} className="icon">
                         {icon}

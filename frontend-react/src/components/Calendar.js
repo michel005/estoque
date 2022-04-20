@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
 import ButtonStyled from './ButtonStyled';
 import styled from "styled-components";
+import DateUtils from "../utils/DateUtils";
 
 const AlternativeCalendarStyled = styled.div`
 background-color: #fff;
@@ -174,7 +175,7 @@ width: 290px;
 }
 `;
 
-export default function Calendar({ whenModifyCurrentDate = () => {}, setCurrentVariable = () => {}, title = null, reduced = false, defaultReduced = false }) {
+export default function Calendar({ whenModifyCurrentDate = () => {}, setCurrentVariable = () => {}, title = null, reduced = false, defaultReduced = false, fieldID = null }) {
     const [current, setCurrent] = useState(new Date());
     const [selectedDate, setSelectedDate] = useState(null);
     const [dayList, setDayList] = useState([]);
@@ -283,7 +284,7 @@ export default function Calendar({ whenModifyCurrentDate = () => {}, setCurrentV
             <div className="selectedDate">
                 <div className="date" title="Data selecionada">
                     <FontAwesomeIcon icon={faCalendar} />
-                    {selectedDate.toLocaleDateString()}
+                    {DateUtils.stringJustDate(selectedDate)}
                 </div>
                 <div className="espacador"></div>
                 <ButtonStyled className="transparent noHover" title="Desmarcar data atual" onClick={removerDataAtual}><FontAwesomeIcon icon={faTrash} /></ButtonStyled>
@@ -344,6 +345,7 @@ export default function Calendar({ whenModifyCurrentDate = () => {}, setCurrentV
                         })}
                         </div>
                 )})}
+                {fieldID !== null ? <input type="hidden" id={fieldID} value={selectedDate !== null ? DateUtils.stringJustDate(selectedDate) : ''} /> : <></>}
             </div>
         </AlternativeCalendarStyled>
     );

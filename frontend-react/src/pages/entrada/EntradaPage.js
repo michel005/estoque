@@ -11,317 +11,414 @@ import TextField from "../../components/forms/TextField";
 import JanelaStyled from "../../components/JanelaStyled";
 import ChoiceMessage from "../../components/ChoiceMessage";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowUp, faPen, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faArrowDown, faArrowUp, faBackward, faEraser, faFastBackward, faFastForward, faForward, faPen, faSearch, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { useState } from "react";
 import LightTableStyled from "../../components/LightTableStyled";
+import DateUtils from "../../utils/DateUtils";
 
 const EntradaPageStyled = styled.div`
-    width: 100%;
+width: 100%;
 
-    .form {
+.filtros {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 21px;
+
+    .linha {
         display: flex;
         flex-direction: row;
 
-        .campos {
+        .campo, .calendario {
             margin-right: 14px;
-            width: 300px;
+            width: 100%;
+        }
+
+        .comandos {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            margin-right: 0px;
+            width: auto;
+
+            .botoes {
+                display: flex;
+                flex-direction: row;
+
+                button {
+                    min-width: 40px;
+                    border-radius: 0px;
+
+                    &:first-child {
+                        border-top-left-radius: 4px;
+                        border-bottom-left-radius: 4px;
+                    }
+
+                    &:last-child {
+                        border-top-right-radius: 4px;
+                        border-bottom-right-radius: 4px;
+                    }
+                }
+            }
         }
     }
+}
 
-    .conteudo {
+.lista {
+    .entrada {
+        background-color: #fff;
         display: flex;
-        flex-direction: row;
-        margin-top: 14px;
-        height: calc(100% - 70px);
+        flex-direction: column;
+        width: 100%;
+        transition: all 0.25s;
+        border: 2px solid #fff;
+        z-index: 10;
 
-        .filtro {
-
-            & > button {
-                margin-top: 14px;
-                width: 100%;
-            }
-
+        &:hover {
+            border: 2px solid #39f;
+            background-color: #f4f4f4;
         }
 
-        table {
-            margin-left: 14px;
-            height: 100%;
-
-            tbody {
-                height: calc(100% - 64px);
-            }
+        &.nohover, &.nohover:hover {
+            background-color: transparent;
+            border: 2px solid transparent;
         }
-    }
 
-    .listaItensContainer {
-
-        .adicionadorItens {
+        .linha {
             display: flex;
             flex-direction: row;
-            margin-bottom: 14px;
-
-            .quantidade {
-                margin-left: 14px;
-            }
-
-            .aux {
-                display: flex;
-                flex-direction: column;
-                justify-content: flex-end;
-                margin-left: 14px;
-            }
-        }
-
-        table {
+            flex-flow: row;
             width: 100%;
-            height: 500px;
+            transition: all 0.25s;
 
-            tbody {
-                height: calc(100% - 62px);
+            .coluna {
+                color: #999;
+                display: flex;
+                flex-direction: row;
+                text-align: left;
+                padding: 14px;
+                width: calc((100% - 80px) / 4);
+                overflow: hidden;
+                text-overflow: ellipsis;
+                word-wrap: break-word;
+                word-break: break-all;
+
+                &.id {
+                    width: 80px;
+                }
+
+                &.descricao {
+                    flex-grow: 1;
+                }
+
+                &.fornecedor {
+                    width: 280px;
+                }
+
+                &.comandoslinha {
+                    display: flex;
+                    flex-direction: row;
+                    justify-content: flex-end;
+                    width: 70px;
+
+                    .opcoesNotificacao {
+                        display: none;
+                    }
+
+                    .botaoSelecionar {
+                        color: #999;
+                        transition: all 0.25s;
+
+                        &.selecionado {
+                            transform: rotate(180deg);
+                        }
+                    }
+                }
+            }
+
+            &.cabecalho {
+                background-color: transparent;
+
+                .coluna {
+                    color: #666;
+                    cursor: pointer;
+                    font-weight: bold;
+                    transition: all 0.25s;
+
+                    .orderBy {
+                        margin-left: 4px;
+                        transition: all 0.25s;
+
+                        &.orderByDesc {
+                            transform: rotate(180deg);
+                        }
+                    }
+                }
             }
         }
 
+        .detalhes {
+            background-color: #f4f4f4;
+            padding: 0px 14px 14px;
+
+            .separador {
+                display: flex;
+                flex-direction: row;
+                margin-top: 14px;
+                margin-bottom: 14px;
+                width: 100%;
+
+                .tituloSeparador {
+                    color: #aaa;
+                    font-weight: bold;
+                    font-size: 20px;
+                    display: flex;
+                    margin-right: 14px;
+                    width: auto;
+                }
+
+                .barraSeparador {
+                    display: flex;
+                    background-color: #ddd;
+                    height: 2px;
+                    flex-grow: 1;
+                    transform: translateY(15px);
+                }
+            }
+
+            .linhaDetalhe {
+                display: flex;
+                flex-direction: row;
+
+                .campo {
+                    flex-grow: 1;
+                    margin-bottom: 14px;
+                    width: 25%;
+                }
+            }
+        }
+
+        &.selecionado {
+            transform: scale(102.5%);
+            z-index: 25;
+            border: 2px solid #39f;
+
+            .linha {
+                background-color: #f4f4f4;
+
+                .coluna {
+                    display: none;
+                }
+
+                .coluna.nome {
+                    color: #3339;
+                    display: flex;
+                    font-size: 30px;
+                    flex-grow: 1;
+                }
+
+                .comandoslinha {
+                    display: flex;
+                    width: auto;
+                    
+                    .opcoesNotificacao {
+                        background-color: transparent;
+                        backdrop-filter: unset;
+                        padding: 0px;
+                        display: flex;
+                        flex-direction: row;
+                        margin-right: 14px;
+                        transform: none;
+                        position: static;
+                        transition: none;
+
+                        button {
+                            background-color: transparent;
+                            width: 100px;
+                            padding: 0px;
+                            color: #3339;
+                            font-size: 18px;
+                            width: auto;
+                            margin-right: 14px;
+                            transition: none;
+                            display: flex;
+                            flex-direction: column;
+                            justify-content: center;
+
+                            &:hover {
+                                background-color: transparent;
+                                color: #39f;
+                            }
+                        }
+                    }
+
+                    .botaoSelecionar {
+                        color: #999;
+                        transition: all 0.25s;
+                        margin-right: 4px;
+
+                        &.selecionado {
+                            transform: rotate(180deg);
+                        }
+                    }
+
+                    .botaoSelecionar {
+                        height: 100%;
+                    }
+                }
+            }
+        }
     }
+}
+
+.paginacao {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    width: 100%;
+    padding: 14px;
+    background-color: #fff;
+
+    button {
+        margin-right: 7px;
+
+        &:last-child {
+            margin-right: 0px;
+        }
+
+        &:disabled {
+            opacity: 0.2;
+        }
+    }
+}
+
+@media print {
+    .filtros, .comandoslinha {
+        display: none;
+    }
+
+    .lista .entrada {
+        display: none;
+    }
+
+    .lista .entrada.selecionado {
+        box-shadow: none;
+        display: flex;
+
+        .coluna {
+            display: none;
+        }
+
+        .coluna.nome {
+            display: flex;
+            font-weight: bold;
+            font-size: 36px;
+        }
+    }
+
+    .paginacao {
+        display: none;
+    }
+}
 `;
 
-function EntradaPage({ status, entradas, error, current, size, page, currentDate, itemList, fornecedorList, pageInfo }) {
+function EntradaPage({ entrada }) {
     const [constructorHasRun, setConstructorHasRun] = useState(false);
+    const [sortType, setSortType] = useState({field: 'descricao', direction: 'asc'});
 
     function constructor() {
         if (constructorHasRun) return;
         document.title = store.getState().appName +  ' - Entradas';
+        atualizar();
         setConstructorHasRun(true);
     };
 
-    function mostrarFormularioCadastrar() {
-        store.dispatch(EntradaAction.statusCadastrar());
-    }
-
-    function mostrarFormularioAlterar(entrada) {
-        store.dispatch(EntradaAction.statusAlterar(entrada.id));
-    }
-
-    function mostrarFormularioExcluir(entrada) {
-        store.dispatch(EntradaAction.statusExcluir(entrada));
-    }
-    
-    function excluir() {
-        store.dispatch(EntradaAction.excluir(current));
-    }
-
-    function salvar() {
-        var curr = current;
-        curr.eventoEntrada.descricao = document.getElementById('descricaoEntrada').value;
-        if (document.getElementById('listaStatus').value !== '') {
-            curr.eventoEntrada.status = document.getElementById('listaStatus').value;
-        } else {
-            curr.eventoEntrada.status = null;
-        }
-        if (document.getElementById('listaFornecedor').value !== '') {
-            curr.eventoEntrada.fornecedor = {
-                id: document.getElementById('listaFornecedor').value
-            };
-        } else {
-            curr.eventoEntrada.fornecedor = null;
-        }
-
-        if (status === EntradaActionTypes.STATUS_CADASTRAR) {
-            store.dispatch(EntradaAction.cadastrar(curr));
-        } else
-        if (status === EntradaActionTypes.STATUS_ALTERAR) {
-            store.dispatch(EntradaAction.alterar(curr));
-        }
-    }
-
     function atualizar() {
-        if (currentDate == null) {
-            store.dispatch(EntradaAction.statusOcioso());
+        if (document.getElementById('filtroDataBase') !== null && document.getElementById('filtroDataBase').value !== '') {
+            store.dispatch(EntradaAction.atualizarData(DateUtils.stringToDate(document.getElementById('filtroDataBase').value)));
+            store.dispatch(EntradaAction.buscarTodos(DateUtils.stringToDate(document.getElementById('filtroDataBase').value)));
         } else {
-            store.dispatch(EntradaAction.buscarTodos(currentDate));
+            store.dispatch(EntradaAction.statusOcioso());
         }
     }
 
-    function fecharJanela() {
-        store.dispatch(EntradaAction.statusOcioso());
-    }
-
-    function fecharMensagemErro() {
-        store.dispatch(EntradaAction.resetarErro());
-    }
-
-    function atualizaFiltro(data) {
-        store.dispatch(EntradaAction.atualizarData(data));
+    function limpar() {
+        document.getElementById('filtroDataBase').value = '';
+        document.getElementById('filtroDescricao').value = '';
     }
 
     function buscarPagina(pagina) {
-        store.dispatch(EntradaAction.buscarPagina({ pagina: pagina - 1 }));
+        store.dispatch(EntradaAction.buscarPagina({
+            pagina: pagina
+        }));
     }
 
-    function adicionarItem() {
-        var item = document.getElementById('listaItens').value;
-        var quantidade = document.getElementById('quantidade').value;
-        if (item.trim() !== '' && quantidade.trim() !== '') {
-            store.dispatch(EntradaAction.adicionaItemNoCurrentEntrada({ nomeItem: item, quantidade: quantidade }));
-            document.getElementById('listaItens').value = '';
-            document.getElementById('quantidade').value = '';
-        } else {
-            store.dispatch(EntradaAction.mostrarErro({
-                "ERRO": "Informe um item válido antes de prosseguir"
-            }));
+    function order(field) {
+        if (sortType.field === field) {
+            return (<div className={'orderBy ' + (sortType.direction === 'desc' ? 'orderByDesc' : '')}><FontAwesomeIcon icon={faArrowDown} /></div>);
         }
+        return <></>;
     }
 
-    function removerItem(item) {
-        store.dispatch(EntradaAction.removeItemNoCurrentEntrada(item.nome));
-    }
-
-    function setCurrent(x) {
-        x(currentDate);
-        store.dispatch(EntradaAction.defineDataEntradaCalendar(x));
+    function mudarOrder(fd) {
+        var dir = ( sortType.field === fd ) ? ( sortType.direction === 'asc' ? 'desc' : 'asc' ) : 'asc';
+        setSortType({field: fd, direction: dir });
+        atualizar({field: fd, direction: dir });
     }
 
     constructor();
 
     return (
         <EntradaPageStyled>
-            <div className="cabecalho">
-                <h1><FontAwesomeIcon icon={faArrowUp} />Entradas</h1>
-            </div>
-
-            <div className="conteudo">
-                <div className="filtro">
-                    <Calendar reduced={true} whenModifyCurrentDate={(data) => atualizaFiltro(data) } setCurrentVariable={setCurrent} title="Data Base"></Calendar>
-                    <ButtonStyled onClick={mostrarFormularioCadastrar} className="primary">Cadastrar</ButtonStyled>
-                    <ButtonStyled disabled={currentDate === null} onClick={atualizar}>Atualizar</ButtonStyled>
-                </div>
-
-                <LightTableStyled>
-                    <thead>
-                        <tr>
-                            <th width="15%">Data / Hora</th>
-                            <th width="50%">Descrição</th>
-                            <th width="25%">Fornecedor</th>
-                            <th width="10%">Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {entradas.map((entrada, index) => {
-                            return ( 
-                            <tr key={index}>
-                                <td width="15%" className="dataEntrada">{entrada.dataEntrada}</td>
-                                <td width="50%">
-                                    <ButtonStyled onClick={() => mostrarFormularioAlterar(entrada)} className="link">{entrada.descricao}</ButtonStyled>
-                                </td>
-                                <td width="25%" className="fornecedor">{entrada.fornecedor !== null ? entrada.fornecedor.nome + ' (' + entrada.fornecedor.cpfCnpj + ')' : ''}</td>
-                                <td width="10%" className="status">{entrada.status}</td>
-                            </tr> );
-                        })}
-                        {currentDate === null ? 
-                        <tr>
-                            <td colSpan={4}>Selecione uma <b>Data Base</b></td>
-                        </tr> : 
-                        entradas.length === 0 ?
-                        <tr className="nohover">
-                            <td colSpan={4}>Nenhum registro encontrado</td>
-                        </tr> : <></>}
-                    </tbody>
-                    {entradas.length !== 0 ?
-                    <tfoot>
-                        <tr>
-                            <th colSpan={4}>
-                                <ButtonStyled disabled={page <= 0} onClick={() => buscarPagina(page)}>{'<'}</ButtonStyled>
-                                {pageInfo.map((value, index) => {
-                                    return ( <ButtonStyled className={value.page === (page + 1) ? 'primary' : ''} key={index} onClick={() => buscarPagina(value.page)}>{value.page}</ButtonStyled> )
-                                })}
-                                <ButtonStyled disabled={((page + 1) === pageInfo.length) || pageInfo.length === 0} onClick={() => buscarPagina(page + 2)}>{'>'}</ButtonStyled>
-                            </th>
-                        </tr>
-                    </tfoot> : <></> }
-                </LightTableStyled>
-            </div>
-
-            {status === EntradaActionTypes.STATUS_CADASTRAR || status === EntradaActionTypes.STATUS_ALTERAR ? <>
-                <JanelaStyled>
-                    <div className="content">
-                        <div className="title">Formulário de Entrada de Itens</div>
-                        <div className="innerContent">
-                            <div className="form">
-                                <div className="campos">
-                                    {status === EntradaActionTypes.STATUS_ALTERAR ? <TextField label="ID da Entrada" fieldID="idItem" defaultValue={current.eventoEntrada.id} disabled={current.id !== null} /> : <></> }
-                                    {status === EntradaActionTypes.STATUS_ALTERAR ? <div className="space"></div> : <></> }
-                                    <TextField label="Descrição" fieldID="descricaoEntrada" defaultValue={current.eventoEntrada.descricao} nullable={false} />
-                                    <div className="space"></div>
-                                    {status === EntradaActionTypes.STATUS_ALTERAR ? <TextField label="Data Entrada" defaultValue={current.eventoEntrada.dataEntrada} disabled={true} /> : <></> }
-                                    {status === EntradaActionTypes.STATUS_ALTERAR ? <div className="space"></div> : <></> }
-                                    <SelectField list={[ 
-                                        {text: 'Pendênte', value: 'PENDENTE'}, 
-                                        {text: 'Aprovado', value: 'APROVADO'}, 
-                                        {text: 'Cancelado', value: 'CANCELADO'} 
-                                    ]} nativeSelect={true} label="Status" fieldID="listaStatus" defaultValue={current.eventoEntrada.status} nullable={false} />
-                                    <div className="space"></div>
-                                    <SelectField list={fornecedorList} nativeSelect={true} label="Fornecedor" fieldID="listaFornecedor" defaultValue={current.eventoEntrada.fornecedor === null || current.eventoEntrada.fornecedor === undefined ? null : current.eventoEntrada.fornecedor.id} nullable={false} />
-                                    <div className="space"></div>
-                                </div>
-                                <div className="listaItensContainer">
-                                    <div className="adicionadorItens">
-                                        <SelectField list={itemList} label="Item" fieldID="listaItens" />
-                                        <TextField type="number" label="Quantidade" fieldID="quantidade" />
-                                        <div className="aux"><ButtonStyled onClick={adicionarItem} className="primary">Adicionar</ButtonStyled></div>
-                                    </div>
-                                    <LightTableStyled>
-                                        <thead>
-                                            <tr>
-                                                <th width="70%">Nome Item</th>
-                                                <th width="20%" className="alignRight">Quantidade</th>
-                                                <th width="10%"></th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {current.itens.map((value, index) => {
-                                                return (
-                                                    <tr key={index}>
-                                                        <td width="70%">{value.nomeItem}</td>
-                                                        <td width="20%" className="alignRight">{value.quantidade}</td>
-                                                        <td width="10%" className="buttonCell"><ButtonStyled onClick={() => removerItem(value)} className="alert"><FontAwesomeIcon icon={faTrash} /></ButtonStyled></td>
-                                                    </tr>
-                                                )
-                                            })}
-                                            {current.itens.length === 0 ? <tr className="nohover"><td colSpan={3}>Nenhum item adicionado</td></tr> : <></>}
-                                        </tbody>
-                                    </LightTableStyled>
-                                </div>
-                            </div>
-                            <div className="commands">
-                                <ButtonStyled className="primary" onClick={salvar}>Salvar</ButtonStyled>
-                                {current.eventoEntrada.id === null ? <></> : <ButtonStyled className="alert" onClick={() => mostrarFormularioExcluir(current.eventoEntrada)}>Excluir</ButtonStyled>}
-                                <ButtonStyled onClick={fecharJanela}>Fechar</ButtonStyled>
-                            </div>
+            <div className="filtros">
+                <div className="linha">
+                    <TextField label="Data Base" fieldID="filtroDataBase" />
+                    <TextField label="Descrição" fieldID="filtroDescricao" />
+                    <div className="comandos">
+                        <div className="botoes">
+                            <ButtonStyled title="Buscar" className="primary" onClick={() => atualizar()}><FontAwesomeIcon icon={faSearch} /></ButtonStyled>
+                            <ButtonStyled title="Limpar filtros" onClick={() => limpar()}><FontAwesomeIcon icon={faEraser} /></ButtonStyled>
                         </div>
                     </div>
-                </JanelaStyled>
-            </> : <></>}
-
-            {status === EntradaActionTypes.STATUS_EXCLUIR ? <>
-                <ChoiceMessage title="Exclusão de Evento de Entrada" text={'Deseja realmente excluir a entrada "' + current.descricao + '"?'} choices={[ { name: 'Sim', command: excluir }, { name: 'Não, cancelar!', command: fecharJanela } ]} />
-            </> : <></>}
-
-            {error !== null ? <Message title="Erro na Entrada de Estoque" text={error.toString()} closeEvent={fecharMensagemErro} /> : <></>}
+                </div>
+            </div>
+            <div className="lista">
+                <div className="entrada nohover">
+                    <div className="linha cabecalho">
+                        <div className="coluna id" onClick={() => mudarOrder('id')}># {order('id')}</div>
+                        <div className="coluna descricao" onClick={() => mudarOrder('descricao')}>Descrição {order('descricao')}</div>
+                        <div className="coluna fornecedor" onClick={() => mudarOrder('fornecedor')}>Fornecedor {order('fornecedor')}</div>
+                        <div className="coluna comandoslinha"></div>
+                    </div>
+                </div>
+                {
+                    entrada.list.map((value, index) => {
+                        return (
+                            <div className="entrada" key={index}>
+                                <div className="linha">
+                                    <div className="coluna id">{value.id}</div>
+                                    <div className="coluna descricao">{value.descricao}</div>
+                                    <div className="coluna fornecedor">{value.fornecedor !== null ? value.fornecedor.nome : ''}</div>
+                                    <div className="coluna comandoslinha"></div>
+                                </div>
+                            </div>
+                        );
+                    })
+                }
+            </div>
+            <div className="paginacao">
+                <ButtonStyled className="transparent" disabled={entrada.page <= 0} onClick={() => buscarPagina(0)}><FontAwesomeIcon icon={faFastBackward} /></ButtonStyled>
+                <ButtonStyled className="transparent" disabled={entrada.page <= 0} onClick={() => buscarPagina(entrada.page - 1)}><FontAwesomeIcon icon={faBackward} /></ButtonStyled>
+                {entrada.pageInfo.length === 0 ? <ButtonStyled className="nohover transparent">0</ButtonStyled> : <ButtonStyled className="nohover transparent">Página {entrada.page + 1} de { entrada.pageInfo.length }</ButtonStyled> }
+                <ButtonStyled className="transparent" disabled={((entrada.page + 1) === entrada.pageInfo.length) || entrada.pageInfo.length === 0} onClick={() => buscarPagina(entrada.page + 1)}><FontAwesomeIcon icon={faForward} /></ButtonStyled>
+                <ButtonStyled className="transparent" disabled={((entrada.page + 1) === entrada.pageInfo.length) || entrada.pageInfo.length === 0} onClick={() => buscarPagina(entrada.pageInfo.length - 1)}><FontAwesomeIcon icon={faFastForward} /></ButtonStyled>
+            </div>
         </EntradaPageStyled>
     );
 };
 
 const EntradaPageConnected = connect((state) => { 
     return {
-        status: state.entrada.status,
-        entradas: state.entrada.list,
-        error: state.entrada.error,
-        current: state.entrada.currentEntrada,
-        size: state.entrada.size,
-        page: state.entrada.page,
-        currentDate: state.entrada.currentDate,
-        itemList: state.entrada.itemList,
-        fornecedorList: state.entrada.fornecedoresList,
-        pageInfo: state.entrada.pageInfo
+        entrada: state.entrada
     }
  })(EntradaPage);
 

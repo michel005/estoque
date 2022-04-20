@@ -7,7 +7,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import TextField from "../../components/forms/TextField";
 import SelectField from "../../components/forms/SelectField";
 import ButtonStyled from "../../components/ButtonStyled";
-import { faArrowDown, faBackward, faEllipsisV, faEraser, faFastBackward, faFastForward, faForward, faPencilAlt, faSearch, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faArrowDown, faBackward, faEllipsisV, faEraser, faFastBackward, faFastForward, faForward, faSearch } from "@fortawesome/free-solid-svg-icons";
 
 const ItemPageStyled = styled.div`
     width: 100%;
@@ -21,11 +21,9 @@ const ItemPageStyled = styled.div`
             display: flex;
             flex-direction: row;
 
-            &.noFullWidth {
-                .campo {
-                    margin-right: 14px;
-                    width: 100%;
-                }
+            .campo {
+                margin-right: 14px;
+                width: 100%;
             }
 
             .comandos {
@@ -103,6 +101,10 @@ const ItemPageStyled = styled.div`
                     text-overflow: ellipsis;
                     word-wrap: break-word;
                     word-break: break-all;
+
+                    &.id {
+                        width: 80px;
+                    }
 
                     &.nome {
                         font-weight: bold;
@@ -256,12 +258,14 @@ function ItemPage({ item }) {
         setMostrarMenu(mostrarMenu === null || mostrarMenu.id !== it.id ? it : null);
     }
 
-    function mostrarFormularioAlterar() {
-        
+    function mostrarFormularioAlterar(item) {
+        eventoMostrarMenu(item);
+        store.dispatch(ItemAction.statusAlterar(item));
     }
 
-    function mostrarFormularioExclusao() {
-        
+    function mostrarFormularioExclusao(item) {
+        eventoMostrarMenu(item);
+        store.dispatch(ItemAction.statusExcluir(item));
     }
 
     constructor();
@@ -283,6 +287,7 @@ function ItemPage({ item }) {
                 <div className="lista">
                     <div className="item nohover">
                         <div className="linha cabecalho">
+                            <div className="coluna id">#</div>
                             <div className="coluna nome" onClick={() => mudarOrder('item.nome')}>Nome {order('item.nome')}</div>
                             <div className="coluna categoria" onClick={() => mudarOrder('item.categoria')}>Categoria {order('item.categoria')}</div>
                             <div className="coluna quantidade">Quantidade</div>
@@ -293,6 +298,7 @@ function ItemPage({ item }) {
                         return (
                             <div className="item" key={index}>
                                 <div className="linha">
+                                    <div className="coluna id">{value.item.id}</div>
                                     <div className="coluna nome">{value.item.nome}</div>
                                     <div className="coluna categoria">{value.item.categoria}</div>
                                     <div className="coluna quantidade">{value.quantidade}</div>

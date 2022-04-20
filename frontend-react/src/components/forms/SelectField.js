@@ -129,7 +129,7 @@ const SelectField = ( {
                 </datalist>
             </>
             : 
-            <select defaultValue={defaultValue} id={fieldID} onBlur={validate}  name={fieldID} placeholder={placeholder}>
+            <select defaultValue={defaultValue} id={fieldID} onBlur={validate}  name={fieldID}>
                 {nullableOption === true ? <option value={nullableOptionValue}>{nullableOptionText}</option> : <></>}
                 {onlyValuesList === true ? 
                     Object.keys(onlyValues).map((value,index) => {

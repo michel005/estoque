@@ -1,4 +1,5 @@
 import ItemAction from "../actions/ItemAction";
+import PaginaAction from "../actions/PaginaAction";
 import API from "../API";
 import ItemActionTypes from "../constants/ItemActionTypes";
 import store from "../store";
@@ -20,6 +21,9 @@ export default function ItemReducer(state, action) {
                 status: ItemActionTypes.STATUS_CADASTRAR,
                 error: null,
                 currentItem: { id: null, nome: 'Novo Item' }
+            },
+            pagina: {
+                atual: 'novoItem'
             }
         });
     } else
@@ -31,6 +35,9 @@ export default function ItemReducer(state, action) {
                 status: ItemActionTypes.STATUS_ALTERAR,
                 error: null,
                 currentItem: action.payload
+            },
+            pagina: {
+                atual: 'novoItem'
             }
         });
     } else
@@ -41,6 +48,9 @@ export default function ItemReducer(state, action) {
                 status: ItemActionTypes.STATUS_EXCLUIR,
                 error: null,
                 currentItem: action.payload
+            },
+            pagina: {
+                atual: 'novoItem'
             }
         });
     } else
@@ -51,13 +61,16 @@ export default function ItemReducer(state, action) {
                 status: ItemActionTypes.STATUS_OCIOSO,
                 error: null,
                 currentItem: null
+            },
+            pagina: {
+                atual: 'inicio'
             }
         });
     } else
     if (action.type === ItemActionTypes.CADASTRAR) {
         API.post('/item/cadastrar', action.payload).then(() => {
             store.dispatch(ItemAction.buscarPagina({pagina: state.item.page}));
-            store.dispatch(ItemAction.statusOcioso());
+            store.dispatch(PaginaAction.mudarPaginaAtual('inicio'));
         }).catch((error) => {
             store.dispatch(ItemAction.mostrarErro(error.response.data));
         });
@@ -65,7 +78,7 @@ export default function ItemReducer(state, action) {
     if (action.type === ItemActionTypes.ALTERAR) {
         API.post('/item/alterar?id=' + action.payload.id, action.payload).then(() => {
             store.dispatch(ItemAction.buscarPagina({pagina: state.item.page}));
-            store.dispatch(ItemAction.statusOcioso());
+            store.dispatch(PaginaAction.mudarPaginaAtual('inicio'));
         }).catch((error) => {
             store.dispatch(ItemAction.mostrarErro(error.response.data));
         });
@@ -73,7 +86,7 @@ export default function ItemReducer(state, action) {
     if (action.type === ItemActionTypes.EXCLUIR) {
         API.post('/item/excluir?id=' + action.payload.id).then(() => {
             store.dispatch(ItemAction.buscarPagina({pagina: state.item.page}));
-            store.dispatch(ItemAction.statusOcioso());
+            store.dispatch(PaginaAction.mudarPaginaAtual('inicio'));
         }).catch((error) => {
             store.dispatch(ItemAction.mostrarErro(error.response.data));
         });
@@ -122,6 +135,9 @@ export default function ItemReducer(state, action) {
                 page: action.payload.page,
                 pageInfo: action.payload.pageInfo,
                 termo: action.payload.termo
+            },
+            pagina: {
+                atual: 'inicio'
             }
         });
     } else

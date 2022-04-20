@@ -54,7 +54,7 @@ export default class DateUtils {
         var day = auxDate.split('/')[0];
         var month = auxDate.split('/')[1];
         var year = auxDate.split('/')[2];
-        return new Date(year, month, day)
+        return new Date(year, month - 1, day)
     }
 
 }

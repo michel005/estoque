@@ -1,7 +1,11 @@
+import { faBahai, faDesktop, faDoorOpen, faPlay } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+import EntradaAction from '../actions/EntradaAction';
 import FornecedorAction from '../actions/FornecedorAction';
+import ItemAction from '../actions/ItemAction';
 import PaginaAction from '../actions/PaginaAction';
 import API from '../API';
 import store from '../store';
@@ -25,10 +29,15 @@ input[type="text"] {
     padding: 14px;
     outline: none;
     width: 450px;
+    z-index: 10;
 
     &::placeholder {
         color: #fff9;
         box-shadow: none;
+    }
+
+    &:hover {
+        background-color: #fff9;
     }
 
     &:focus {
@@ -40,12 +49,11 @@ input[type="text"] {
 }
 
 .caixaBuscaContainer {
-    background-color: #0009;
+    background-color: #fff;
     backdrop-filter: blur(15px);
     border-radius: 4px;
     display: none;
     flex-direction: column;
-    opacity: 0;
     padding: 7px;
     position: fixed;
     top: 50px;
@@ -54,24 +62,57 @@ input[type="text"] {
 
     .resultado {
         border-radius: 4px;
-        color: #fff;
+        color: #000;
         cursor: pointer;
+        margin-bottom: 4px;
         padding: 7px;
         font-size: 14px;
         font-weight: normal;
 
         &:hover {
-            background-color: #39f3;
+            background-color: #eee;
+        }
+
+        &.comando {
+            .icone svg {
+                font-size: 10px;
+                margin-top: 5px;
+                margin-right: 7px;
+            }
+        }
+
+        .icone {
+            display: flex;
+            flex-direction: row;
+            margin-bottom: 4px;
+
+            svg {
+                margin-top: 2px;
+                margin-right: 7px;
+            }
         }
 
         .descricao {
-            color: #fff;
+            color: #ccc;
             font-weight: bold;
         }
 
         &.selecionado {
             background-color: #39f;
             color: #999;
+        }
+    }
+
+    .itemBusca {
+        border-radius: 4px;
+        color: #000;
+        cursor: pointer;
+        padding: 7px;
+        font-size: 14px;
+        font-weight: bold;
+
+        svg {
+            margin-right: 7px;
         }
     }
 }
@@ -94,7 +135,6 @@ input[type="text"] {
     .caixaBuscaContainer {
         border-radius: 0px 0px 4px 4px;
         display: flex;
-        opacity: 1;
     }
 }
 
@@ -102,148 +142,292 @@ input[type="text"] {
 
 export default function SearchComponent() {
 
-    const comandos = [
-        { comando: 'fornecedor', evento: null, texto: 'Fornecedor...' },
-        { comando: 'fornecedor index', evento: indexFornecedor, texto: 'Gestão de Fornecedores' },
-        { comando: 'fornecedor cadastrar', evento: cadastrarFornecedor, texto: 'Cadastrar um novo fornecedor' },
-        { comando: 'fornecedor alterar', evento: alterarFornecedor, texto: 'Alterar um fornecedor existente' }
-    ];
+    const comandos = {
+        fornecedor: {
+            nome: 'Fornecedores',
+            cadastrar: { fim: true, nome: 'Cadastrar um fornecedor', comando: eventoCadastrarFornecedor },
+            alterar: {
+                nome: 'Alterar um fornecedor',
+                porCpf: { fim: true, nome: 'Por CPF/CNPJ', comando: eventoAlterarFornecedorCPF, hint: 'Informe o CPF/CNPJ', param: true },
+                porID: { fim: true, nome: 'Por ID', comando: eventoAlterarFornecedorID, hint: 'Informe o ID', param: true },
+                fim: false
+            },
+            excluir: {
+                nome: 'Excluir um fornecedor',
+                porCpf: { fim: true, nome: 'Por CPF/CNPJ', comando: eventoExcluirFornecedorCPF, hint: 'Informe o CPF/CNPJ', param: true },
+                porID: { fim: true, nome: 'Por ID', comando: eventoExcluirFornecedorID, hint: 'Informe o ID', param: true },
+                fim: false
+            },
+            inicio: { fim: true, nome: 'Pagina inicial', comando: eventoInicioFornecedor },
+            fim: false
+        },
+        item: {
+            nome: 'Itens',
+            cadastrar: { fim: true, nome: 'Cadastrar um item', comando: eventoCadastrarItem },
+            alterar: {
+                nome: 'Alterar um item',
+                porNome: { fim: true, nome: 'Por nome', comando: eventoAlterarItemNome, hint: 'Informe o nome do item', param: true },
+                porID: { fim: true, nome: 'Por ID', comando: eventoAlterarItemID, hint: 'Informe o ID', param: true },
+                fim: false
+            },
+            excluir: {
+                nome: 'Excluir um item',
+                porNome: { fim: true, nome: 'Por nome', comando: eventoExcluirItemNome, hint: 'Informe o nome do item', param: true },
+                porID: { fim: true, nome: 'Por ID', comando: eventoExcluirItemID, hint: 'Informe o ID', param: true },
+                fim: false
+            },
+            inicio: { fim: true, nome: 'Pagina inicial', comando: eventoInicioItem },
+            fim: false
+        },
+        entrada: {
+            nome: 'Eventos de Entrada',
+            inicio: { fim: true, nome: 'Pagina inicial', comando: eventoInicioEntrada },
+            fim: false
+        },
+        fim: false
+    };
+    const [buscaAtual, setBuscaAtual] = useState([]);
     const [resultados, setResultados] = useState([]);
-    const [selecionado, setSelecionado] = useState(null);
     const navigate = useNavigate();
 
-    function eventoBuscar(e, cont = true) {
-        var valor = document.getElementById('buscaGeral').value;
-        
-        console.log(cont);
-        if (e.key === 'ArrowUp') {
-            if (selecionado == null) {
-                setSelecionado(resultados[resultados.length - 1]);
-            } else {
-                var index = resultados.indexOf(selecionado);
-                if (index === 0) {
-                    setSelecionado(resultados[resultados.length - 1]);
-                } else {
-                    setSelecionado(resultados[index - 1]);
-                }
-            }
+    function mostrarOpcoes(evento) {
+        preencheSugestoes();
+        if (evento.key === 'Enter') {
+            eventoEnter()
         } else
-        if (e.key === 'ArrowDown') {
-            if (selecionado == null) {
-                setSelecionado(resultados[0]);
-            } else {
-                var index = resultados.indexOf(selecionado);
-                if ((index + 1) > (resultados.length - 1)) {
-                    setSelecionado(resultados[0]);
-                } else {
-                    setSelecionado(resultados[index + 1]);
-                }
-            }
-        } else
-        if (e.key === 'ArrowRight') {
-            document.getElementById('buscaGeral').value = selecionado.comando + ' ';
-            eventoBuscar({ key: '' }, false);
-        } else
-        if (e.key === 'Escape') {
-            document.getElementById('buscaGeral').value = '';
-            eventoBuscar({ key: '' }, false);
-        } else
-        if (e.key === 'Enter' && selecionado !== null && cont === true) {
-            if (selecionado.evento !== null) {
-                selecionado.evento(selecionado, document.getElementById('buscaGeral').value);
-                document.getElementById('buscaGeral').value = '';
-                eventoBuscar({ key: '' }, false);
-            } else {
-                document.getElementById('buscaGeral').value = selecionado.comando + ' ';
-                eventoBuscar(e, false);
-                document.getElementById('buscaGeral').focus();
-            }
-            setSelecionado(null);
-        } else
-        if (e.key === 'Enter' && cont === true) {
-            if (valor.indexOf('>') !== -1) {
-                comandos.filter((value) => value.evento !== null && valor.split('>')[0].trim().includes(value.comando)).forEach((value) => {
-                    console.log(value);
-                    value.evento(value, valor);
-                    return value;
-                });
-                document.getElementById('buscaGeral').value = '';
-                eventoBuscar({ key: '' }, false);
-            }
-            setSelecionado(null);
-        } else
-        if (valor.length < 3) {
-            document.getElementsByClassName(SearchStyle.styledComponentId)[0].classList.remove('mostrar');
-        } else {
-            setSelecionado(null);
-            document.getElementsByClassName(SearchStyle.styledComponentId)[0].classList.add('mostrar');
-            var results = [];
-            comandos.filter((value) => valor.includes(value.comando) || value.comando.includes(valor)).forEach((value, index) => {
-                if (index <= 5) {
-                    results.push(value);
-                }
-                return value;
-            });
-            if (results.length === 0) {
-                results.push({ comando: valor, evento: null, texto: 'Nenhum resultado encontrado' })
-            }
-            setResultados(results);
+        if (evento.key === 'Scape') {
+            zerarBusca();
         }
     }
 
-    function cadastrarFornecedor(comando, busca) {
-        store.dispatch(FornecedorAction.statusCadastrar());
-        store.dispatch(PaginaAction.mudarPaginaAtual('cadastrarFornecedor'));
+    function preencheSugestoes(ba = buscaAtual) {
+        var opcoes = comandos;
+        var baAux = ba;
+        baAux.map((value) => {
+            if (opcoes[value]) {
+                opcoes = opcoes[value];
+            }
+            return value;
+        });
+        var resultadosAux = [];
+        if (opcoes.fim === false) {
+            var op = Object.keys(opcoes);
+            op.filter((value) => value !== 'nome' && value !== 'fim').map((value) => {
+                resultadosAux.push({ ...opcoes[value], nomeComando: value })
+                return value;
+            })
+        }
+        setResultados(resultadosAux);
     }
 
-    function alterarFornecedor(comando, busca) {
-        var id = busca.split('>')[1];
-        API.get('/fornecedor/buscarPorId?id=' + id).then((value) => {
-            store.dispatch(FornecedorAction.statusAlterar(value.data));
-            store.dispatch(PaginaAction.mudarPaginaAtual('cadastrarFornecedor'));
+    function eventoEnter() {
+        var opcoes = comandos;
+        buscaAtual.map((value) => {
+            if (opcoes[value] !== undefined) {
+                opcoes = opcoes[value];
+            }
+            return value;
+        });
+        if (opcoes.fim === true) {
+            opcoes.comando(document.getElementById('buscaGeral').value);
+            zerarBusca();
+        } else
+        if (opcoes[document.getElementById('buscaGeral').value].fim === true) {
+            if (opcoes[document.getElementById('buscaGeral').value].param !== undefined && opcoes[document.getElementById('buscaGeral').value].param === true) {
+                if (document.getElementById('buscaGeral').value.trim().length !== 0) {
+                    setBuscaAtual([ ...buscaAtual, document.getElementById('buscaGeral').value ]);
+                }
+            
+                preencheSugestoes([ ...buscaAtual, document.getElementById('buscaGeral').value ]);
+            } else {
+                opcoes[document.getElementById('buscaGeral').value].comando(document.getElementById('buscaGeral').value);
+                zerarBusca();
+            }
+        } else {
+            if (document.getElementById('buscaGeral').value.trim().length !== 0) {
+                setBuscaAtual([ ...buscaAtual, document.getElementById('buscaGeral').value ]);
+            }
+        
+            preencheSugestoes([ ...buscaAtual, document.getElementById('buscaGeral').value ]);
+        }
+        document.getElementById('buscaGeral').value = '';
+    }
+
+    function proximoComando(com) {
+        var valores = buscaAtual;
+        valores.push(com.nomeComando);
+        setBuscaAtual(valores)
+        mostrarOpcoes({ key: '' })
+    }
+
+    function zerarBusca() {
+        document.getElementById('buscaGeral').value = '';
+        setResultados([]);
+        setBuscaAtual([]);
+    }
+
+    function executaComando(ex) {
+        if (!ex.param || ex.param === false) {
+            ex.comando();
+            zerarBusca();
+        } else {
+            proximoComando(ex);
+            document.getElementById('buscaGeral').focus();
+        }
+    }
+
+    function eventoCadastrarFornecedor() {
+        navigate('/fornecedores');
+        store.dispatch(FornecedorAction.statusOcioso());
+        setTimeout(() => {
+            store.dispatch(FornecedorAction.statusCadastrar());
+        }, 100);
+    }
+
+    function eventoAlterarFornecedorCPF(cpfCnpj) {
+        navigate('/fornecedores');
+        API.post('/fornecedor/buscaPaginadaPorTermos?pagina=0&tamanho=1', { nome: '', cpfCnpj: cpfCnpj, tipoPessoa: '', orderBy: 'nome', orderByDirection: 'asc' }).then((value) => {
+            store.dispatch(FornecedorAction.statusOcioso());
+            setTimeout(() => {
+                store.dispatch(FornecedorAction.statusAlterar(value.data.content[0]));
+            }, 100);
         });
     }
 
-    function indexFornecedor(comando, busca) {
-        store.dispatch(PaginaAction.mudarPaginaAtual('inicio'));
+    function eventoAlterarFornecedorID(id) {
+        navigate('/fornecedores');
+        API.get('/fornecedor/buscarPorId?id=' + id).then((value) => {
+            store.dispatch(FornecedorAction.statusOcioso());
+            setTimeout(() => {
+                store.dispatch(FornecedorAction.statusAlterar(value.data));
+            }, 100);
+        })
+    }
+
+    function eventoExcluirFornecedorCPF(cpfCnpj) {
+        navigate('/fornecedores');
+        API.post('/fornecedor/buscaPaginadaPorTermos?pagina=0&tamanho=1', { nome: '', cpfCnpj: cpfCnpj, tipoPessoa: '', orderBy: 'nome', orderByDirection: 'asc' }).then((value) => {
+            store.dispatch(FornecedorAction.statusOcioso());
+            setTimeout(() => {
+                store.dispatch(FornecedorAction.statusExcluir(value.data.content[0]));
+            }, 100);
+        });
+    }
+
+    function eventoExcluirFornecedorID(id) {
+        navigate('/fornecedores');
+        API.get('/fornecedor/buscarPorId?id=' + id).then((value) => {
+            store.dispatch(FornecedorAction.statusOcioso());
+            setTimeout(() => {
+                store.dispatch(FornecedorAction.statusExcluir(value.data));
+            }, 100);
+        })
+    }
+
+    function eventoInicioFornecedor() {
         store.dispatch(FornecedorAction.statusOcioso());
-        navigate('/fornecedores')
+        navigate('/fornecedores');
     }
 
-
-    function buscarFornecedor(comando, busca) {
-        
+    function eventoCadastrarItem() {
+        navigate('/itens');
+        store.dispatch(ItemAction.statusOcioso());
+        setTimeout(() => {
+            store.dispatch(ItemAction.statusCadastrar());
+        }, 100);
     }
 
-    function executaEvento(value) {
-        document.getElementById('buscaGeral').value = value.comando + ' ';
-        if (value.evento !== null) {
-            value.evento(value, document.getElementById('buscaGeral').value);
-            document.getElementById('buscaGeral').value = '';
-            eventoBuscar({ key: '' }, false);
-        } else {
-            document.getElementById('buscaGeral').focus();
-            eventoBuscar({ key: '' }, false);
-        }
-        setSelecionado(null);
+    function eventoAlterarItemNome(nome) {
+        navigate('/itens');
+        API.get('/item/buscaPorNome?nome=' + nome).then((value) => {
+            store.dispatch(ItemAction.statusOcioso());
+            setTimeout(() => {
+                store.dispatch(ItemAction.statusAlterar(value.data));
+            }, 100);
+        });
+    }
+
+    function eventoAlterarItemID(id) {
+        navigate('/itens');
+        API.get('/item/buscarPorId?id=' + id).then((value) => {
+            store.dispatch(ItemAction.statusOcioso());
+            setTimeout(() => {
+                store.dispatch(ItemAction.statusAlterar(value.data));
+            }, 100);
+        });
+    }
+
+    function eventoExcluirItemNome(nome) {
+        navigate('/itens');
+        API.get('/item/buscaPorNome?nome=' + nome).then((value) => {
+            store.dispatch(ItemAction.statusOcioso());
+            setTimeout(() => {
+                store.dispatch(ItemAction.statusExcluir(value.data));
+            }, 100);
+        });
+    }
+
+    function eventoExcluirItemID(id) {
+        navigate('/itens');
+        API.get('/item/buscarPorId?id=' + id).then((value) => {
+            store.dispatch(ItemAction.statusOcioso());
+            setTimeout(() => {
+                store.dispatch(ItemAction.statusExcluir(value.data));
+            }, 100);
+        });
+    }
+
+    function eventoInicioItem() {
+        store.dispatch(ItemAction.statusOcioso());
+        navigate('/itens');
+    }
+
+    function eventoInicioEntrada() {
+        store.dispatch(EntradaAction.statusOcioso());
+        navigate('/entradas');
     }
 
     return (
-        <SearchStyle>
-            <input type="text" id="buscaGeral" placeholder="Buscar" autoComplete="off" onKeyUp={(e) => { eventoBuscar(e) } } />
+        <SearchStyle className={resultados.length === 0 && buscaAtual.length === 0 ? '' : 'mostrar'}>
+            <div className="busca">
+                <input type="text" id="buscaGeral" placeholder="Buscar" autoComplete="off" onClick={(e) => mostrarOpcoes(e)} onKeyUp={(e) => mostrarOpcoes(e)} />
+            </div>
             <div className="caixaBuscaContainer">
+                {buscaAtual.length === 0 ? <></> :
+                <div className="itemBusca">
+                    <FontAwesomeIcon icon={faDesktop} />
+                    {
+                        buscaAtual.map((value, index) => {
+                            return (
+                                (index === 0 ? '' : ' > ') + value
+                            );
+                        })
+                    }
+                </div> }
                 {
                     resultados.map((value, index) => {
-                        return (
-                            <div 
-                            key={index} 
-                            className={'resultado ' + (selecionado != null && selecionado === value ? 'selecionado' : '')} 
-                            onClick={() => executaEvento(value)}>
-                                {value.comando} <div className="descricao">{value.texto}</div>
-                            </div>
-                        );
+                        if (value.fim === false) {
+                            return (
+                                <div 
+                                key={index} 
+                                className='resultado' onClick={() => proximoComando(value)}>
+                                    <div className='icone'><FontAwesomeIcon icon={faBahai} /> {value.nomeComando}</div> <div className="descricao">{value.nome}</div>
+                                </div>
+                            );
+                        } else {
+                            return (
+                                <div 
+                                key={index} 
+                                className='resultado comando' onClick={() => executaComando(value)}>
+                                    <div className='icone'><FontAwesomeIcon icon={faPlay} /> {value.nomeComando}</div> <div className="descricao">{value.nome}</div>
+                                </div>
+                            );
+                        }
                     })
                 }
+                <div className='resultado' onClick={zerarBusca}>
+                    <div className='icone'><FontAwesomeIcon icon={faDoorOpen} /> Fechar busca</div>
+                </div>
             </div>
         </SearchStyle>
     );

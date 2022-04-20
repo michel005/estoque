@@ -40,6 +40,9 @@ export default function EntradaReducer(state, action) {
                 ...state.entrada,
                 status: action.payload.status,
                 currentEntrada: action.payload.entrada
+            },
+            pagina: {
+                atual: 'novaEntrada'
             }
         });
     } else
@@ -66,6 +69,9 @@ export default function EntradaReducer(state, action) {
                     }, 
                     itens: [] 
                 }
+            },
+            pagina: {
+                atual: 'novaEntrada'
             }
         });
     } else
@@ -84,6 +90,9 @@ export default function EntradaReducer(state, action) {
                 status: EntradaActionTypes.STATUS_EXCLUIR,
                 error: null,
                 currentEntrada: action.payload
+            },
+            pagina: {
+                atual: 'novaEntrada'
             }
         });
     } else
@@ -127,6 +136,9 @@ export default function EntradaReducer(state, action) {
                     ...state.entrada,
                     list: [],
                     page: 0
+                },
+                pagina: {
+                    atual: 'inicio'
                 }
             });
         } else {
@@ -165,6 +177,9 @@ export default function EntradaReducer(state, action) {
                 list: action.payload.result,
                 page: action.payload.page,
                 pageInfo: action.payload.pageInfo
+            },
+            pagina: {
+                atual: 'inicio'
             }
         });
     } else

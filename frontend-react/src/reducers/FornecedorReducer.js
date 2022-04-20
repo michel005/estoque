@@ -1,4 +1,5 @@
 import FornecedorAction from "../actions/FornecedorAction";
+import PaginaAction from "../actions/PaginaAction";
 import API from "../API";
 import FornecedorActionTypes from "../constants/FornecedorActionTypes";
 import store from "../store";
@@ -12,6 +13,9 @@ export default function FornecedorReducer(state, action) {
                 status: FornecedorActionTypes.STATUS_CADASTRAR,
                 error: null,
                 currentFornecedor: { id: null, nome: 'Novo Fornecedor', tipoPessoa: 'F' }
+            },
+            pagina: {
+                atual: 'novoFornecedor'
             }
         });
     } else
@@ -22,6 +26,9 @@ export default function FornecedorReducer(state, action) {
                 status: FornecedorActionTypes.STATUS_ALTERAR,
                 error: null,
                 currentFornecedor: action.payload
+            },
+            pagina: {
+                atual: 'novoFornecedor'
             }
         });
     } else
@@ -32,6 +39,9 @@ export default function FornecedorReducer(state, action) {
                 status: FornecedorActionTypes.STATUS_EXCLUIR,
                 error: null,
                 currentFornecedor: action.payload
+            },
+            pagina: {
+                atual: 'novoFornecedor'
             }
         });
     } else
@@ -43,11 +53,15 @@ export default function FornecedorReducer(state, action) {
                 error: null,
                 currentFornecedor: null,
                 selecionados: []
+            },
+            pagina: {
+                atual: 'inicio'
             }
         });
     } else
     if (action.type === FornecedorActionTypes.CADASTRAR) {
-        API.post('/fornecedor/cadastrar', action.payload).then((response) => {
+        API.post('/fornecedor/cadastrar', action.payload).then(() => {
+            store.dispatch(PaginaAction.mudarPaginaAtual('inicio'));
             store.dispatch(FornecedorAction.buscarTodos(state.fornecedor.termo));
         }).catch((error) => {
             store.dispatch(FornecedorAction.mostrarErro(error.response.data));
@@ -55,6 +69,7 @@ export default function FornecedorReducer(state, action) {
     } else
     if (action.type === FornecedorActionTypes.ALTERAR) {
         API.post('/fornecedor/alterar?id=' + action.payload.id, action.payload).then(() => {
+            store.dispatch(PaginaAction.mudarPaginaAtual('inicio'));
             store.dispatch(FornecedorAction.buscarTodos(state.fornecedor.termo));
         }).catch((error) => {
             store.dispatch(FornecedorAction.mostrarErro(error.response.data));
@@ -62,6 +77,7 @@ export default function FornecedorReducer(state, action) {
     } else
     if (action.type === FornecedorActionTypes.EXCLUIR) {
         API.post('/fornecedor/excluir?id=' + action.payload.id).then(() => {
+            store.dispatch(PaginaAction.mudarPaginaAtual('inicio'));
             store.dispatch(FornecedorAction.buscarTodos(state.fornecedor.termo));
         }).catch((error) => {
             store.dispatch(FornecedorAction.mostrarErro(error.response.data));
@@ -93,6 +109,9 @@ export default function FornecedorReducer(state, action) {
                 pageInfo: action.payload.pageInfo,
                 termo: action.payload.termo,
                 data: action.payload.data
+            },
+            pagina: {
+                atual: 'inicio'
             }
         });
     } else

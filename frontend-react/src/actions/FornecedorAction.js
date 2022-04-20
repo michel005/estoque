@@ -38,10 +38,6 @@ class FornecedorAction {
         return { type: FornecedorActionTypes.BUSCAR_PAGINA, payload };
     };
 
-    static buscarMais = (payload) => {
-        return { type: FornecedorActionTypes.BUSCAR_MAIS, payload };
-    };
-
     static preencherConsulta = (payload) => {
         return { type: FornecedorActionTypes.PREENCHER_CONSULTA, payload };
     };
@@ -52,10 +48,6 @@ class FornecedorAction {
 
     static resetarErro = (payload) => {
         return { type: FornecedorActionTypes.RESETAR_ERRO, payload };
-    };
-
-    static selecionados = (payload) => {
-        return { type: FornecedorActionTypes.SELECIONADOS, payload };
     };
 
 }

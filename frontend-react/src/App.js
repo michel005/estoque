@@ -1,25 +1,25 @@
-import { faBell, faBox, faPlus, faSearch } from "@fortawesome/free-solid-svg-icons";
+import { faBell, faBox, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
 import { connect } from "react-redux";
 import {
     Route,
     Routes,
-    NavLink,
     useNavigate
 } from "react-router-dom";
 import styled from 'styled-components';
 import FornecedorAction from "./actions/FornecedorAction";
 import PaginaAction from "./actions/PaginaAction";
 import ButtonStyled from "./components/ButtonStyled";
-import TextField from "./components/forms/TextField";
 import SearchComponent from "./components/SearchComponent";
 import EntradaPageConnected from "./pages/entrada/EntradaPage";
 import FornecedorFormularioConnect from "./pages/fornecedor/FornecedorFormularioPage";
+import ItemFormularioConnect from "./pages/item/ItemFormularioPage";
 import FornecedorPageConnected from "./pages/fornecedor/FornecedorPage";
 import InicioPageConnected from "./pages/inicio/InicioPage";
 import ItemPageConnected from "./pages/item/ItemPage";
 import store from "./store";
+import ItemAction from "./actions/ItemAction";
 
 const DefaultMenuStyled = styled.div`
     background-color: #39f;
@@ -241,6 +241,7 @@ const DefaultMenuStyled = styled.div`
             display: flex;
             flex-direction: row;
             justify-content: center;
+            margin-top: -14px;
             width: 100%;
 
             a, button {
@@ -279,7 +280,8 @@ const Content = styled.div`
     justify-content: center;
     flex-grow: 1;
     width: 100%;
-    max-height: 100%;
+    height: 100%;
+    overflow-y: auto;
     z-index: 0;
 
     .tamanhoTela {
@@ -304,9 +306,20 @@ function App({ paginaAtual }) {
     const navigate = useNavigate();
 
     function cadastrarFornecedor() {
-        store.dispatch(FornecedorAction.statusCadastrar());
-        store.dispatch(PaginaAction.mudarPaginaAtual('novoFornecedor'));
         navigate('/fornecedores');
+        store.dispatch(FornecedorAction.statusOcioso());
+        setTimeout(() => {
+            store.dispatch(FornecedorAction.statusCadastrar());
+        }, 100);
+        setFixarCadastrar(false);
+    }
+
+    function cadastrarItem() {
+        navigate('/itens');
+        store.dispatch(ItemAction.statusOcioso());
+        setTimeout(() => {
+            store.dispatch(ItemAction.statusCadastrar());
+        }, 100);
         setFixarCadastrar(false);
     }
 
@@ -336,7 +349,7 @@ function App({ paginaAtual }) {
                                 <div className="opcoesCadastrar">
                                     <div className="titulo">Cadastrar</div>
                                     <ButtonStyled className="link" onClick={cadastrarFornecedor}>Fornecedor</ButtonStyled>
-                                    <ButtonStyled className="link">Item</ButtonStyled>
+                                    <ButtonStyled className="link" onClick={cadastrarItem}>Item</ButtonStyled>
                                     <ButtonStyled className="link">Entrada</ButtonStyled>
                                     <ButtonStyled className="link">Saída</ButtonStyled>
                                 </div>
@@ -374,13 +387,13 @@ function App({ paginaAtual }) {
                         </div>
                     </div>
                     <div className="menuOptions">
-                        <a type="button" className={curentLink() === '/' ? 'active' : ''} onClick={ () => navegar('/') }>Início</a>
-                        <a type="button" className={paginaAtual === 'novoFornecedor' || curentLink() === '/fornecedores' ? 'active' : ''} onClick={ () => navegar('/fornecedores') }>Fornecedores</a>
-                        <a type="button" className={curentLink() === '/itens' ? 'active' : ''} onClick={ () => navegar('/itens') }>Itens</a>
-                        <a type="button" className={curentLink() === '/entradas' ? 'active' : ''} onClick={ () => navegar('/entradas') }>Entradas</a>
-                        <a type="button" className={curentLink() === '/saidas' ? 'active' : ''} onClick={ () => navegar('/saidas') }>Saídas</a>
-                        <a type="button" className={curentLink() === '/inventario' ? 'active' : ''} onClick={ () => navegar('/inventario') }>Inventário</a>
-                        <a type="button" className={curentLink() === '/faturamento' ? 'active' : ''} onClick={ () => navegar('/faturamento') }>Faturamento</a>
+                        <a className={curentLink() === '/' ? 'active' : ''} onClick={ () => navegar('/') }>Início</a>
+                        <a className={paginaAtual === 'novoFornecedor' || curentLink() === '/fornecedores' ? 'active' : ''} onClick={ () => navegar('/fornecedores') }>Fornecedores</a>
+                        <a className={paginaAtual === 'novoItem' || curentLink() === '/itens' ? 'active' : ''} onClick={ () => navegar('/itens') }>Itens</a>
+                        <a className={paginaAtual === 'novaEntrada' || curentLink() === '/entradas' ? 'active' : ''} onClick={ () => navegar('/entradas') }>Entradas</a>
+                        <a className={paginaAtual === 'novaSaida' || curentLink() === '/saidas' ? 'active' : ''} onClick={ () => navegar('/saidas') }>Saídas</a>
+                        <a className={curentLink() === '/inventario' ? 'active' : ''} onClick={ () => navegar('/inventario') }>Inventário</a>
+                        <a className={curentLink() === '/faturamento' ? 'active' : ''} onClick={ () => navegar('/faturamento') }>Faturamento</a>
                     </div>
                 </div>
             </DefaultMenuStyled>
@@ -390,6 +403,10 @@ function App({ paginaAtual }) {
                         paginaAtual === 'novoFornecedor'
                         ? 
                         <FornecedorFormularioConnect />
+                        :
+                        paginaAtual === 'novoItem'
+                        ? 
+                        <ItemFormularioConnect />
                         :
                         <Routes>
                             <Route exact path='/' element={<InicioPageConnected />} />
