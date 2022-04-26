@@ -4,6 +4,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.math.BigDecimal;
+
 import javax.persistence.*;
 
 @Entity
@@ -23,5 +25,8 @@ public class ItemEventoEntrada extends AbstractEntity {
 
     @Column(name = "quantidade", nullable = false)
     private Integer quantidade;
+
+    @Column(name = "valor")
+    private BigDecimal valor;
 
 }

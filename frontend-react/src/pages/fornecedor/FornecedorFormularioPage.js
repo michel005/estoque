@@ -2,14 +2,12 @@ import { connect } from "react-redux";
 import store from "../../store";
 import styled from "styled-components";
 import TextField from "../../components/forms/TextField";
-import ButtonOptions from "../../components/forms/ButtonOptions";
 import ButtonStyled from "../../components/ButtonStyled";
 import Message from "../../components/Message";
 import ChoiceMessage from "../../components/ChoiceMessage";
 import FornecedorAction from "../../actions/FornecedorAction";
 import FornecedorActionTypes from "../../constants/FornecedorActionTypes";
 import {
-    NavLink,
     useNavigate
 } from "react-router-dom";
 import PaginaAction from "../../actions/PaginaAction";
@@ -95,8 +93,8 @@ function Separador({ titulo }) {
 }
 
 function FornecedorFormularioPage({ fornecedor, error, status }) {
-    const tipoPessoaType = [ {text: 'Física', value: 'F'}, {text: 'Jurídica', value: 'J'} ];
     const navigate = useNavigate();
+    const tipoPessoaType = { F: 'Física', J: 'Jurídica' };
 
     function valueById(id) {
         return document.getElementById(id) ? (document.getElementById(id).value === '' ? null : document.getElementById(id).value) : null;
@@ -134,11 +132,7 @@ function FornecedorFormularioPage({ fornecedor, error, status }) {
     }
 
     function fecharExcluir() {
-        if (fornecedor.id === null) {
-            store.dispatch(FornecedorAction.statusCadastrar());
-        } else {
-            store.dispatch(FornecedorAction.statusAlterar(fornecedor));
-        }
+        store.dispatch(FornecedorAction.resetarErro());
     }
 
     function cancelar() {
@@ -153,7 +147,7 @@ function FornecedorFormularioPage({ fornecedor, error, status }) {
             <Separador titulo="Dados pessoais" />
             <div className="linha">
                 <TextField label="Nome Completo" defaultValue={fornecedor.nome} fieldID="fieldNome" nullable={false} />
-                <TextField label="Tipo Pessoa" defaultValue={fornecedor.tipoPessoa} fieldID="fieldTipoPessoa" nullable={false} />
+                <SelectField label="Tipo Pessoa" defaultValue={fornecedor.tipoPessoa} fieldID="fieldTipoPessoa" nativeSelect={true} nullable={false} nullableOption={false} list={tipoPessoaType} />
                 <TextField label="CPF/CNPJ" defaultValue={fornecedor.cpfCnpj} fieldID="fieldCpfCnpj" nullable={false} />
             </div>
             <div className="linha">

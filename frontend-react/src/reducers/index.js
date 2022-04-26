@@ -44,17 +44,14 @@ const initialState = {
     },
     entrada: {
         status: EntradaActionTypes.STATUS_OCIOSO,
-        currentDate: null,
-        currentEntrada: null,
+        dataAtual: new Date(),
         list: [],
         itemList: [],
         fornecedoresList: [],
         pageInfo: [],
         page: 0,
-        size: 10,
-        error: null,
-        termo: '',
-        functionDataEntradaCalendar: null
+        size: 5,
+        error: null
     }
 };
 

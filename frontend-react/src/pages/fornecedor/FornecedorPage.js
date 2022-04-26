@@ -8,8 +8,6 @@ import ButtonStyled from "../../components/ButtonStyled";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFile, faFlag, faIdBadge, faArrowDown, faEraser, faIdCard, faLocationArrow, faSearch, faMailBulk, faMap, faMapSigns, faPhone, faSortNumericDown, faStreetView, faSuitcaseRolling, faUser, faChevronDown, faFastForward, faForward, faFastBackward, faBackward, faPrint, faPencilAlt, faTrash } from "@fortawesome/free-solid-svg-icons";
 import ButtonOptions from "../../components/forms/ButtonOptions";
-import FornecedorActionTypes from "../../constants/FornecedorActionTypes";
-import FornecedorFormularioConnect from "./FornecedorFormularioPage";
 
 const FornecedorPageStyled = styled.div`
     width: 100%;

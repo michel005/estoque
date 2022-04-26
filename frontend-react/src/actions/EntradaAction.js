@@ -18,10 +18,6 @@ export default class EntradaAction {
         return { type: EntradaActionTypes.STATUS_OCIOSO };
     };
 
-    static preencheCurrentEntrada = (payload) => {
-        return { type: EntradaActionTypes.PREENCHE_CURRENT_ENTRADA, payload };
-    };
-
     static cadastrar = (payload) => {
         return { type: EntradaActionTypes.CADASTRAR, payload };
     };
@@ -42,20 +38,16 @@ export default class EntradaAction {
         return { type: EntradaActionTypes.BUSCAR_PAGINA, payload };
     };
 
+    static preencherDataAtual = (payload) => {
+        return { type: EntradaActionTypes.PREENCHER_DATA_ATUAL, payload };
+    };
+
     static preencherConsulta = (payload) => {
         return { type: EntradaActionTypes.PREENCHER_CONSULTA, payload };
     };
 
-    static mostrarErro = (payload) => {
-        return { type: EntradaActionTypes.MOSTRAR_ERRO, payload };
-    };
-
-    static resetarErro = (payload) => {
-        return { type: EntradaActionTypes.RESETAR_ERRO, payload };
-    };
-
-    static atualizarData = (payload) => {
-        return { type: EntradaActionTypes.ATUALIZAR_DATA, payload };
+    static preencherCurrentEntrada = (payload) => {
+        return { type: EntradaActionTypes.PREENCHER_CURRENT_ENTRADA, payload };
     };
 
     static preencherListaItens = (payload) => {
@@ -74,8 +66,12 @@ export default class EntradaAction {
         return { type: EntradaActionTypes.REMOVE_ITEM_CURRENT_ENTRADA, payload };
     };
 
-    static defineDataEntradaCalendar = (payload) => {
-        return { type: EntradaActionTypes.FUNCTION_DEFINE_DATA_ENTRADA_CALENDAR, payload };
+    static mostrarErro = (payload) => {
+        return { type: EntradaActionTypes.MOSTRAR_ERRO, payload };
+    };
+
+    static resetarErro = (payload) => {
+        return { type: EntradaActionTypes.RESETAR_ERRO, payload };
     };
 
 }

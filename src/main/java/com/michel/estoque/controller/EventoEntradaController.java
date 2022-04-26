@@ -10,6 +10,7 @@ import com.michel.estoque.service.EventoEntradaService;
 import com.michel.estoque.service.ServiceResponse;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -71,7 +72,7 @@ public class EventoEntradaController extends AbstractController<EventoEntrada, E
     @JsonFormat(pattern = "ddMMyyyy")
     @DateTimeFormat(pattern = "ddMMyyyy")
     LocalDate dataEntrada) {
-        ServiceResponse<Page<EventoEntrada>> originalResposta = servico.buscarPorDataEntrada(pagina, tamanho, dataEntrada);
+        ServiceResponse<Page<EventoEntradaAnaliticoModel>> originalResposta = servico.buscarPorDataEntrada(pagina, tamanho, dataEntrada);
 
         if (originalResposta.temExcecao()) {
             return ResponseEntity.badRequest().body(originalResposta.getExcecao().getErros());

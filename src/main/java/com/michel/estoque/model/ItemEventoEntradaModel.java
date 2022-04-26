@@ -1,5 +1,7 @@
 package com.michel.estoque.model;
 
+import java.math.BigDecimal;
+
 import com.michel.estoque.entity.ItemEventoEntrada;
 
 import lombok.Getter;
@@ -13,6 +15,7 @@ public class ItemEventoEntradaModel {
 
     private String nomeItem;
     private Integer quantidade;
+    private BigDecimal valor;
 
     public ItemEventoEntradaModel() {
         
@@ -23,6 +26,7 @@ public class ItemEventoEntradaModel {
             this.nomeItem = itemEventoEntrada.getItem().getNome();
         }
         this.quantidade = itemEventoEntrada.getQuantidade();
+        this.valor = itemEventoEntrada.getValor();
     }
 
 }

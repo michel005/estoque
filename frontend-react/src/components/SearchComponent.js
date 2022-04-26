@@ -6,7 +6,6 @@ import styled from 'styled-components';
 import EntradaAction from '../actions/EntradaAction';
 import FornecedorAction from '../actions/FornecedorAction';
 import ItemAction from '../actions/ItemAction';
-import PaginaAction from '../actions/PaginaAction';
 import API from '../API';
 import store from '../store';
 
@@ -145,6 +144,7 @@ export default function SearchComponent() {
     const comandos = {
         fornecedor: {
             nome: 'Fornecedores',
+            inicio: { fim: true, nome: 'Pagina inicial', comando: eventoInicioFornecedor },
             cadastrar: { fim: true, nome: 'Cadastrar um fornecedor', comando: eventoCadastrarFornecedor },
             alterar: {
                 nome: 'Alterar um fornecedor',
@@ -158,11 +158,11 @@ export default function SearchComponent() {
                 porID: { fim: true, nome: 'Por ID', comando: eventoExcluirFornecedorID, hint: 'Informe o ID', param: true },
                 fim: false
             },
-            inicio: { fim: true, nome: 'Pagina inicial', comando: eventoInicioFornecedor },
             fim: false
         },
         item: {
             nome: 'Itens',
+            inicio: { fim: true, nome: 'Pagina inicial', comando: eventoInicioItem },
             cadastrar: { fim: true, nome: 'Cadastrar um item', comando: eventoCadastrarItem },
             alterar: {
                 nome: 'Alterar um item',
@@ -176,12 +176,12 @@ export default function SearchComponent() {
                 porID: { fim: true, nome: 'Por ID', comando: eventoExcluirItemID, hint: 'Informe o ID', param: true },
                 fim: false
             },
-            inicio: { fim: true, nome: 'Pagina inicial', comando: eventoInicioItem },
             fim: false
         },
         entrada: {
             nome: 'Eventos de Entrada',
             inicio: { fim: true, nome: 'Pagina inicial', comando: eventoInicioEntrada },
+            cadastrar: { fim: true, nome: 'Cadastrar um evento de entrada', comando: eventoCadastrarEntrada },
             fim: false
         },
         fim: false
@@ -193,7 +193,8 @@ export default function SearchComponent() {
     function mostrarOpcoes(evento) {
         preencheSugestoes();
         if (evento.key === 'Enter') {
-            eventoEnter()
+            eventoEnter(buscaAtual);
+            document.getElementById('buscaGeral').value = '';
         } else
         if (evento.key === 'Scape') {
             zerarBusca();
@@ -212,7 +213,7 @@ export default function SearchComponent() {
         var resultadosAux = [];
         if (opcoes.fim === false) {
             var op = Object.keys(opcoes);
-            op.filter((value) => value !== 'nome' && value !== 'fim').map((value) => {
+            op.filter((value) => value !== 'nome' && value !== 'fim' && value.match(document.getElementById('buscaGeral').value)).map((value) => {
                 resultadosAux.push({ ...opcoes[value], nomeComando: value })
                 return value;
             })
@@ -220,7 +221,7 @@ export default function SearchComponent() {
         setResultados(resultadosAux);
     }
 
-    function eventoEnter() {
+    function eventoEnter(buscaAtu = buscaAtual) {
         var opcoes = comandos;
         buscaAtual.map((value) => {
             if (opcoes[value] !== undefined) {
@@ -385,6 +386,14 @@ export default function SearchComponent() {
     function eventoInicioEntrada() {
         store.dispatch(EntradaAction.statusOcioso());
         navigate('/entradas');
+    }
+
+    function eventoCadastrarEntrada() {
+        navigate('/entradas');
+        store.dispatch(EntradaAction.statusOcioso());
+        setTimeout(() => {
+            store.dispatch(EntradaAction.statusCadastrar());
+        }, 100);
     }
 
     return (

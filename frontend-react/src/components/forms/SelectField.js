@@ -58,7 +58,6 @@ const StyleError = styled.span`
 const SelectField = ( {
     externalError = '', 
     fieldID = '', 
-    validation = () => { return ''; }, 
     label = '', 
     nullable = true, 
     defaultValue, 
@@ -66,7 +65,6 @@ const SelectField = ( {
     placeholder = '',
     nativeSelect = false,
     nullableOption = true,
-    onlyValuesList = false,
     nullableOptionText = '',
     nullableOptionValue = null,
     enterEvent = () => {}
@@ -85,28 +83,15 @@ const SelectField = ( {
     const validate = () => {
         var value = document.getElementById(fieldID).value;
         var erro = '';
-        if (nullable === false && (value.trim() === '' || value === null)) {
+        if (nullable === false && (value === null || value.trim() === '')) {
             erro = 'Campo obrigatório não preenchido!';
         }
-        if (erro === '' && value !== null && value !== '' && fieldID && fieldID !== null) {
-            if (nativeSelect === false) {
-                if (!list.includes(value)) {
-                    erro = 'Valor informado não é válido';
-                }
+        if (erro === '' && value !== null && value !== '' && nativeSelect === false) {
+            if (!list.includes(value)) {
+                erro = 'Valor informado não é válido';
             }
         }
-        if (erro === '' && value !== null && value !== '' && validation !== undefined) {
-            erro = validation();
-        }
         showError(erro);
-    }
-
-    var onlyValues = [];
-    if (onlyValuesList === true) {
-        list.map((value) => {
-            onlyValues.push({text: value, value: value});
-            return value;
-        })
     }
 
     function enterEventInner(event) {
@@ -123,23 +108,18 @@ const SelectField = ( {
             <>
                 <input list={fieldID + '_datalist'} onKeyPress={enterEventInner} autoComplete="false" type="text" id={fieldID} name={fieldID} defaultValue={defaultValue} onBlur={validate} placeholder={placeholder} />
                 <datalist id={fieldID + '_datalist'}>
-                    {list.map((value,index) => {
-                        return (<option key={index} value={value} />);
+                    {nullableOption === true ? <option value={nullableOptionValue}>{nullableOptionText}</option> : <></>}
+                    {Object.keys(list).map((value,index) => {
+                        return (<option key={index} value={value}>{list[value]}</option>);
                     })}
                 </datalist>
             </>
             : 
             <select defaultValue={defaultValue} id={fieldID} onBlur={validate}  name={fieldID}>
                 {nullableOption === true ? <option value={nullableOptionValue}>{nullableOptionText}</option> : <></>}
-                {onlyValuesList === true ? 
-                    Object.keys(onlyValues).map((value,index) => {
-                        return (<option key={index} value={onlyValues[value].value}>{onlyValues[value].text}</option>);
-                    })
-                :
-                    Object.keys(list).map((value,index) => {
-                        return (<option key={index} value={list[value].value}>{list[value].text}</option>);
-                    })
-                }
+                {Object.keys(list).map((value,index) => {
+                    return (<option key={index} value={value}>{list[value]}</option>);
+                })}
             </select>}
             <StyleError>{error}</StyleError>
         </Style>

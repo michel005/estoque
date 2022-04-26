@@ -16,9 +16,8 @@ export default class DateUtils {
             if (currentMonth === auxDate.getMonth()) {
                 lastDay = auxDate.getDate();
             }
-            console.log(auxDate);
         }
-        return new Date(date.getFullYear(), date.getMonth(), lastDay);
+        return lastDay;
     }
 
     static justDate(date = new Date()) {

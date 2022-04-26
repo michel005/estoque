@@ -53,6 +53,7 @@ public class EventoEntradaService extends AbstractService<EventoEntrada, EventoE
                 itemEventoEntrada.setEventoEntrada(eventoEntrada);
                 itemEventoEntrada.setItem(i);
                 itemEventoEntrada.setQuantidade(item.getQuantidade());
+                itemEventoEntrada.setValor(item.getValor());
                 itemEventoEntradaBusiness.cadastrar(itemEventoEntrada);
             }
             return eventoEntrada;
@@ -75,6 +76,7 @@ public class EventoEntradaService extends AbstractService<EventoEntrada, EventoE
                 itemEventoEntrada.setEventoEntrada(eventoEntrada);
                 itemEventoEntrada.setItem(i);
                 itemEventoEntrada.setQuantidade(item.getQuantidade());
+                itemEventoEntrada.setValor(item.getValor());
                 itemEventoEntradaBusiness.cadastrar(itemEventoEntrada);
             }
             return eventoEntrada;
@@ -98,17 +100,11 @@ public class EventoEntradaService extends AbstractService<EventoEntrada, EventoE
 
     public ServiceResponse<EventoEntradaAnaliticoModel> visualizarAnalitico(Long id) {
         return ServiceResponse.callback(() -> {
-            EventoEntrada eventoEntrada = negocio.buscaPorId(id);
-            EventoEntradaAnaliticoModel model = new EventoEntradaAnaliticoModel();
-            model.setEventoEntrada(eventoEntrada);
-            for (ItemEventoEntrada itemEventoEntrada : itemEventoEntradaBusiness.buscaPorEventoEntrada(model.getEventoEntrada().getId())) {
-                model.getItens().add(new ItemEventoEntradaModel(itemEventoEntrada));
-            }
-            return model;
+            return negocio.visualizarAnalitico(id);
         });
     }
 
-    public ServiceResponse<Page<EventoEntrada>> buscarPorDataEntrada(int pagina, int tamanho, LocalDate dataEntrada) {
+    public ServiceResponse<Page<EventoEntradaAnaliticoModel>> buscarPorDataEntrada(int pagina, int tamanho, LocalDate dataEntrada) {
         return ServiceResponse.callback(() -> {
             return negocio.buscarPorDataEntrada(pagina, tamanho, dataEntrada);
         });

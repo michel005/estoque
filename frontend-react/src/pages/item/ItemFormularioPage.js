@@ -2,20 +2,15 @@ import { connect } from "react-redux";
 import store from "../../store";
 import styled from "styled-components";
 import TextField from "../../components/forms/TextField";
-import ButtonOptions from "../../components/forms/ButtonOptions";
 import ButtonStyled from "../../components/ButtonStyled";
 import Message from "../../components/Message";
 import ChoiceMessage from "../../components/ChoiceMessage";
-import FornecedorAction from "../../actions/FornecedorAction";
-import FornecedorActionTypes from "../../constants/FornecedorActionTypes";
 import {
-    NavLink,
     useNavigate
 } from "react-router-dom";
 import PaginaAction from "../../actions/PaginaAction";
 import ItemAction from "../../actions/ItemAction";
 import ItemActionTypes from "../../constants/ItemActionTypes";
-import { useState } from "react";
 import SelectField from "../../components/forms/SelectField";
 
 const StyledFormulario = styled.div`
@@ -144,7 +139,7 @@ function ItemFormularioPage({ item, error, status, categorias }) {
             <Separador titulo="Dados gerais" />
             <div className="linha">
                 <TextField label="Nome do Item" defaultValue={item.nome} fieldID="fieldNome" nullable={false} />
-                <SelectField label="Categoria" defaultValue={item.categoria === null ? '' : item.categoria} fieldID="fieldCategoria" list={categorias} onlyValuesList={true} />
+                <SelectField label="Categoria" defaultValue={item.categoria === null ? '' : item.categoria} fieldID="fieldCategoria" list={categorias} />
             </div>
             <div className="comandos">
                 <ButtonStyled className="primary" onClick={salvar}>Salvar</ButtonStyled>

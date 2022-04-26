@@ -10,16 +10,17 @@ import {
 import styled from 'styled-components';
 import FornecedorAction from "./actions/FornecedorAction";
 import PaginaAction from "./actions/PaginaAction";
-import ButtonStyled from "./components/ButtonStyled";
 import SearchComponent from "./components/SearchComponent";
 import EntradaPageConnected from "./pages/entrada/EntradaPage";
 import FornecedorFormularioConnect from "./pages/fornecedor/FornecedorFormularioPage";
 import ItemFormularioConnect from "./pages/item/ItemFormularioPage";
+import EntradaFormularioConnect from "./pages/entrada/EntradaFormularioPage";
 import FornecedorPageConnected from "./pages/fornecedor/FornecedorPage";
 import InicioPageConnected from "./pages/inicio/InicioPage";
 import ItemPageConnected from "./pages/item/ItemPage";
 import store from "./store";
 import ItemAction from "./actions/ItemAction";
+import EntradaAction from "./actions/EntradaAction";
 
 const DefaultMenuStyled = styled.div`
     background-color: #39f;
@@ -49,7 +50,9 @@ const DefaultMenuStyled = styled.div`
             margin-bottom: -10px;
             width: 100%;
 
-            a {
+            & > button {
+                background-color: transparent;
+                border: none;
                 cursor: pointer;
                 display: flex;
                 flex-direction: row;
@@ -72,11 +75,23 @@ const DefaultMenuStyled = styled.div`
                     margin-left: 28px;
                 }
 
-                button {
+                .botaoCadastro, .botaoNotificacao {
+                    background-color: #fff3;
+                    border: none;
+                    border-radius: 18px;
+                    color: #fff;
+                    cursor: pointer;
                     margin-top: 10px;
                     margin-left: 14px;
                     height: 36px;
                     width: 36px;
+                    font-size: 14px;
+                    text-align: center;
+                    transition: all 0.25s;
+
+                    &:hover {
+                        background-color: #fff9;
+                    }
                 }
 
                 .imagemUsuario {
@@ -96,19 +111,6 @@ const DefaultMenuStyled = styled.div`
                     transform: translateX(-141px);
                     z-index: 100;
 
-                    button.menuPrincipal {
-                        margin: 0px;
-                        margin-top: 12px;
-                        height: 36px;
-                        width: 36px;
-                        background-color: #fff3;
-
-                        &:hover {
-                            border-color: #3c3;
-                            color: #3c3;
-                        }
-                    }
-
                     .opcoesCadastrar {
                         background-color: #3939;
                         backdrop-filter: blur(15px);
@@ -120,7 +122,7 @@ const DefaultMenuStyled = styled.div`
                         width: 130px;
                         opacity: 0;
                         transition: all 0.25s;
-                        transform: translate(-47px, -54px) scale(0);
+                        transform: translate(-37px, -54px) scale(0);
                         overflow: hidden;
                         z-index: 1;
 
@@ -133,6 +135,9 @@ const DefaultMenuStyled = styled.div`
                         }
 
                         button {
+                            background-color: transparent;
+                            border: none;
+                            cursor: pointer;
                             margin: 0px;
                             width: 100%;
                             text-align: left;
@@ -153,7 +158,7 @@ const DefaultMenuStyled = styled.div`
                         .opcoesCadastrar {
                             display: flex;
                             z-index: 100;
-                            transform: translate(-47px, 54px) scale(1);
+                            transform: translate(-37px, 54px) scale(1);
                             opacity: 1;
                         }
                     }
@@ -244,7 +249,7 @@ const DefaultMenuStyled = styled.div`
             margin-top: -14px;
             width: 100%;
 
-            a, button {
+            button {
                 background-color: transparent;
                 border: 2px solid transparent;
                 border-radius: 0px;
@@ -323,6 +328,15 @@ function App({ paginaAtual }) {
         setFixarCadastrar(false);
     }
 
+    function cadastrarEntrada() {
+        navigate('/entradas');
+        store.dispatch(EntradaAction.statusOcioso());
+        setTimeout(() => {
+            store.dispatch(EntradaAction.statusCadastrar());
+        }, 100);
+        setFixarCadastrar(false);
+    }
+
     function navegar(link) {
         store.dispatch(PaginaAction.mudarPaginaAtual('inicio'));
         navigate(link);
@@ -339,25 +353,25 @@ function App({ paginaAtual }) {
             <DefaultMenuStyled>
                 <div className="tamanhoTela">
                     <div className="appTitle noprint">
-                        <a onClick={ () => navegar('/') }>{store.getState().appName}</a>
+                        <button onClick={ () => navegar('/') }>{store.getState().appName}</button>
                         <SearchComponent />
                         <div className="menuUsuario">
                             <div className={'menuCadastrar ' + (fixarCadastrar === true ? 'fixar' : '')}>
-                                <ButtonStyled className="menuPrincipal" onClick={() => { setFixarCadastrar(!fixarCadastrar); setFixarNotificacoes(false); }}>
+                                <button className="botaoCadastro" onClick={() => { setFixarCadastrar(!fixarCadastrar); setFixarNotificacoes(false); }}>
                                     <FontAwesomeIcon icon={faPlus} />
-                                </ButtonStyled>
+                                </button>
                                 <div className="opcoesCadastrar">
                                     <div className="titulo">Cadastrar</div>
-                                    <ButtonStyled className="link" onClick={cadastrarFornecedor}>Fornecedor</ButtonStyled>
-                                    <ButtonStyled className="link" onClick={cadastrarItem}>Item</ButtonStyled>
-                                    <ButtonStyled className="link">Entrada</ButtonStyled>
-                                    <ButtonStyled className="link">Saída</ButtonStyled>
+                                    <button className="link" onClick={cadastrarFornecedor}>Fornecedor</button>
+                                    <button className="link" onClick={cadastrarItem}>Item</button>
+                                    <button className="link" onClick={cadastrarEntrada}>Entrada</button>
+                                    <button className="link">Saída</button>
                                 </div>
                             </div>
                             <div className={'menuNotificacao ' + (fixarNotificacoes === true ? 'fixar' : '')}>
-                                <ButtonStyled className="menuPrincipal inverso" onClick={() => { setFixarNotificacoes(!fixarNotificacoes); setFixarCadastrar(false); }}>
+                                <button className="botaoNotificacao" onClick={() => { setFixarNotificacoes(!fixarNotificacoes); setFixarCadastrar(false); }}>
                                     <FontAwesomeIcon icon={faBell} />
-                                </ButtonStyled>
+                                </button>
                                 <div className="opcoesNotificacao">
                                     <div className="titulo">Notificações</div>
                                     <div className="notificacao">
@@ -387,26 +401,30 @@ function App({ paginaAtual }) {
                         </div>
                     </div>
                     <div className="menuOptions">
-                        <a className={curentLink() === '/' ? 'active' : ''} onClick={ () => navegar('/') }>Início</a>
-                        <a className={paginaAtual === 'novoFornecedor' || curentLink() === '/fornecedores' ? 'active' : ''} onClick={ () => navegar('/fornecedores') }>Fornecedores</a>
-                        <a className={paginaAtual === 'novoItem' || curentLink() === '/itens' ? 'active' : ''} onClick={ () => navegar('/itens') }>Itens</a>
-                        <a className={paginaAtual === 'novaEntrada' || curentLink() === '/entradas' ? 'active' : ''} onClick={ () => navegar('/entradas') }>Entradas</a>
-                        <a className={paginaAtual === 'novaSaida' || curentLink() === '/saidas' ? 'active' : ''} onClick={ () => navegar('/saidas') }>Saídas</a>
-                        <a className={curentLink() === '/inventario' ? 'active' : ''} onClick={ () => navegar('/inventario') }>Inventário</a>
-                        <a className={curentLink() === '/faturamento' ? 'active' : ''} onClick={ () => navegar('/faturamento') }>Faturamento</a>
+                        <button className={curentLink() === '/' ? 'active' : ''} onClick={ () => navegar('/') }>Início</button>
+                        <button className={paginaAtual === 'novoFornecedor' || curentLink() === '/fornecedores' ? 'active' : ''} onClick={ () => navegar('/fornecedores') }>Fornecedores</button>
+                        <button className={paginaAtual === 'novoItem' || curentLink() === '/itens' ? 'active' : ''} onClick={ () => navegar('/itens') }>Itens</button>
+                        <button className={paginaAtual === 'novaEntrada' || curentLink() === '/entradas' ? 'active' : ''} onClick={ () => navegar('/entradas') }>Entradas</button>
+                        <button className={paginaAtual === 'novaSaida' || curentLink() === '/saidas' ? 'active' : ''} onClick={ () => navegar('/saidas') }>Saídas</button>
+                        <button className={curentLink() === '/inventario' ? 'active' : ''} onClick={ () => navegar('/inventario') }>Inventário</button>
+                        <button className={curentLink() === '/faturamento' ? 'active' : ''} onClick={ () => navegar('/faturamento') }>Faturamento</button>
                     </div>
                 </div>
             </DefaultMenuStyled>
             <Content>
                 <div className="tamanhoTela">
                     {
-                        paginaAtual === 'novoFornecedor'
+                        (paginaAtual === 'novoFornecedor'
                         ? 
                         <FornecedorFormularioConnect />
                         :
-                        paginaAtual === 'novoItem'
+                        (paginaAtual === 'novoItem'
                         ? 
                         <ItemFormularioConnect />
+                        :
+                        (paginaAtual === 'novaEntrada'
+                        ? 
+                        <EntradaFormularioConnect />
                         :
                         <Routes>
                             <Route exact path='/' element={<InicioPageConnected />} />
@@ -416,7 +434,7 @@ function App({ paginaAtual }) {
                             <Route path='/saidas' element={<h1>Saídas</h1>} />
                             <Route path='/inventario' element={<h1>Inventário</h1>} />
                             <Route path='/faturamento' element={<h1>Faturamento</h1>} />
-                        </Routes>
+                        </Routes>)))
                     }
                 </div>
             </Content>

@@ -181,3 +181,15 @@ databaseChangeLog:
               - column:
                   name: complemento
                   type: varchar(50)
+  - changeSet:
+      id: '7.0'
+      author: Michel Douglas Grigoli
+      changes:
+        - addColumn:
+            schemaName: estoque
+            tableName: es_item_evento_entrada
+            columns:
+              - column:
+                  name: valor
+                  type: number(11,2)
+            validate: true

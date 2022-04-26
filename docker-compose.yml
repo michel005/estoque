@@ -9,5 +9,7 @@ services:
       MYSQL_USER: michel
       MYSQL_PASSWORD: michel
     command: ['mysqld', '--default-time-zone=-03:00']
+    cap_add:
+      - SYS_NICE  # CAP_SYS_NICE
     ports:
       - "3306:3306"

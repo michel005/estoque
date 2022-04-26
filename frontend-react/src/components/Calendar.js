@@ -1,41 +1,91 @@
-import { faArrowCircleLeft, faArrowCircleRight, faArrowLeft, faArrowRight, faCalendar, faLock, faLockOpen, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faArrowCircleLeft, faArrowCircleRight, faArrowLeft, faArrowRight, faCalendarAlt } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
-import ButtonStyled from './ButtonStyled';
 import styled from "styled-components";
 import DateUtils from "../utils/DateUtils";
+import ButtonStyled from "./ButtonStyled";
 
 const AlternativeCalendarStyled = styled.div`
-background-color: #fff;
-box-shadow: #ddd 0px 0px 7px;
 overflow: hidden;
-padding: 4px;
-width: 290px;
+width: 200px;
 
-.title {
-    color: #000;
-    cursor: pointer;
-    padding: 10px 10px 4px;
-    font-weight: bold;
-    transition: all 0.25s;
+&:hover .inputIcon:hover {
+    border: 1px solid #39f;
 
-    &:hover {
-        color: #39f;
+    button {
+        background-color: #39f;
+    }
+}
+
+.campoLabel {
+    display: flex;
+    flex-direction: column;
+
+    label {
+        font-weight: bold;
+        margin-bottom: 4px;
+        color: #999;
+
+        .notNullable {
+            color: #CCC;
+            font-size: 14px;
+        }
     }
 
-    .cont {
+    input {
+        border-radius: 4px 0px 0px 4px;
+        border: 0px solid #aaa;
+        margin: 0px;
+        max-height: 35px;
+        outline: none;
+        padding: 10px 7px;
+        transition: all 0.5s;
+        width: 100%;
+
+        &:disabled, &:read-only {
+            background-color: #fff;
+            cursor: not-allowed;
+        }
+
+        &:hover {
+            border-color: #666;
+        }
+
+        &:focus {
+            border-color: #39f;
+        }
+    }
+
+    .inputIcon {
         display: flex;
+        flex-direction: row;
+        border-radius: 4px;
+        border: 1px solid #aaa;
+        overflow: hidden;
+        
+        button {
+            color: #fff;
+            margin-left: -1px;
+            border-radius: 0px;
 
-        .text {
-            display: flex;
-
-            svg {
-                margin-top: 2px;
-                margin-left: 4px;
-                font-size: 8px;
+            &:hover {
+                background-color: #39f;
             }
         }
     }
+}
+
+.commandsAndCalendarViewer {
+    display: flex;
+    flex-direction: column;
+    background-color: #fff3;
+    backdrop-filter: blur(15px);
+    box-shadow: #3333 0px 0px 7px;
+    border-radius: 4px;
+    margin-top: 7px;
+    position: absolute;
+    width: 220px;
+    z-index: 100;
 }
 
 .commands {
@@ -59,43 +109,14 @@ width: 290px;
         display: flex;
         flex-direction: column;
         flex-grow: 1;
-        font-size: 16px;
+        font-size: 14px;
         justify-content: center;
         text-align: center;
         height: 29px;
     }
 }
 
-.selectedDate {
-    color: #111;
-    display: flex;
-    flex-direction: row;
-    font-weight: bold;
-    justify-content: center;
-    padding: 14px 7px 7px;
-    text-align: center;
-
-    .date {
-        text-align: left;
-        padding: 4px;
-        width: 100%;
-
-        svg {
-            margin-right: 10px;
-        }
-    }
-
-    .espacador {
-    }
-
-    button {
-        color: red;
-        margin-right: -3px;
-    }
-}
-
 .calendarViewer {
-    background-color: #fff;
     width: 100%;
 
     .week {
@@ -108,9 +129,10 @@ width: 290px;
             flex-grow: 1;
             border-radius: 7px;
             justify-content: center;
-            height: 40px;
+            height: 30px;
             margin: 2px;
             text-align: center;
+            font-size: 12px;
             width: 100%;
             transition: all 0.5s;
 
@@ -148,7 +170,7 @@ width: 290px;
             flex-grow: 1;
             justify-content: center;
             font-weight: bold;
-            height: 40px;
+            height: 30px;
             text-align: center;
             width: 100%;
             transition: all 0.5s;
@@ -163,24 +185,15 @@ width: 290px;
     .commands {
         display: none;
     }
-
-    &:hover {
-        .calendarViewer {
-            display: inline;
-        }
-        .commands {
-            display: flex;
-        }
-    }
 }
 `;
 
-export default function Calendar({ whenModifyCurrentDate = () => {}, setCurrentVariable = () => {}, title = null, reduced = false, defaultReduced = false, fieldID = null }) {
-    const [current, setCurrent] = useState(new Date());
-    const [selectedDate, setSelectedDate] = useState(null);
+export default function Calendar({title = null, fieldID = null, value = null, afterUpdateCurrentDate = () => {} }) {
+    const [current, setCurrent] = useState(new Date(value));
+    const [selectedDate, setSelectedDate] = useState(new Date(value));
     const [dayList, setDayList] = useState([]);
     const [constructorHasRun, setConstructorHasRun] = useState(false);
-    const [reduzido, setReduzido] = useState(defaultReduced);
+    const [focusInput, setFocusInput] = useState(false);
 
     var weekCount = [ 1, 2, 3, 4, 5, 6, 7 ];
     var weekMonthCount = [ 1, 2, 3, 4, 5, 6 ];
@@ -189,7 +202,6 @@ export default function Calendar({ whenModifyCurrentDate = () => {}, setCurrentV
     function constructor () {
         if (constructorHasRun) return;
         montarDias();
-        setCurrentVariable(mudarDiaAtual);
         setConstructorHasRun(true);
     };
 
@@ -209,7 +221,7 @@ export default function Calendar({ whenModifyCurrentDate = () => {}, setCurrentV
 
     function montarDias() {
         compensacao = 0;
-        var lastDay = lastDayOfMonth(current);
+        var lastDay = DateUtils.lastDayOfMonth(current);
         var day = 1;
         var dl = [];
         var primeiroDia = new Date(current.getFullYear(), current.getMonth(), day);
@@ -241,111 +253,83 @@ export default function Calendar({ whenModifyCurrentDate = () => {}, setCurrentV
         setDayList(dl);
     }
 
-    function lastDayOfMonth(date = new Date()) {
-        var auxDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-        var currentMonth = auxDate.getMonth();
-        var lastDay = auxDate.getDate();
-
-        while(currentMonth === auxDate.getMonth()) {
-            auxDate.setDate(auxDate.getDate() + 1);
-            if (currentMonth === auxDate.getMonth()) {
-                lastDay = auxDate.getDate();
-            }
-        }
-        return lastDay;
-    }
-
     function mudarDiaAtual(data) {
         setSelectedDate(data);
-        whenModifyCurrentDate(data);
+        setFocusInput(false);
+        afterUpdateCurrentDate(data);
     }
 
-    function removerDataAtual() {
-        setSelectedDate(null);
-        whenModifyCurrentDate(null);
+    function eventoMostrarCalendario() {
+        setFocusInput(!focusInput);
+    }
+
+    function mesmoDia(data1, data2) {
+        return DateUtils.stringJustDate(data1) === DateUtils.stringJustDate(data2);
     }
 
     constructor();
 
     return (
-        <AlternativeCalendarStyled className={'calendario' + (reduzido === true ? ' reduzido' : '')}>
-            {title !== null ? 
-            <div className="title" onClick={() => { setReduzido(!reduzido) }}>
-                <div className="cont">
-                    <div className="text">
-                        <div>
-                            {title}
-                        </div>
-                        {reduzido !== true ? <FontAwesomeIcon icon={faLock} /> : <FontAwesomeIcon icon={faLockOpen} />}
+        <AlternativeCalendarStyled className={'calendario ' + (focusInput === true ? '' : 'reduzido' ) }>
+            <div className="campoLabel">
+                <label>{title}</label>
+                <div className="inputIcon">
+                    <input type="text" id={fieldID} autoComplete="false" readOnly={true} value={DateUtils.stringJustDate(selectedDate)} />
+                    <ButtonStyled onClick={eventoMostrarCalendario}><FontAwesomeIcon icon={faCalendarAlt} /></ButtonStyled>
+                </div>
+            </div>
+            <div className="commandsAndCalendarViewer">
+                <div className="commands">
+                    <button title="Voltar 6 meses" onClick={() => anterior(6)}><FontAwesomeIcon icon={faArrowCircleLeft} /></button>
+                    <button title="Voltar 1 mês" onClick={() => anterior(1)}><FontAwesomeIcon icon={faArrowLeft} /></button>
+                    <div className="currentMonth">{(current.getMonth() + 1).toString().padStart(2, '0') + '/' + current.getFullYear()}</div>
+                    <button title="Avançar 1 mês" onClick={() => proximo(1)}><FontAwesomeIcon icon={faArrowRight} /></button>
+                    <button title="Avançar 6 meses" onClick={() => proximo(6)}><FontAwesomeIcon icon={faArrowCircleRight} /></button>
+                </div>
+                <div className="calendarViewer">
+                    <div className="weekLegend">
+                        <div className="day">D</div>
+                        <div className="day">S</div>
+                        <div className="day">T</div>
+                        <div className="day">Q</div>
+                        <div className="day">Q</div>
+                        <div className="day">S</div>
+                        <div className="day">S</div>
                     </div>
-                </div>
-            </div> : <></>}
-            {selectedDate !== null ? 
-            <div className="selectedDate">
-                <div className="date" title="Data selecionada">
-                    <FontAwesomeIcon icon={faCalendar} />
-                    {DateUtils.stringJustDate(selectedDate)}
-                </div>
-                <div className="espacador"></div>
-                <ButtonStyled className="transparent noHover" title="Desmarcar data atual" onClick={removerDataAtual}><FontAwesomeIcon icon={faTrash} /></ButtonStyled>
-            </div>
-            : 
-            <div className="selectedDate">
-                <div className="date" title="Data selecionada">
-                    <FontAwesomeIcon icon={faCalendar} />
-                    Nenhuma Data Selecionada
-                </div>
-            </div>}
-            <div className="commands">
-                <button title="Voltar 6 meses" onClick={() => anterior(6)}><FontAwesomeIcon icon={faArrowCircleLeft} /></button>
-                <button title="Voltar 1 mês" onClick={() => anterior(1)}><FontAwesomeIcon icon={faArrowLeft} /></button>
-                <div className="currentMonth">{(current.getMonth() + 1).toString().padStart(2, '0') + '/' + current.getFullYear()}</div>
-                <button title="Avançar 1 mês" onClick={() => proximo(1)}><FontAwesomeIcon icon={faArrowRight} /></button>
-                <button title="Avançar 6 meses" onClick={() => proximo(6)}><FontAwesomeIcon icon={faArrowCircleRight} /></button>
-            </div>
-            <div className="calendarViewer">
-                <div className="weekLegend">
-                    <div className="day">D</div>
-                    <div className="day">S</div>
-                    <div className="day">T</div>
-                    <div className="day">Q</div>
-                    <div className="day">Q</div>
-                    <div className="day">S</div>
-                    <div className="day">S</div>
-                </div>
-                {weekMonthCount.map((linha, i) => {
-                    return (
-                        <div key={i} className="week">
-                        {weekCount.map((coluna) => {
-                            var index = (((linha - 1) * 7) + coluna) - 1 - (compensacao);
-                            if (linha === 1 && dayList[index] !== undefined) {
-                                if (coluna === (dayList[index].getDay() + 1)) {
-                                    if (dayList[index].getMonth() !== current.getMonth()) {
-                                        return (<div key={linha + '-' + coluna} className="day disabled">{dayList[index].getDate()}</div>)
+                    {weekMonthCount.map((linha, i) => {
+                        return (
+                            <div key={i} className="week">
+                            {weekCount.map((coluna) => {
+                                var index = (((linha - 1) * 7) + coluna) - 1 - (compensacao);
+                                if (linha === 1 && dayList[index] !== undefined) {
+                                    if (coluna === (dayList[index].getDay() + 1)) {
+                                        if (dayList[index].getMonth() !== current.getMonth()) {
+                                            return (<div key={linha + '-' + coluna} className="day disabled">{dayList[index].getDate()}</div>)
+                                        } else {
+                                            return (<div key={linha + '-' + coluna} onClick={() => mudarDiaAtual(dayList[index])} className={'day ' + (selectedDate !== null && mesmoDia(dayList[index], selectedDate)?'current':'') + ' ' + (dayList[index].toLocaleDateString() === new Date().toLocaleDateString()?'today':'')}>{dayList[index].getDate()}</div>)
+                                        }
                                     } else {
-                                        return (<div key={linha + '-' + coluna} onClick={() => mudarDiaAtual(dayList[index])} className={'day ' + (selectedDate !== null && dayList[index].toLocaleDateString() === selectedDate.toLocaleDateString()?'current':'') + ' ' + (dayList[index].toLocaleDateString() === new Date().toLocaleDateString()?'today':'')}>{dayList[index].getDate()}</div>)
+                                        compensacao++;
+                                        return (<div key={linha + '-' + coluna} className="day disabled"></div>)
+                                    }
+                                } else
+                                if (dayList[index] !== undefined) {
+                                    if (coluna === (dayList[index].getDay() + 1)) {
+                                        if (dayList[index].getMonth() !== current.getMonth() || dayList[index].getFullYear() !== current.getFullYear()) {
+                                            return (<div key={linha + '-' + coluna} className="day disabled">{dayList[index].getDate()}</div>)
+                                        } else {
+                                            return (<div key={linha + '-' + coluna} onClick={() => mudarDiaAtual(dayList[index])} className={'day ' + (selectedDate !== null && mesmoDia(dayList[index], selectedDate)?'current':'') + ' ' + (dayList[index].toLocaleDateString() === new Date().toLocaleDateString()?'today':'')}>{dayList[index].getDate()}</div>)
+                                        }
                                     }
                                 } else {
-                                    compensacao++;
-                                    return (<div key={linha + '-' + coluna} className="day disabled"></div>)
+                                    return (dayList[index] !== undefined ? <div key={linha + '-' + coluna} onClick={() => mudarDiaAtual(dayList[index])} className={'day ' + (selectedDate !== null && mesmoDia(dayList[index], selectedDate)?'current':'') + ' ' + (dayList[index].toLocaleDateString() === new Date().toLocaleDateString()?'today':'')}>{dayList[index].getDate()}</div> : <div key={linha + '-' + coluna} className="day disabled"></div>)
                                 }
-                            } else
-                            if (dayList[index] !== undefined) {
-                                if (coluna === (dayList[index].getDay() + 1)) {
-                                    if (dayList[index].getMonth() !== current.getMonth()) {
-                                        return (<div key={linha + '-' + coluna} className="day disabled">{dayList[index].getDate()}</div>)
-                                    } else {
-                                        return (<div key={linha + '-' + coluna} onClick={() => mudarDiaAtual(dayList[index])} className={'day ' + (selectedDate !== null && dayList[index].toLocaleDateString() === selectedDate.toLocaleDateString()?'current':'') + ' ' + (dayList[index].toLocaleDateString() === new Date().toLocaleDateString()?'today':'')}>{dayList[index].getDate()}</div>)
-                                    }
-                                }
-                            } else {
-                                return (dayList[index] !== undefined ? <div key={linha + '-' + coluna} onClick={() => mudarDiaAtual(dayList[index])} className={'day ' + (selectedDate !== null && dayList[index].toLocaleDateString() === selectedDate.toLocaleDateString()?'current':'') + ' ' + (dayList[index].toLocaleDateString() === new Date().toLocaleDateString()?'today':'')}>{dayList[index].getDate()}</div> : <div key={linha + '-' + coluna} className="day disabled"></div>)
-                            }
-                            return coluna;
-                        })}
-                        </div>
-                )})}
-                {fieldID !== null ? <input type="hidden" id={fieldID} value={selectedDate !== null ? DateUtils.stringJustDate(selectedDate) : ''} /> : <></>}
+                                return coluna;
+                            })}
+                            </div>
+                        )
+                    })}
+                </div>
             </div>
         </AlternativeCalendarStyled>
     );

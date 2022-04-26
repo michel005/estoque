@@ -114,7 +114,13 @@ const ItemPageStyled = styled.div`
                     &.quantidade {
                         cursor: auto !important;
                         justify-content: flex-end;
-                        width: 120px;
+                        width: 150px;
+                    }
+
+                    &.valor {
+                        cursor: auto !important;
+                        justify-content: flex-end;
+                        width: 200px;
                     }
 
                     &.comandoslinha {
@@ -128,7 +134,7 @@ const ItemPageStyled = styled.div`
                                 color: #999;
                             }
 
-                            .opcoesNotificacao {
+                            .opcoesItem {
                                 background-color: #3339;
                                 backdrop-filter: blur(5px);
                                 border-radius: 4px;
@@ -155,7 +161,7 @@ const ItemPageStyled = styled.div`
                             }
 
                             &.mostrar {
-                                .opcoesNotificacao {
+                                .opcoesItem {
                                     transform: scale(1);
                                 }
                             }
@@ -212,6 +218,7 @@ function ItemPage({ item }) {
     const [constructorHasRun, setConstructorHasRun] = useState(false);
     const [mostrarMenu, setMostrarMenu] = useState(null);
     const [sortType, setSortType] = useState({field: 'item.nome', direction: 'asc'});
+    const moneyFormater = Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
 
     function constructor() {
         if (constructorHasRun) return;
@@ -291,6 +298,8 @@ function ItemPage({ item }) {
                             <div className="coluna nome" onClick={() => mudarOrder('item.nome')}>Nome {order('item.nome')}</div>
                             <div className="coluna categoria" onClick={() => mudarOrder('item.categoria')}>Categoria {order('item.categoria')}</div>
                             <div className="coluna quantidade">Quantidade</div>
+                            <div className="coluna valor">Valor Mínimo</div>
+                            <div className="coluna valor">Valor Máximo</div>
                             <div className="coluna comandoslinha"></div>
                         </div>
                     </div>
@@ -302,10 +311,12 @@ function ItemPage({ item }) {
                                     <div className="coluna nome">{value.item.nome}</div>
                                     <div className="coluna categoria">{value.item.categoria}</div>
                                     <div className="coluna quantidade">{value.quantidade}</div>
+                                    <div className="coluna valor">{moneyFormater.format(value.minValor)}</div>
+                                    <div className="coluna valor">{moneyFormater.format(value.maxValor)}</div>
                                     <div className="coluna comandoslinha">
                                         <div className={'botaoDetalhes ' + (mostrarMenu !== null && mostrarMenu.id === value.item.id ? 'mostrar' : '')}>
                                             <ButtonStyled title="Opções" className="link" onClick={() => eventoMostrarMenu(value.item)}><FontAwesomeIcon icon={faEllipsisV} /></ButtonStyled>
-                                            <div className="opcoesNotificacao">
+                                            <div className="opcoesItem">
                                                 <ButtonStyled title="Alterar" onClick={() => mostrarFormularioAlterar(value.item)}>Alterar</ButtonStyled>
                                                 <ButtonStyled title="Excluir" onClick={() => mostrarFormularioExclusao(value.item)}>Excluir</ButtonStyled>
                                             </div>

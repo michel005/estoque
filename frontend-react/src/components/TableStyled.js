@@ -3,8 +3,10 @@ import styled from "styled-components";
 const TableStyled = styled.table`
     border-collapse: collapse;
     margin-bottom: 14px;
-    width: 100%;
     table-layout: fixed;
+    border-radius: 4px;
+    overflow: hidden;
+    min-width: 100%;
 
     thead {
         background-color: #333;

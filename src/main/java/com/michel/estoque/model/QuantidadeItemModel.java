@@ -1,5 +1,7 @@
 package com.michel.estoque.model;
 
+import java.math.BigDecimal;
+
 import com.michel.estoque.entity.Item;
 
 import lombok.Getter;
@@ -17,9 +19,15 @@ public class QuantidadeItemModel {
 
     private Long quantidade;
 
-    public QuantidadeItemModel(Item item, Long quantidade) {
+    private BigDecimal minValor;
+
+    private BigDecimal maxValor;
+
+    public QuantidadeItemModel(Item item, Long quantidade, BigDecimal minValor, BigDecimal maxValor) {
         this.item = item;
         this.quantidade = quantidade;
+        this.minValor = minValor;
+        this.maxValor = maxValor;
     }
 
 }

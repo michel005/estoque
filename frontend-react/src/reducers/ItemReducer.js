@@ -6,7 +6,12 @@ import store from "../store";
 
 function buscarCategorias() {
     API.get('/item/buscaCategorias').then((response) => {
-        store.dispatch(ItemAction.preencherCategorias(response.data));
+        var result = [];
+        response.data.map((value) => {
+            result[value] = value;
+            return value;
+        });
+        store.dispatch(ItemAction.preencherCategorias(result));
     }).catch((error) => {
         store.dispatch(ItemAction.mostrarErro(error.response.data));
     });

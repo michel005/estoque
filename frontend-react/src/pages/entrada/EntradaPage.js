@@ -2,19 +2,14 @@ import { connect } from "react-redux";
 import styled from "styled-components";
 import EntradaAction from "../../actions/EntradaAction";
 import Calendar from "../../components/Calendar";
-import SelectField from "../../components/forms/SelectField";
-import Message from "../../components/Message";
 import store from "../../store";
 import ButtonStyled from "../../components/ButtonStyled";
-import EntradaActionTypes from "../../constants/EntradaActionTypes";
 import TextField from "../../components/forms/TextField";
-import JanelaStyled from "../../components/JanelaStyled";
-import ChoiceMessage from "../../components/ChoiceMessage";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowDown, faArrowUp, faBackward, faEraser, faFastBackward, faFastForward, faForward, faPen, faSearch, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faBackward, faCalendar, faChevronDown, faDollarSign, faFastBackward, faFastForward, faFile, faForward, faList, faMagic, faMoneyBill, faMoneyBillWave, faMoneyCheck, faPencilAlt, faPrint, faTrash, faUser } from "@fortawesome/free-solid-svg-icons";
 import { useState } from "react";
-import LightTableStyled from "../../components/LightTableStyled";
-import DateUtils from "../../utils/DateUtils";
+import TableStyled from "../../components/TableStyled";
+import ConvertUtils from "../../utils/ConvertUtils";
 
 const EntradaPageStyled = styled.div`
 width: 100%;
@@ -31,6 +26,10 @@ width: 100%;
         .campo, .calendario {
             margin-right: 14px;
             width: 100%;
+        }
+
+        .calendario {
+            width: 220px;
         }
 
         .comandos {
@@ -102,16 +101,34 @@ width: 100%;
                 word-wrap: break-word;
                 word-break: break-all;
 
+                &.grow2 {
+                    flex-grow: 2;
+                }
+
                 &.id {
                     width: 80px;
                 }
 
                 &.descricao {
                     flex-grow: 1;
+                    font-weight: bold;
                 }
 
                 &.fornecedor {
                     width: 280px;
+                }
+
+                &.quantidade {
+                    width: 130px;
+                }
+
+                &.status {
+                    width: 130px;
+                }
+
+                &.somaValor {
+                    justify-content: flex-end;
+                    width: 180px;
                 }
 
                 &.comandoslinha {
@@ -140,18 +157,8 @@ width: 100%;
 
                 .coluna {
                     color: #666;
-                    cursor: pointer;
                     font-weight: bold;
                     transition: all 0.25s;
-
-                    .orderBy {
-                        margin-left: 4px;
-                        transition: all 0.25s;
-
-                        &.orderByDesc {
-                            transform: rotate(180deg);
-                        }
-                    }
                 }
             }
         }
@@ -189,18 +196,29 @@ width: 100%;
                 display: flex;
                 flex-direction: row;
 
-                .campo {
+                .campo, table {
                     flex-grow: 1;
+                    margin-right: 14px;
                     margin-bottom: 14px;
                     width: 25%;
+
+                    &:last-child {
+                        margin-right: 0px;
+                    }
+                }
+
+                table {
+                    box-shadow: #3333 0px 0px 7px;
                 }
             }
         }
 
         &.selecionado {
-            transform: scale(102.5%);
-            z-index: 25;
             border: 2px solid #39f;
+
+            .detalhes {
+                padding-bottom: 0px;
+            }
 
             .linha {
                 background-color: #f4f4f4;
@@ -209,10 +227,10 @@ width: 100%;
                     display: none;
                 }
 
-                .coluna.nome {
+                .coluna.descricao {
                     color: #3339;
                     display: flex;
-                    font-size: 30px;
+                    font-size: 24px;
                     flex-grow: 1;
                 }
 
@@ -254,7 +272,6 @@ width: 100%;
                     .botaoSelecionar {
                         color: #999;
                         transition: all 0.25s;
-                        margin-right: 4px;
 
                         &.selecionado {
                             transform: rotate(180deg);
@@ -268,6 +285,20 @@ width: 100%;
             }
         }
     }
+}
+
+.colunaItem {
+    width: 60%;
+}
+
+.colunaQuantidade {
+    text-align: center;
+    width: 20%;
+}
+
+.colunaComando {
+    text-align: right;
+    width: 20%;
 }
 
 .paginacao {
@@ -323,7 +354,11 @@ width: 100%;
 
 function EntradaPage({ entrada }) {
     const [constructorHasRun, setConstructorHasRun] = useState(false);
-    const [sortType, setSortType] = useState({field: 'descricao', direction: 'asc'});
+    const moneyFormater = Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
+    const tipoPessoaType = { F: 'Física', J: 'Jurídica' };
+    const statusType = { PENDENTE: 'Pendente', APROVADO: 'Aprovado', CANCELADO: 'Cancelado' };
+    const [selecionado, setSelecionado] = useState(null);
+    const [mostrarMenu, setMostrarMenu] = useState(null);
 
     function constructor() {
         if (constructorHasRun) return;
@@ -333,17 +368,41 @@ function EntradaPage({ entrada }) {
     };
 
     function atualizar() {
-        if (document.getElementById('filtroDataBase') !== null && document.getElementById('filtroDataBase').value !== '') {
-            store.dispatch(EntradaAction.atualizarData(DateUtils.stringToDate(document.getElementById('filtroDataBase').value)));
-            store.dispatch(EntradaAction.buscarTodos(DateUtils.stringToDate(document.getElementById('filtroDataBase').value)));
-        } else {
-            store.dispatch(EntradaAction.statusOcioso());
-        }
+        setSelecionado(null);
+        setMostrarMenu(null);
+        store.dispatch(EntradaAction.buscarTodos());
     }
 
-    function limpar() {
-        document.getElementById('filtroDataBase').value = '';
-        document.getElementById('filtroDescricao').value = '';
+    function afterUpdateCurrentDate(date) {
+        store.dispatch(EntradaAction.preencherDataAtual(date));
+        atualizar();
+    }
+
+    function selecionar(ent) {
+        setSelecionado(selecionado === null || selecionado.eventoEntrada.id !== ent.eventoEntrada.id ? ent : null);
+        setMostrarMenu(null);
+    }
+
+    function eventoMostrarMenu(ent) {
+        setMostrarMenu(mostrarMenu === null || mostrarMenu.eventoEntrada.id !== ent.eventoEntrada.id ? ent : null);
+    }
+
+    function mostrarFormularioAlterar(ent) {
+        store.dispatch(EntradaAction.statusAlterar(ent.eventoEntrada.id));
+    }
+
+    function mostrarFormularioExclusao(ent) {
+        store.dispatch(EntradaAction.statusExcluir(ent));
+    }
+
+    function imprimir(ent) {
+        eventoMostrarMenu(ent);
+        if (selecionado === null || selecionado.eventoEntrada.id !== ent.eventoEntrada.id) {
+            selecionar(ent); 
+        }
+        setTimeout(() => {
+            window.print();
+        }, 100)
     }
 
     function buscarPagina(pagina) {
@@ -352,31 +411,16 @@ function EntradaPage({ entrada }) {
         }));
     }
 
-    function order(field) {
-        if (sortType.field === field) {
-            return (<div className={'orderBy ' + (sortType.direction === 'desc' ? 'orderByDesc' : '')}><FontAwesomeIcon icon={faArrowDown} /></div>);
-        }
-        return <></>;
-    }
-
-    function mudarOrder(fd) {
-        var dir = ( sortType.field === fd ) ? ( sortType.direction === 'asc' ? 'desc' : 'asc' ) : 'asc';
-        setSortType({field: fd, direction: dir });
-        atualizar({field: fd, direction: dir });
-    }
-
     constructor();
 
     return (
         <EntradaPageStyled>
             <div className="filtros">
                 <div className="linha">
-                    <TextField label="Data Base" fieldID="filtroDataBase" />
-                    <TextField label="Descrição" fieldID="filtroDescricao" />
+                    <Calendar title="Data Base" fieldID="filtroDataBase" value={entrada.dataAtual} afterUpdateCurrentDate={afterUpdateCurrentDate} />
                     <div className="comandos">
                         <div className="botoes">
-                            <ButtonStyled title="Buscar" className="primary" onClick={() => atualizar()}><FontAwesomeIcon icon={faSearch} /></ButtonStyled>
-                            <ButtonStyled title="Limpar filtros" onClick={() => limpar()}><FontAwesomeIcon icon={faEraser} /></ButtonStyled>
+                            <ButtonStyled title="Buscar" className="primary" onClick={() => atualizar()}>Atualizar</ButtonStyled>
                         </div>
                     </div>
                 </div>
@@ -384,25 +428,97 @@ function EntradaPage({ entrada }) {
             <div className="lista">
                 <div className="entrada nohover">
                     <div className="linha cabecalho">
-                        <div className="coluna id" onClick={() => mudarOrder('id')}># {order('id')}</div>
-                        <div className="coluna descricao" onClick={() => mudarOrder('descricao')}>Descrição {order('descricao')}</div>
-                        <div className="coluna fornecedor" onClick={() => mudarOrder('fornecedor')}>Fornecedor {order('fornecedor')}</div>
+                        <div className="coluna id">#</div>
+                        <div className="coluna descricao">Descrição</div>
+                        <div className="coluna fornecedor">Fornecedor</div>
+                        <div className="coluna status">Situação</div>
+                        <div className="coluna quantidade">Quantidade</div>
+                        <div className="coluna somaValor">Valor Total</div>
                         <div className="coluna comandoslinha"></div>
                     </div>
                 </div>
                 {
                     entrada.list.map((value, index) => {
                         return (
-                            <div className="entrada" key={index}>
+                            <div className={'entrada ' + (selecionado !== null && selecionado.eventoEntrada.id === value.eventoEntrada.id ? 'selecionado' : '')} key={index}>
                                 <div className="linha">
-                                    <div className="coluna id">{value.id}</div>
-                                    <div className="coluna descricao">{value.descricao}</div>
-                                    <div className="coluna fornecedor">{value.fornecedor !== null ? value.fornecedor.nome : ''}</div>
-                                    <div className="coluna comandoslinha"></div>
+                                    <div className="coluna id">{value.eventoEntrada.id}</div>
+                                    <div className="coluna descricao">{value.eventoEntrada.descricao}</div>
+                                    <div className="coluna fornecedor">{value.eventoEntrada.fornecedor !== null ? value.eventoEntrada.fornecedor.nome : 'Fornecedor não informado'}</div>
+                                    <div className="coluna status">{ConvertUtils.listOnText(statusType, value.eventoEntrada.status)}</div>
+                                    <div className="coluna quantidade">{value.itens.map(e => e.quantidade).reduce((prev, curr) => prev + curr, 0)}</div>
+                                    <div className="coluna somaValor">{moneyFormater.format(value.itens.map(e => e.valor).reduce((prev, curr) => prev + curr, 0))}</div>
+                                    <div className="coluna comandoslinha">
+                                        <div className="opcoesNotificacao">
+                                            <ButtonStyled title="Imprimir" onClick={() => imprimir(value)}><FontAwesomeIcon icon={faPrint} /></ButtonStyled>
+                                            <ButtonStyled title="Alterar" onClick={() => mostrarFormularioAlterar(value)}><FontAwesomeIcon icon={faPencilAlt} /></ButtonStyled>
+                                            <ButtonStyled title="Excluir" onClick={() => mostrarFormularioExclusao(value)}><FontAwesomeIcon icon={faTrash} /></ButtonStyled>
+                                        </div>
+                                        <ButtonStyled title="Mostrar detalhes" className={'botaoSelecionar link ' + (selecionado !== null && selecionado.eventoEntrada.id === value.eventoEntrada.id ? 'selecionado' : '')} onClick={() => selecionar(value)}>
+                                            <FontAwesomeIcon icon={faChevronDown} />
+                                        </ButtonStyled>
+                                    </div>
                                 </div>
+                                {selecionado !== null && selecionado.eventoEntrada.id === value.eventoEntrada.id ?
+                                <div className="detalhes">
+                                    <div className="separador">
+                                        <div className="tituloSeparador">Dados gerais</div>
+                                        <div className="barraSeparador"></div>
+                                    </div>
+                                    <div className="linhaDetalhe">
+                                        <TextField readonlyIcon={<FontAwesomeIcon icon={faFile} />} readonly={true} label="Descrição" defaultValue={value.eventoEntrada.descricao} />
+                                        <TextField readonlyIcon={<FontAwesomeIcon icon={faCalendar} />} readonly={true} label="Data de Entrada" defaultValue={value.eventoEntrada.dataEntrada} />
+                                        <TextField readonlyIcon={<FontAwesomeIcon icon={faFile} />} readonly={true} label="Situação" defaultValue={ConvertUtils.listOnText(statusType, value.eventoEntrada.status)} />
+                                    </div>
+                                    {value.eventoEntrada.fornecedor !== null ?
+                                    <>
+                                        <div className="separador">
+                                            <div className="tituloSeparador">Fornecedor</div>
+                                            <div className="barraSeparador"></div>
+                                        </div>
+                                        <div className="linhaDetalhe">
+                                            <TextField readonlyIcon={<FontAwesomeIcon icon={faFile} />} readonly={true} label="Nome Completo" defaultValue={value.eventoEntrada.fornecedor.nome} />
+                                            <TextField readonlyIcon={<FontAwesomeIcon icon={faCalendar} />} readonly={true} label="Tipo Pessoa" defaultValue={ConvertUtils.listOnText(tipoPessoaType, value.eventoEntrada.fornecedor.tipoPessoa)} />
+                                            <TextField readonlyIcon={<FontAwesomeIcon icon={faCalendar} />} readonly={true} label="CPF/CNPJ" defaultValue={value.eventoEntrada.fornecedor.cpfCnpj} />
+                                        </div>
+                                    </>:
+                                    <div className="linhaDetalhe">
+                                        {value.eventoEntrada.fornecedor !== null ? <div className="campo"></div> : 
+                                        <TextField readonlyIcon={<FontAwesomeIcon icon={faUser} />} readonly={true} label="Fornecedor" defaultValue='Não informado' />}
+                                    </div>}
+                                    <div className="separador">
+                                        <div className="tituloSeparador">Itens</div>
+                                        <div className="barraSeparador"></div>
+                                    </div>
+                                    <div className="linhaDetalhe">
+                                        <TextField readonlyIcon={<FontAwesomeIcon icon={faList} />} readonly={true} label="Total de Itens" defaultValue={value.itens.length} />
+                                        <TextField readonlyIcon={<FontAwesomeIcon icon={faMagic} />} readonly={true} label="Quantidade Total" defaultValue={value.itens.map(e => e.quantidade).reduce((prev, curr) => prev + curr, 0)} />
+                                        <TextField readonlyIcon={<FontAwesomeIcon icon={faMoneyBillWave} />} readonly={true} label="Valor Total" defaultValue={moneyFormater.format(value.itens.map(e => e.valor).reduce((prev, curr) => prev + curr, 0))} />
+                                    </div>
+                                </div>:<></>}
                             </div>
                         );
                     })
+                }
+                {
+                    entrada.dataAtual === null ?
+                    <div className='entrada'>
+                        <div className="linha">
+                            <div className="coluna grow2">
+                                Informe uma Data Base para prosseguir
+                            </div>
+                        </div>
+                    </div>
+                    :
+                    entrada.list.length === 0 ?
+                    <div className='entrada'>
+                        <div className="linha">
+                            <div className="coluna">
+                                Nenhum registro encontrado
+                            </div>
+                        </div>
+                    </div>
+                    : <></>
                 }
             </div>
             <div className="paginacao">
