@@ -53,7 +53,9 @@ export default function ButtonOptions ({
     label = null,
     list = [],
     fieldID = '',
-    defaultValue = null
+    defaultValue = null,
+    nullableOption = false,
+    nullableOptionText = ''
 }) {
     const [selecionado, setSelecionado] = useState(defaultValue);
 
@@ -63,9 +65,12 @@ export default function ButtonOptions ({
             <div className="opcoes">
                 {Object.keys(list).map((val, index) => {
                     return (
-                        <ButtonStyled key={index} className={selecionado === list[val].value ? 'primary' : ''} onClick={() => setSelecionado(list[val].value)}>{list[val].text}</ButtonStyled>
+                        <ButtonStyled key={index} className={selecionado === val ? 'primary' : ''} onClick={() => setSelecionado(val)}>{list[val]}</ButtonStyled>
                     )
                 })}
+                {nullableOption === true ? 
+                    <ButtonStyled className={selecionado === '' ? 'primary' : ''} onClick={() => setSelecionado('')}>{nullableOptionText}</ButtonStyled>
+                : <></>}
             </div>
             <input type="hidden" id={fieldID} name={fieldID} value={selecionado} />
         </Style>

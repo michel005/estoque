@@ -132,7 +132,11 @@ function FornecedorFormularioPage({ fornecedor, error, status }) {
     }
 
     function fecharExcluir() {
-        store.dispatch(FornecedorAction.resetarErro());
+        if (fornecedor.id === null) {
+            store.dispatch(FornecedorAction.statusCadastrar());
+        } else {
+            store.dispatch(FornecedorAction.statusAlterar(fornecedor));
+        }
     }
 
     function cancelar() {

@@ -14,8 +14,12 @@ import lombok.ToString;
 @ToString
 @NoArgsConstructor
 public class QuantidadeItemModel {
+
+    private Long id;
     
-    private Item item;
+    private String nome;
+
+    private String categoria;
 
     private Long quantidade;
 
@@ -24,7 +28,9 @@ public class QuantidadeItemModel {
     private BigDecimal maxValor;
 
     public QuantidadeItemModel(Item item, Long quantidade, BigDecimal minValor, BigDecimal maxValor) {
-        this.item = item;
+        this.id = item.getId();
+        this.nome = item.getNome();
+        this.categoria = item.getCategoria();
         this.quantidade = quantidade;
         this.minValor = minValor;
         this.maxValor = maxValor;

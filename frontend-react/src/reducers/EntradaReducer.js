@@ -209,19 +209,15 @@ export default function EntradaReducer(state, action) {
     } else
     if (action.type === EntradaActionTypes.REMOVE_ITEM_CURRENT_ENTRADA) {
         var temItem = null;
-        console.log(action.payload);
         var valoresAux = state.entrada.currentEntrada.itens;
-        console.log(valoresAux);
         valoresAux.map((value, index) => {
             if (value.nomeItem === action.payload) {
                 temItem = index;
             }
             return value;
         });
-        console.log(temItem);
         if (temItem !== null) {
             valoresAux.splice(temItem, 1);
-            console.log(valoresAux);
             return Object.assign({}, state, {
                 entrada: {
                     ...state.entrada,

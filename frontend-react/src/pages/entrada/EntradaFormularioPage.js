@@ -220,8 +220,7 @@ function EntradaFormularioPage({current, fornecedoresList, status, error, itemLi
     function validaSomenteNumeros() {
         var valor = document.getElementById('fieldValor').value.replace('.', '').replace(',', '.');
         var quantidade = parseInt(document.getElementById('fieldQuantidade').value);
-        console.log(quantidade);
-        if (isNaN(valor) || valor.toString().indexOf('.') == -1) {
+        if (isNaN(valor) || valor.toString().indexOf('.') === -1) {
             document.getElementById('fieldValor').value = '0,00';
             return 'O valor informado não é um número válido!';
         }

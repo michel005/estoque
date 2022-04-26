@@ -14,6 +14,7 @@ import lombok.ToString;
 @ToString
 public class EventoEntradaAnaliticoModel {
 
+    private Long id;
     private EventoEntrada eventoEntrada;
     private List<ItemEventoEntradaModel> itens = new ArrayList<>();
 

@@ -293,7 +293,55 @@ const Content = styled.div`
         display: flex;
         width: 1200px;
         padding: 14px 0px;
-        padding-top: 28px;
+        padding-top: 14px;
+
+        .filtros {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 7px;
+
+            .linha {
+                display: flex;
+                flex-direction: row;
+
+                .campo, .calendario {
+                    margin-right: 14px;
+                    width: 100%;
+                }
+
+                .calendario {
+                    width: 220px;
+                }
+
+                .comandos {
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: flex-end;
+                    margin-right: 0px;
+                    width: auto;
+
+                    .botoes {
+                        display: flex;
+                        flex-direction: row;
+
+                        button {
+                            min-width: 40px;
+                            border-radius: 0px;
+
+                            &:first-child {
+                                border-top-left-radius: 4px;
+                                border-bottom-left-radius: 4px;
+                            }
+
+                            &:last-child {
+                                border-top-right-radius: 4px;
+                                border-bottom-right-radius: 4px;
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 `;
 
@@ -312,6 +360,7 @@ function App({ paginaAtual }) {
 
     function cadastrarFornecedor() {
         navigate('/fornecedores');
+        store.dispatch(PaginaAction.mudarPaginaAtual('inicio'));
         store.dispatch(FornecedorAction.statusOcioso());
         setTimeout(() => {
             store.dispatch(FornecedorAction.statusCadastrar());
@@ -321,6 +370,7 @@ function App({ paginaAtual }) {
 
     function cadastrarItem() {
         navigate('/itens');
+        store.dispatch(PaginaAction.mudarPaginaAtual('inicio'));
         store.dispatch(ItemAction.statusOcioso());
         setTimeout(() => {
             store.dispatch(ItemAction.statusCadastrar());
@@ -330,6 +380,7 @@ function App({ paginaAtual }) {
 
     function cadastrarEntrada() {
         navigate('/entradas');
+        store.dispatch(PaginaAction.mudarPaginaAtual('inicio'));
         store.dispatch(EntradaAction.statusOcioso());
         setTimeout(() => {
             store.dispatch(EntradaAction.statusCadastrar());

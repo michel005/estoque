@@ -52,6 +52,7 @@ public class EventoEntradaBusiness extends AbstractBusiness<EventoEntrada, Event
     public EventoEntradaAnaliticoModel visualizarAnalitico(Long id) {
         EventoEntrada eventoEntrada = buscaPorId(id);
         EventoEntradaAnaliticoModel model = new EventoEntradaAnaliticoModel();
+        model.setId(eventoEntrada.getId());
         model.setEventoEntrada(eventoEntrada);
         for (ItemEventoEntrada itemEventoEntrada : itemEventoEntradaBusiness.buscaPorEventoEntrada(model.getEventoEntrada().getId())) {
             model.getItens().add(new ItemEventoEntradaModel(itemEventoEntrada));
