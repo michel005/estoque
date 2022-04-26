@@ -36,7 +36,7 @@ width: 200px;
         border-radius: 4px 0px 0px 4px;
         border: 0px solid #aaa;
         margin: 0px;
-        max-height: 35px;
+        max-height: 33px;
         outline: none;
         padding: 10px 7px;
         transition: all 0.5s;
@@ -62,6 +62,7 @@ width: 200px;
         border-radius: 4px;
         border: 1px solid #aaa;
         overflow: hidden;
+        max-height: 35px;
         
         button {
             color: #fff;
