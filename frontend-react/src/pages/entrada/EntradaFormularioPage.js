@@ -200,8 +200,7 @@ function EntradaFormularioPage({current, fornecedoresList, status, error, itemLi
     }
 
     function excluir() {
-        console.log(current);
-        store.dispatch(EntradaAction.statusExcluir(current.eventoEntrada.id));
+        store.dispatch(EntradaAction.statusExcluir(current));
     }
 
     function acaoExcluir() {

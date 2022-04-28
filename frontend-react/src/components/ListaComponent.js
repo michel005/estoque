@@ -1,36 +1,166 @@
-import { faChevronDown, faPencilAlt, faPrint, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faChevronDown, faPencilAlt, faPrint, faTrash, faFastForward, faForward, faBackward, faFastBackward, faFilter, faSearch, faColumns, faArrowCircleDown } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
 import styled from "styled-components";
 import ButtonStyled from "./ButtonStyled";
 import ConvertUtils from "../utils/ConvertUtils";
 import TextField from "./forms/TextField";
+import SelectField from "./forms/SelectField";
+import store from "../store";
+import TabelaAction from "../actions/TabelaAction";
+import ButtonOptions from "./forms/ButtonOptions";
+import Calendar from "./Calendar";
+import DateUtils from "../utils/DateUtils";
 
 const Style = styled.div`
 display: flex;
 flex-direction: column;
 
-.linha {
+.columnActive {
+    background-color: #3331;
+    color: #666 !important;
+}
+
+.cabecalho > .columnActive {
+    background-color: transparent !important;
+}
+
+.selecionado .columnActive {
     background-color: #fff;
+    color: #3339 !important;
+}
+
+.orderBy {
+    color: #3339;
+    margin-left: 7px;
+
+    &.desc {
+        transform: rotate(180deg);
+        margin-left: 0px;
+    }
+}
+
+.filtros {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    margin-bottom: 7px;
+
+    .linhaFiltro {
+        display: flex;
+        flex-direction: row;
+
+        .filtro {
+            margin-right: 14px;
+            width: 100%;
+
+            .campo label, .campoLabel label {
+                margin-left: 14px;
+            }
+        }
+
+        .filtro {
+            button.link {
+                position: absolute;
+                margin-top: 3px;
+                font-weight: bold;
+            }
+        }
+
+        .calendario {
+            width: 220px;
+        }
+
+        .comandos {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            margin-right: 0px;
+            width: auto;
+
+            .botoes {
+                display: flex;
+                flex-direction: row;
+
+                .opcoesColunas {
+                    background-color: #3339;
+                    border-radius: 4px;
+                    display: flex;
+                    flex-direction: column;
+                    padding: 7px;
+                    position: fixed;
+                    transform: translateY(40px);
+                    z-index: 100 !important;
+                    backdrop-filter: blur(10px);
+
+                    .title {
+                        color: #fff;
+                        padding: 4px;
+                    }
+
+                    button {
+                        color: #aaa;
+                        padding: 4px;
+                        text-align: left;
+                        font-size: 12px;
+                        font-weight: normal;
+
+                        &.showing {
+                            color: #eee;
+                        }
+
+                        &:hover {
+                            color: #eee;
+                            background-color: #3339;
+                        }
+
+                        svg {
+                            font-size: 12px;
+                            margin-right: 7px;
+                            width: 12px;
+                        }
+                    }
+                }
+
+                button {
+                    min-width: 40px;
+                    border-radius: 0px;
+
+                    &:first-child {
+                        border-top-left-radius: 4px;
+                        border-bottom-left-radius: 4px;
+                    }
+
+                    &:last-child {
+                        border-top-right-radius: 4px;
+                        border-bottom-right-radius: 4px;
+                    }
+                }
+            }
+        }
+    }
+}
+
+.linha {
+    background-color: #f4f4f4;
     display: flex;
     flex-direction: column;
     width: 100%;
     transition: all 0.25s;
-    border: 2px solid #fff;
-    z-index: 10;
+
+    &:nth-child(even) {
+        background-color: #fff;
+    }
 
     &:hover {
-        border: 2px solid #39f;
-        background-color: #f4f4f4;
+        background-color: #eee;
     }
 
     &.nohover, &.nohover:hover {
         background-color: transparent;
-        border: 2px solid transparent;
     }
 
     &.empty {
-        border: 2px solid transparent;
         background-color: #fff;
     }
 
@@ -51,22 +181,38 @@ flex-direction: column;
             overflow: hidden;
             text-overflow: ellipsis;
             word-wrap: break-word;
-            word-break: break-all;
+            word-break: normal;
             width: 100%;
+            transition: all 0.25s;
 
-            &.align.right {
-                text-align: right;
-                justify-content: flex-end;
+            &.align {
+                &.right {
+                    text-align: right;
+                    justify-content: flex-end;
+                }
+                &.center {
+                    text-align: center;
+                    justify-content: center;
+                }
             }
 
             &.comandoslinha {
                 display: flex;
                 flex-direction: row;
                 justify-content: flex-end;
-                width: 70px;
+                max-width: 50px;
 
-                .opcoesNotificacao {
+                .opcoesRegistro {
+                    background-color: transparent;
+                    backdrop-filter: unset;
+                    padding: 0px;
                     display: none;
+                    flex-direction: row;
+                    margin-right: 14px;
+                    transform: none;
+                    position: static;
+                    transition: none;
+                    min-width: 100px;
                 }
 
                 .botaoSelecionar {
@@ -88,21 +234,18 @@ flex-direction: column;
                 font-weight: bold;
                 transition: all 0.25s;
 
-                .orderBy {
-                    margin-left: 4px;
-                    transition: all 0.25s;
-
-                    &.orderByDesc {
-                        transform: rotate(180deg);
-                    }
+                svg {
+                    margin-top: 3px;
+                    margin-right: 7px;
                 }
             }
         }
     }
 
     .detalhes {
-        background-color: #f4f4f4;
+        background-color: #fff;
         padding: 0px 14px 14px;
+        margin-bottom: 14px;
 
         .separador {
             display: flex;
@@ -142,11 +285,12 @@ flex-direction: column;
     }
 
     &.selecionado {
-        z-index: 25;
-        border: 2px solid #39f;
+        background-color: #fff;
+        box-shadow: #3333 0px 0px 7px;
+        z-index: 100;
+        transform: scale(1.025);
 
         .linhaInterna {
-            background-color: #f4f4f4;
 
             .coluna {
                 display: none;
@@ -161,18 +305,10 @@ flex-direction: column;
 
             .comandoslinha {
                 display: flex;
-                width: auto;
+                min-width: 200px;
                 
-                .opcoesNotificacao {
-                    background-color: transparent;
-                    backdrop-filter: unset;
-                    padding: 0px;
+                .opcoesRegistro {
                     display: flex;
-                    flex-direction: row;
-                    margin-right: 14px;
-                    transform: none;
-                    position: static;
-                    transition: none;
 
                     button {
                         background-color: transparent;
@@ -210,6 +346,67 @@ flex-direction: column;
             }
         }
     }
+
+    .opcoesColunas {
+        background-color: #3339;
+        border-radius: 4px;
+        display: flex;
+        flex-direction: column;
+        padding: 7px;
+        position: fixed;
+        transform: translateY(30px);
+        z-index: 100 !important;
+        backdrop-filter: blur(10px);
+
+        .title {
+            color: #fff;
+            padding: 4px;
+        }
+
+        button {
+            color: #aaa;
+            padding: 4px;
+            text-align: left;
+            font-size: 12px;
+            font-weight: normal;
+
+            &.showing {
+                color: #eee;
+            }
+
+            &:hover {
+                color: #eee;
+                background-color: #3339;
+            }
+
+            svg {
+                font-size: 12px;
+                margin-right: 7px;
+                width: 12px;
+            }
+        }
+    }
+}
+
+.paginacao {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    width: 100%;
+    padding: 14px;
+    background-color: #fff;
+
+    button {
+        margin-right: 7px;
+
+        &:last-child {
+            margin-right: 0px;
+        }
+
+        &:disabled {
+            opacity: 0.2;
+        }
+    }
 }
 
 @media print {
@@ -238,9 +435,43 @@ flex-direction: column;
 }
 `;
 
-export default function ListaComponent({ data = [], columnMapper = null, detailMapper = null, events = null }) {
+export default function ListaComponent({ dataType = '', data = [], detailMapper = null, events = null, pageInfo = null }) {
     const [selecionado, setSelecionado] = useState(null);
+    const [abrirMenuColunas, setAbrirMenuColunas] = useState(false);
+    const [abrirMenuFiltros, setAbrirMenuFiltros] = useState(false);
+    const [orderBy, setOrderBy] = useState(null);
+    const [columnMapper] = useState(store.getState().tabela[dataType].columnMapper);
     const moneyFormater = Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
+    const [constructorIndicator, setConstructorIndicator] = useState(false);
+
+    function constructor() {
+        if (constructorIndicator === false) {
+            startOrderBy();
+            setConstructorIndicator(true);
+        }
+    }
+
+    function startOrderBy() {
+        var savedFilter = store.getState().tabela[dataType].filter;
+        if (savedFilter !== undefined && savedFilter !== null && savedFilter.orderBy !== undefined) {
+            setOrderBy({ orderBy: savedFilter.orderBy, orderByDirection: savedFilter.orderByDirection });
+            return;
+        }
+        var fieldsWithOrderBy = Object.keys(columnMapper)
+        .filter((e) => columnMapper[e].order !== undefined);
+        var start = fieldsWithOrderBy.filter((e) => columnMapper[e].startOrder !== undefined && columnMapper[e].startOrder === true);
+        var finishOrderBy = null;
+        if (start.length === 0) {
+            if (fieldsWithOrderBy.length > 0) {
+                finishOrderBy = ({ orderBy: columnMapper[fieldsWithOrderBy[0]].order, orderByDirection: 'asc' });
+            } else {
+                return;
+            }
+        } else {
+            finishOrderBy = ({ orderBy: columnMapper[start[0]].order, orderByDirection: 'asc' });
+        }
+        setOrderBy(finishOrderBy);
+    }
 
     function selecionar(value) {
         setSelecionado(selecionado === null || selecionado.id !== value.id ? value : null);
@@ -288,23 +519,234 @@ export default function ListaComponent({ data = [], columnMapper = null, detailM
         }
     }
 
+    function buscarPagina(value) {
+        if (events !== null && events.page !== undefined && events.page !== null) {
+            events.page(value);
+        }
+    }
+
+    function filtrar(ob = orderBy) {
+        setAbrirMenuColunas(false);
+        setAbrirMenuFiltros(false);
+        var values = {};
+        Object.keys(columnMapper)
+        .filter((value) => 
+            columnMapper[value].filtered !== undefined && 
+            columnMapper[value].filtered === true
+        ).map((value) => {
+            var component = document.getElementById('filtro_' + value);
+            values[value] = component === undefined || component === null ? '' : component.value;
+            return value;
+        });
+        if (events !== null && events.filter !== undefined && events.filter !== null) {
+            if (ob !== null) {
+                values.orderBy = ob.orderBy;
+                values.orderByDirection = ob.orderByDirection;
+            }
+            store.dispatch(TabelaAction.salvarFiltro({ type: dataType, filter: values }));
+            events.filter(values);
+        }
+    }
+
+    function adicionarFiltro(value) {
+        store.dispatch(TabelaAction.mudarVisibilidadeFiltro({ type: dataType, column: value }));
+        setAbrirMenuFiltros(false);
+    }
+
+    function removerFiltro(value) {
+        store.dispatch(TabelaAction.mudarVisibilidadeFiltro({ type: dataType, column: value }));
+        setAbrirMenuFiltros(true);
+    }
+
+    function EventoMostrarColuna(value) {
+        store.dispatch(TabelaAction.mudarVisibilidade({ type: dataType, column: value }));
+        setAbrirMenuColunas(false);
+        setTimeout(() => {
+            setAbrirMenuColunas(true);
+        })
+    }
+
+    function mouseOver(value) {
+        if (data.length > 0) {
+            var st = document.getElementsByClassName('colunaEstiloInterno' + value);
+            for (var i = 0; i < st.length; i++) {
+                st.item(i).classList.add('columnActive');
+            }
+        }
+    }
+
+    function mouseOut(value) {
+        var st = document.getElementsByClassName('colunaEstiloInterno' + value);
+        for (var i = 0; i < st.length; i++) {
+            st.item(i).classList.remove('columnActive');
+         }
+    }
+
+    function defaultValue(field) {
+        var savedFilter = store.getState().tabela[dataType].filter;
+        var columnMapper = store.getState().tabela[dataType].columnMapper[field];
+        var defaultValue = store.getState().tabela[dataType].columnMapper[field].defaultFilterValue;
+
+        var val = null;
+        if (savedFilter !== undefined && savedFilter !== null && savedFilter[field] !== null && savedFilter[field] !== '') {
+            val = savedFilter[field];
+        } else
+        if (defaultValue !== undefined) {
+            val = defaultValue;
+        }
+        if (columnMapper.date !== undefined && columnMapper.date === true) {
+            return DateUtils.stringToDate(val);
+        }
+        return (val === null ? '' : val);
+    }
+
+    function eventoAbrirMenuColunas() {
+        setAbrirMenuColunas(!abrirMenuColunas);
+        setAbrirMenuFiltros(false);
+    }
+
+    function eventoAbrirMenuFiltros() {
+        setAbrirMenuFiltros(!abrirMenuFiltros);
+        setAbrirMenuColunas(false);
+    }
+
+    function changeOrderBy(field) {
+        var campo = field;
+        if (columnMapper[field].order !== undefined) {
+            campo = columnMapper[field].order;
+            var dir = 'asc';
+            if (orderBy !== null && orderBy.orderBy === columnMapper[field].order) {
+                dir = orderBy.orderByDirection === 'asc' ? 'desc' : 'asc';
+            }
+            setOrderBy({ orderBy: campo, orderByDirection: dir });
+            
+            filtrar({ orderBy: campo, orderByDirection: dir });
+        }
+    }
+
+    function orderByIcon(field) {
+        return (
+            orderBy !== null && columnMapper[field].order !== undefined && orderBy.orderBy === columnMapper[field].order ?
+            <ButtonStyled className={'link orderBy ' + orderBy.orderByDirection}>
+                <FontAwesomeIcon icon={faArrowCircleDown} />
+            </ButtonStyled>
+            :<></>
+        );
+    }
+
+    constructor();
+
     return (
         <Style>
-
-            <div className="linha nohover">
-                <div className="linhaInterna cabecalho">
+            <div className="filtros">
+                <div className="linhaFiltro noFullWidth">
                     {
-                        Object.keys(columnMapper).map((value, index) => {
-                            if (columnMapper[value].visible === undefined || columnMapper[value].visible === true) {
-                                return (
-                                    <div key={index} className={'coluna ' + columnStyles(value) + ' ' + value}>{columnMapper[value].name}</div>
-                                );
+                        Object.keys(columnMapper)
+                        .filter((value) => 
+                            columnMapper[value].filtered !== undefined && 
+                            columnMapper[value].filtered === true && 
+                            columnMapper[value].filterVisible !== undefined &&
+                            columnMapper[value].filterVisible === true
+                        ).map((value, index) => {
+                            if (columnMapper[value].convert !== undefined) {
+                                if (Object.keys(columnMapper[value].convert).length <= 4) {
+                                    return (
+                                        <div key={index} className="filtro">
+                                            <ButtonStyled className="link" onClick={() => removerFiltro(value)}>x</ButtonStyled>
+                                            <ButtonOptions fieldID={'filtro_' + value} label={columnMapper[value].name} list={columnMapper[value].convert} defaultValue={defaultValue(value)} nullableOption={true} nullableOptionText="Todos" />
+                                        </div>
+                                    );
+                                } else {
+                                    return (
+                                        <div key={index} className="filtro">
+                                            <ButtonStyled className="link" onClick={() => removerFiltro(value)}>x</ButtonStyled>
+                                            <SelectField fieldID={'filtro_' + value} label={columnMapper[value].name} list={columnMapper[value].convert} defaultValue={defaultValue(value)} />
+                                        </div>
+                                    );
+                                }
                             } else {
-                                return ( <></> );
+                                if (columnMapper[value].date !== undefined && columnMapper[value].date === true) {
+                                    return (
+                                        <div key={index} className="filtro">
+                                            <ButtonStyled className="link" onClick={() => removerFiltro(value)}>x</ButtonStyled>
+                                            <Calendar title={columnMapper[value].name} fieldID={'filtro_' + value} value={defaultValue(value)} />
+                                        </div>
+                                    );
+                                } else {
+                                    return (
+                                        <div key={index} className="filtro">
+                                            <ButtonStyled className="link" onClick={() => removerFiltro(value)}>x</ButtonStyled>
+                                            <TextField fieldID={'filtro_' + value} label={columnMapper[value].name} defaultValue={defaultValue(value)} />
+                                        </div>
+                                    );
+                                }
                             }
                         })
                     }
-                    <div className="coluna comandoslinha"></div>
+                    <div className="comandos">
+                        <div className="botoes">
+                            <ButtonStyled title="Mostrar colunas" onClick={eventoAbrirMenuColunas}>
+                                <FontAwesomeIcon icon={faColumns} />
+                            </ButtonStyled>
+                            {abrirMenuColunas === true ?
+                            <div className="opcoesColunas">
+                                <div className="title">Colunas Visiveis</div>
+                                {
+                                    Object.keys(columnMapper).filter((value) => (columnMapper[value].visible === undefined || columnMapper[value].visible === true)).sort((a, b) => columnMapper[a].name.localeCompare(columnMapper[b].name)).map((value, index) => {
+                                        return (
+                                            <ButtonStyled key={index} className="link showing" onClick={() => EventoMostrarColuna(value)}>{columnMapper[value].icon !== undefined ? <FontAwesomeIcon icon={columnMapper[value].icon} /> : <></>}  {columnMapper[value].name}</ButtonStyled>
+                                        );
+                                    })
+                                }
+                                {Object.keys(columnMapper).filter((value) => (!(columnMapper[value].visible === undefined || columnMapper[value].visible === true))).length > 0
+                                ? <div className="title">Disponíveis</div> : <></>}
+                                {
+                                    Object.keys(columnMapper).filter((value) => (!(columnMapper[value].visible === undefined || columnMapper[value].visible === true))).sort((a, b) => columnMapper[a].name.localeCompare(columnMapper[b].name)).map((value, index) => {
+                                        return (
+                                            <ButtonStyled key={index} className="link" onClick={() => EventoMostrarColuna(value)}>{columnMapper[value].icon !== undefined ? <FontAwesomeIcon icon={columnMapper[value].icon} /> : <></>} {columnMapper[value].name}</ButtonStyled>
+                                        );
+                                    })
+                                }
+                            </div>
+                            : <></>}
+                            <ButtonStyled title="Filtrar colunas" onClick={eventoAbrirMenuFiltros}>
+                                <FontAwesomeIcon icon={faFilter} />
+                            </ButtonStyled>
+                            {abrirMenuFiltros === true ?
+                            <div className="opcoesColunas">
+                                <div className="title">Filtros Disponíveis</div>
+                                {
+                                    Object.keys(columnMapper)
+                                    .filter((value) => 
+                                        columnMapper[value].filtered !== undefined && 
+                                        columnMapper[value].filtered === true && 
+                                        ( columnMapper[value].filterVisible === undefined ||
+                                          columnMapper[value].filterVisible === false )
+                                    ).sort((a, b) => columnMapper[a].name.localeCompare(columnMapper[b].name)).map((value, index) => {
+                                        return (
+                                            <ButtonStyled key={index} className="link showing" onClick={() => adicionarFiltro(value)}>{columnMapper[value].icon !== undefined ? <FontAwesomeIcon icon={columnMapper[value].icon} /> : <></>} {columnMapper[value].name}</ButtonStyled>
+                                        );
+                                    })
+                                }
+                            </div>
+                            : <></>}
+                            <ButtonStyled title="Buscar" className="primary" onClick={() => filtrar()}><FontAwesomeIcon icon={faSearch} /></ButtonStyled>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div className="linha nohover">
+                <div className="linhaInterna cabecalho">
+                    {
+                        Object.keys(columnMapper).filter((value) => (columnMapper[value].visible === undefined || columnMapper[value].visible === true)).map((value, index) => {
+                            return (
+                                <div key={index} onMouseOver={(x) => mouseOver(value)} onMouseOut={(x) => mouseOut(value)} onClick={() => changeOrderBy(value)} className={'coluna colunaEstiloInterno' + value + ' ' + columnStyles(value) + ' ' + value}>{columnMapper[value].icon !== undefined ? <FontAwesomeIcon icon={columnMapper[value].icon} /> : <></>} {columnMapper[value].name} {orderByIcon(value)}</div>
+                            );
+                        })
+                    }
+                    <div className="coluna comandoslinha">
+                        
+                    </div>
                 </div>
             </div>
             {
@@ -313,18 +755,16 @@ export default function ListaComponent({ data = [], columnMapper = null, detailM
                         <div key={idx} className={'linha ' + (selecionado !== null && selecionado.id === linha.id ? 'selecionado' : '')}>
                             <div className="linhaInterna">
                                 {
-                                    Object.keys(columnMapper).filter((dadosLinha) => dadosLinha !== 'requestData').map((dadosLinha, indexLinha) => {
-                                        if (columnMapper[dadosLinha].visible === undefined || columnMapper[dadosLinha].visible === true) {
-                                            return (
-                                                <div key={indexLinha} className={'coluna' + columnStyles(dadosLinha) + ' ' + dadosLinha}>{valueModifier(linha, dadosLinha)}</div>
-                                            );
-                                        } else {
-                                            return ( <></> );
-                                        }
+                                    Object.keys(columnMapper)
+                                    .filter((dadosLinha) => dadosLinha !== 'requestData' && (columnMapper[dadosLinha].visible === undefined || columnMapper[dadosLinha].visible === true))
+                                    .map((dadosLinha, indexLinha) => {
+                                        return (
+                                            <div key={indexLinha} className={'coluna colunaEstiloInterno' + dadosLinha + ' ' + columnStyles(dadosLinha) + ' ' + dadosLinha}>{valueModifier(linha, dadosLinha)}</div>
+                                        );
                                     })
                                 }
                                 <div className="coluna comandoslinha">
-                                    <div className="opcoesNotificacao">
+                                    <div className="opcoesRegistro">
                                         <ButtonStyled title="Imprimir" onClick={() => imprimir()}><FontAwesomeIcon icon={faPrint} /></ButtonStyled>
                                         <ButtonStyled title="Alterar" onClick={() => mostrarFormularioAlterar(linha.requestData !== undefined ? linha.requestData : linha)}><FontAwesomeIcon icon={faPencilAlt} /></ButtonStyled>
                                         <ButtonStyled title="Excluir" onClick={() => mostrarFormularioExclusao(linha.requestData !== undefined ? linha.requestData : linha)}><FontAwesomeIcon icon={faTrash} /></ButtonStyled>
@@ -338,7 +778,9 @@ export default function ListaComponent({ data = [], columnMapper = null, detailM
                             {detailMapper !== null && selecionado !== null && selecionado.id === linha.id ?
                             <div className="detalhes">
                                 {
-                                    Object.keys(detailMapper).map((detField, idx1) => {
+                                    Object.keys(detailMapper)
+                                    .filter((value) => detailMapper[value].title !== undefined || detailMapper[value].fields !== undefined)
+                                    .map((detField, idx1) => {
                                         if (detailMapper[detField].title !== undefined) {
                                             return (
                                                 <div key={idx1} className="separador">
@@ -346,8 +788,7 @@ export default function ListaComponent({ data = [], columnMapper = null, detailM
                                                     <div className="barraSeparador"></div>
                                                 </div>
                                             );
-                                        } else
-                                        if (detailMapper[detField].fields !== undefined) {
+                                        } else {
                                             return (
                                                 <div key={idx1} className="linhaDetalhe">
                                                     {
@@ -358,15 +799,13 @@ export default function ListaComponent({ data = [], columnMapper = null, detailM
                                                                 );
                                                             } else {
                                                                 return (
-                                                                    <div className="campo"></div>
+                                                                    <div key={idx2} className="campo"></div>
                                                                 );
                                                             }
                                                         })
                                                     }
                                                 </div>
                                             );
-                                        } else {
-                                            return ( <></> );
                                         }
                                     })
                                 }
@@ -386,6 +825,17 @@ export default function ListaComponent({ data = [], columnMapper = null, detailM
                     </div>
                 </div>
                 :<></>
+            }
+            {
+                pageInfo !== null ?
+                <div className="paginacao">
+                    <ButtonStyled className="transparent" disabled={pageInfo.page <= 0} onClick={() => buscarPagina(0)}><FontAwesomeIcon icon={faFastBackward} /></ButtonStyled>
+                    <ButtonStyled className="transparent" disabled={pageInfo.page <= 0} onClick={() => buscarPagina(pageInfo.page - 1)}><FontAwesomeIcon icon={faBackward} /></ButtonStyled>
+                    {pageInfo.pageInfo.length === 0 ? <ButtonStyled className="nohover transparent">0</ButtonStyled> : <ButtonStyled className="nohover transparent">Página {pageInfo.page + 1} de { pageInfo.pageInfo.length }</ButtonStyled> }
+                    <ButtonStyled className="transparent" disabled={((pageInfo.page + 1) === pageInfo.pageInfo.length) || pageInfo.pageInfo.length === 0} onClick={() => buscarPagina(pageInfo.page + 1)}><FontAwesomeIcon icon={faForward} /></ButtonStyled>
+                    <ButtonStyled className="transparent" disabled={((pageInfo.page + 1) === pageInfo.pageInfo.length) || pageInfo.pageInfo.length === 0} onClick={() => buscarPagina(pageInfo.pageInfo.length - 1)}><FontAwesomeIcon icon={faFastForward} /></ButtonStyled>
+                </div>
+                : <></>
             }
         </Style>
     );

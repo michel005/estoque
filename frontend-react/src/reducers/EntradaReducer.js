@@ -6,14 +6,9 @@ import DateUtils from "../utils/DateUtils";
 
 export default function EntradaReducer(state, action) {
 
-    function montarUrlBusca(pagina, tamanho) {
-        var dataAtual = state.entrada.dataAtual;
-        if (dataAtual !== null) {
-            dataAtual = DateUtils.stringJustDate(DateUtils.justDate(dataAtual)).replace('/', '').replace('/', '')
-        } else {
-            dataAtual = DateUtils.stringJustDate(DateUtils.justDate(new Date())).replace('/', '').replace('/', '')
-        }
-        return '/evento/entrada/buscaPorDataEntrada?pagina=' + pagina + '&tamanho=' + tamanho + '&dataEntrada=' + dataAtual;
+    function montarUrlBusca(pagina, tamanho, termo = state.entrada.termo) {
+        var data = data = termo.dataEntrada.replace('/', '').replace('/', '');
+        return '/evento/entrada/buscaPorDataEntrada?pagina=' + pagina + '&tamanho=' + tamanho + '&dataEntrada=' + data;
     }
 
     function buscarItens() {
@@ -111,16 +106,9 @@ export default function EntradaReducer(state, action) {
             store.dispatch(EntradaAction.mostrarErro(error.response.data));
         });
     } else
-    if (action.type === EntradaActionTypes.PREENCHER_DATA_ATUAL) {
-        return Object.assign({}, state, {
-            entrada: {
-                ...state.entrada,
-                dataAtual: action.payload
-            }
-        });
-    } else
     if (action.type === EntradaActionTypes.BUSCAR_TODOS) {
-        if (state.entrada.dataAtual === null) {
+        var termo = action.payload;
+        if (termo.dataEntrada === null || termo.dataEntrada === '') {
             return Object.assign({}, state, {
                 entrada: {
                     ...state.entrada,
@@ -128,19 +116,19 @@ export default function EntradaReducer(state, action) {
                 }
             });
         }
-        API.get(montarUrlBusca(0, state.entrada.size)).then((response) => {
+        API.get(montarUrlBusca(0, state.entrada.size, termo)).then((response) => {
             var x = 1;
             var pages = [];
             while (x <= response.data.totalPages) {
                 pages.push({ page: x })
                 x++;
             }
-            store.dispatch(EntradaAction.preencherConsulta({ dataAtual: state.entrada.dataAtual, result: response.data.content, pageInfo: pages, page: 0 }));
+            store.dispatch(EntradaAction.preencherConsulta({ termo: termo, result: response.data.content, pageInfo: pages, page: 0 }));
         });
     } else
     if (action.type === EntradaActionTypes.BUSCAR_PAGINA) {
         API.get(montarUrlBusca(action.payload.pagina, state.entrada.size)).then((response) => {
-            store.dispatch(EntradaAction.preencherConsulta({ dataAtual: state.entrada.dataAtual, result: response.data.content, pageInfo: state.entrada.pageInfo, page: action.payload.pagina }));
+            store.dispatch(EntradaAction.preencherConsulta({ termo: state.entrada.termo, result: response.data.content, pageInfo: state.entrada.pageInfo, page: action.payload.pagina }));
         });
     } else
     if (action.type === EntradaActionTypes.PREENCHER_CONSULTA) {
@@ -151,7 +139,7 @@ export default function EntradaReducer(state, action) {
                 list: action.payload.result,
                 page: action.payload.page,
                 pageInfo: action.payload.pageInfo,
-                dataAtual: action.payload.dataAtual
+                termo: action.payload.termo
             },
             pagina: {
                 atual: 'inicio'

@@ -189,22 +189,15 @@ width: 200px;
 }
 `;
 
-export default function Calendar({title = null, fieldID = null, value = null, afterUpdateCurrentDate = () => {} }) {
+export default function Calendar({title = null, fieldID = null, value = null }) {
     const [current, setCurrent] = useState(new Date(value));
     const [selectedDate, setSelectedDate] = useState(new Date(value));
     const [dayList, setDayList] = useState([]);
-    const [constructorHasRun, setConstructorHasRun] = useState(false);
     const [focusInput, setFocusInput] = useState(false);
 
     var weekCount = [ 1, 2, 3, 4, 5, 6, 7 ];
     var weekMonthCount = [ 1, 2, 3, 4, 5, 6 ];
     var compensacao = 0;
-
-    function constructor () {
-        if (constructorHasRun) return;
-        montarDias();
-        setConstructorHasRun(true);
-    };
 
     function proximo(qtd = 1) {
         var curr = current;
@@ -257,25 +250,25 @@ export default function Calendar({title = null, fieldID = null, value = null, af
     function mudarDiaAtual(data) {
         setSelectedDate(data);
         setFocusInput(false);
-        afterUpdateCurrentDate(data);
     }
 
     function eventoMostrarCalendario() {
         setFocusInput(!focusInput);
+        if (focusInput === false) {
+            montarDias();
+        }
     }
 
     function mesmoDia(data1, data2) {
         return DateUtils.stringJustDate(data1) === DateUtils.stringJustDate(data2);
     }
 
-    constructor();
-
     return (
         <AlternativeCalendarStyled className={'calendario ' + (focusInput === true ? '' : 'reduzido' ) }>
             <div className="campoLabel">
                 <label>{title}</label>
                 <div className="inputIcon">
-                    <input type="text" id={fieldID} autoComplete="false" readOnly={true} value={DateUtils.stringJustDate(selectedDate)} />
+                    <input type="text" id={fieldID} autoComplete="false" readOnly={true} value={selectedDate === null ? '' : DateUtils.stringJustDate(selectedDate)} />
                     <ButtonStyled onClick={eventoMostrarCalendario}><FontAwesomeIcon icon={faCalendarAlt} /></ButtonStyled>
                 </div>
             </div>

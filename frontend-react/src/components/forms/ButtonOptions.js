@@ -72,7 +72,7 @@ export default function ButtonOptions ({
                     <ButtonStyled className={selecionado === '' ? 'primary' : ''} onClick={() => setSelecionado('')}>{nullableOptionText}</ButtonStyled>
                 : <></>}
             </div>
-            <input type="hidden" id={fieldID} name={fieldID} value={selecionado} />
+            <input type="hidden" id={fieldID} name={fieldID} defaultValue={selecionado} />
         </Style>
     );
 }
