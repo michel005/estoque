@@ -11,6 +11,7 @@ import TabelaAction from "../actions/TabelaAction";
 import ButtonOptions from "./forms/ButtonOptions";
 import Calendar from "./Calendar";
 import DateUtils from "../utils/DateUtils";
+import JanelaStyled from "./JanelaStyled";
 
 const Style = styled.div`
 display: flex;
@@ -443,6 +444,7 @@ export default function ListaComponent({ dataType = '', data = [], detailMapper 
     const [columnMapper] = useState(store.getState().tabela[dataType].columnMapper);
     const moneyFormater = Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
     const [constructorIndicator, setConstructorIndicator] = useState(false);
+    const [status, setStatus] = useState('OCIOSO');
 
     function constructor() {
         if (constructorIndicator === false) {
@@ -536,6 +538,9 @@ export default function ListaComponent({ dataType = '', data = [], detailMapper 
         ).map((value) => {
             var component = document.getElementById('filtro_' + value);
             values[value] = component === undefined || component === null ? '' : component.value;
+            if (columnMapper[value].date !== undefined && columnMapper[value].date === true && values[value] !== '') {
+                values[value] = values[value].replace('/', '').replace('/', '');
+            }
             return value;
         });
         if (events !== null && events.filter !== undefined && events.filter !== null) {
@@ -554,8 +559,11 @@ export default function ListaComponent({ dataType = '', data = [], detailMapper 
     }
 
     function removerFiltro(value) {
+        setAbrirMenuFiltros(false);
         store.dispatch(TabelaAction.mudarVisibilidadeFiltro({ type: dataType, column: value }));
-        setAbrirMenuFiltros(true);
+        setTimeout(() => {
+            setAbrirMenuFiltros(true);
+        })
     }
 
     function EventoMostrarColuna(value) {
@@ -589,7 +597,11 @@ export default function ListaComponent({ dataType = '', data = [], detailMapper 
 
         var val = null;
         if (savedFilter !== undefined && savedFilter !== null && savedFilter[field] !== null && savedFilter[field] !== '') {
-            val = savedFilter[field];
+            if (columnMapper.date !== undefined && columnMapper.date === true) {
+                val = savedFilter[field].substr(0, 2) + '/' + savedFilter[field].substr(2, 2) + '/' + savedFilter[field].substr(4, 4);
+            } else {
+                val = savedFilter[field];
+            }
         } else
         if (defaultValue !== undefined) {
             val = defaultValue;

@@ -2,13 +2,11 @@ import EntradaAction from "../actions/EntradaAction";
 import API from "../API";
 import EntradaActionTypes from "../constants/EntradaActionTypes";
 import store from "../store";
-import DateUtils from "../utils/DateUtils";
 
 export default function EntradaReducer(state, action) {
 
-    function montarUrlBusca(pagina, tamanho, termo = state.entrada.termo) {
-        var data = data = termo.dataEntrada.replace('/', '').replace('/', '');
-        return '/evento/entrada/buscaPorDataEntrada?pagina=' + pagina + '&tamanho=' + tamanho + '&dataEntrada=' + data;
+    function montarUrlBusca(pagina, tamanho) {
+        return '/evento/entrada/buscaPorDataEntrada?pagina=' + pagina + '&tamanho=' + tamanho;
     }
 
     function buscarItens() {
@@ -87,47 +85,41 @@ export default function EntradaReducer(state, action) {
     } else
     if (action.type === EntradaActionTypes.CADASTRAR) {
         API.post('/evento/entrada/cadastrarModelo', action.payload).then(() => {
-            store.dispatch(EntradaAction.buscarTodos());
+            store.dispatch(EntradaAction.buscarTodos(state.entrada.termo));
         }).catch((error) => {
+            console.log(error);
             store.dispatch(EntradaAction.mostrarErro(error.response.data));
         });
     } else
     if (action.type === EntradaActionTypes.ALTERAR) {
         API.post('/evento/entrada/alterarModelo', action.payload).then(() => {
-            store.dispatch(EntradaAction.buscarTodos());
+            store.dispatch(EntradaAction.buscarPagina({pagina: state.item.page}));
         }).catch((error) => {
+            console.log(error);
             store.dispatch(EntradaAction.mostrarErro(error.response.data));
         });
     } else
     if (action.type === EntradaActionTypes.EXCLUIR) {
         API.post('/evento/entrada/excluir?id=' + action.payload).then(() => {
-            store.dispatch(EntradaAction.buscarTodos());
+            store.dispatch(EntradaAction.buscarTodos(state.entrada.termo));
         }).catch((error) => {
+            console.log(error);
             store.dispatch(EntradaAction.mostrarErro(error.response.data));
         });
     } else
     if (action.type === EntradaActionTypes.BUSCAR_TODOS) {
-        var termo = action.payload;
-        if (termo.dataEntrada === null || termo.dataEntrada === '') {
-            return Object.assign({}, state, {
-                entrada: {
-                    ...state.entrada,
-                    list: []
-                }
-            });
-        }
-        API.get(montarUrlBusca(0, state.entrada.size, termo)).then((response) => {
+        API.post(montarUrlBusca(0, state.entrada.size), action.payload).then((response) => {
             var x = 1;
             var pages = [];
             while (x <= response.data.totalPages) {
                 pages.push({ page: x })
                 x++;
             }
-            store.dispatch(EntradaAction.preencherConsulta({ termo: termo, result: response.data.content, pageInfo: pages, page: 0 }));
+            store.dispatch(EntradaAction.preencherConsulta({ termo: action.payload, result: response.data.content, pageInfo: pages, page: 0 }));
         });
     } else
     if (action.type === EntradaActionTypes.BUSCAR_PAGINA) {
-        API.get(montarUrlBusca(action.payload.pagina, state.entrada.size)).then((response) => {
+        API.post(montarUrlBusca(action.payload.pagina, state.entrada.size), state.entrada.termo).then((response) => {
             store.dispatch(EntradaAction.preencherConsulta({ termo: state.entrada.termo, result: response.data.content, pageInfo: state.entrada.pageInfo, page: action.payload.pagina }));
         });
     } else

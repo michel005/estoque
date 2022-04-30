@@ -8,7 +8,9 @@ import java.util.List;
 
 import com.michel.estoque.entity.EventoEntrada;
 import com.michel.estoque.entity.ItemEventoEntrada;
+import com.michel.estoque.entity.StatusEventoEntrada;
 import com.michel.estoque.model.EventoEntradaAnaliticoModel;
+import com.michel.estoque.model.FiltroEventoEntradaModel;
 import com.michel.estoque.model.ItemEventoEntradaModel;
 import com.michel.estoque.repository.EventoEntradaRepository;
 import com.michel.estoque.validation.EventoEntradaValidation;
@@ -35,12 +37,13 @@ public class EventoEntradaBusiness extends AbstractBusiness<EventoEntrada, Event
         super.excluir(entidade);
     }
 
-    public Page<EventoEntradaAnaliticoModel> buscarPorDataEntrada(int pagina, int tamanho, LocalDate dataEntrada) {
-        LocalDateTime dataInicial = LocalDateTime.of(dataEntrada, LocalTime.of(0, 0, 0));
-        LocalDateTime dataFinal = LocalDateTime.of(dataEntrada, LocalTime.of(23, 59, 59));
-        PageRequest pageRequest = PageRequest.of(pagina, tamanho, Sort.Direction.DESC, "dataEntrada");
+    public Page<EventoEntradaAnaliticoModel> buscarPorDataEntrada(int pagina, int tamanho, FiltroEventoEntradaModel filtro) {
+        LocalDateTime dataInicial = filtro.getDataEntrada() == null ? null : LocalDateTime.of(filtro.getDataEntrada(), LocalTime.of(0, 0, 0));
+        LocalDateTime dataFinal = filtro.getDataEntrada() == null ? null : LocalDateTime.of(filtro.getDataEntrada(), LocalTime.of(23, 59, 59));
+        PageRequest pageRequest = PageRequest.of(pagina, tamanho, Sort.Direction.valueOf(filtro.getOrderByDirection().toUpperCase()), filtro.getOrderBy());
 
-        Page<EventoEntrada> resultado = repo.findByDataEntrada(pageRequest, dataInicial, dataFinal);
+        System.out.println(filtro);
+        Page<EventoEntrada> resultado = repo.findByDataEntrada(pageRequest, dataInicial, dataFinal, filtro.getDescricao(), filtro.getStatus() == null || filtro.getStatus().equals("") ? null : StatusEventoEntrada.valueOf(filtro.getStatus()));
         List<EventoEntradaAnaliticoModel> analiticos = new ArrayList<>();
         resultado.forEach((e) -> {
             analiticos.add(visualizarAnalitico(e.getId()));

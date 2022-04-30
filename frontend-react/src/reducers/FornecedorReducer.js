@@ -61,7 +61,6 @@ export default function FornecedorReducer(state, action) {
     } else
     if (action.type === FornecedorActionTypes.CADASTRAR) {
         API.post('/fornecedor/cadastrar', action.payload).then(() => {
-            store.dispatch(PaginaAction.mudarPaginaAtual('inicio'));
             store.dispatch(FornecedorAction.buscarTodos(state.fornecedor.termo));
         }).catch((error) => {
             store.dispatch(FornecedorAction.mostrarErro(error.response.data));
@@ -69,15 +68,13 @@ export default function FornecedorReducer(state, action) {
     } else
     if (action.type === FornecedorActionTypes.ALTERAR) {
         API.post('/fornecedor/alterar?id=' + action.payload.id, action.payload).then(() => {
-            store.dispatch(PaginaAction.mudarPaginaAtual('inicio'));
-            store.dispatch(FornecedorAction.buscarTodos(state.fornecedor.termo));
+            store.dispatch(FornecedorAction.buscarPagina({pagina: state.item.page}));
         }).catch((error) => {
             store.dispatch(FornecedorAction.mostrarErro(error.response.data));
         });
     } else
     if (action.type === FornecedorActionTypes.EXCLUIR) {
         API.post('/fornecedor/excluir?id=' + action.payload.id).then(() => {
-            store.dispatch(PaginaAction.mudarPaginaAtual('inicio'));
             store.dispatch(FornecedorAction.buscarTodos(state.fornecedor.termo));
         }).catch((error) => {
             store.dispatch(FornecedorAction.mostrarErro(error.response.data));

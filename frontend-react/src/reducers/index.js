@@ -156,7 +156,7 @@ const initialState = {
                     getValue: (reg) => {
                         return reg.eventoEntrada.id;
                     },
-                    order: 'eventoEntrada.id'
+                    order: 'id'
                 },
                 dataEntrada: {
                     name: 'Data Entrada',
@@ -169,7 +169,7 @@ const initialState = {
                     filterVisible: true,
                     date: true, 
                     defaultFilterValue: DateUtils.stringJustDate(new Date()),
-                    order: 'eventoEntrada.dataEntrada',
+                    order: 'dataEntrada',
                     startOrder: true
                 },
                 descricao: {
@@ -178,19 +178,21 @@ const initialState = {
                     getValue: (reg) => {
                         return reg.eventoEntrada.descricao;
                     },
+                    filtered: true,
                     style: 'colunaDescricao',
                     icon: faFile,
-                    order: 'eventoEntrada.descricao'
+                    order: 'descricao'
                 },
                 status: {
                     name: 'Situação',
                     icon: faSync,
+                    filtered: true,
                     getValue: (reg) => {
                         return reg.eventoEntrada.status;
                     },
                     style: 'colunaStatus',
                     convert: statusType,
-                    order: 'eventoEntrada.status'
+                    order: 'status'
                 },
                 fornecedor: {
                     name: 'Fornecedor',
@@ -276,7 +278,7 @@ const initialState = {
         fornecedoresList: [],
         pageInfo: [],
         page: 0,
-        size: 5,
+        size: 10,
         error: null
     }
 };

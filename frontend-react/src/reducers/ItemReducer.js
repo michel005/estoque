@@ -1,5 +1,4 @@
 import ItemAction from "../actions/ItemAction";
-import PaginaAction from "../actions/PaginaAction";
 import API from "../API";
 import ItemActionTypes from "../constants/ItemActionTypes";
 import store from "../store";
@@ -74,8 +73,7 @@ export default function ItemReducer(state, action) {
     } else
     if (action.type === ItemActionTypes.CADASTRAR) {
         API.post('/item/cadastrar', action.payload).then(() => {
-            store.dispatch(ItemAction.buscarPagina({pagina: state.item.page}));
-            store.dispatch(PaginaAction.mudarPaginaAtual('inicio'));
+            store.dispatch(ItemAction.buscarTodos({pagina: state.item.termo}));
         }).catch((error) => {
             store.dispatch(ItemAction.mostrarErro(error.response.data));
         });
@@ -83,15 +81,13 @@ export default function ItemReducer(state, action) {
     if (action.type === ItemActionTypes.ALTERAR) {
         API.post('/item/alterar?id=' + action.payload.id, action.payload).then(() => {
             store.dispatch(ItemAction.buscarPagina({pagina: state.item.page}));
-            store.dispatch(PaginaAction.mudarPaginaAtual('inicio'));
         }).catch((error) => {
             store.dispatch(ItemAction.mostrarErro(error.response.data));
         });
     } else
     if (action.type === ItemActionTypes.EXCLUIR) {
         API.post('/item/excluir?id=' + action.payload.id).then(() => {
-            store.dispatch(ItemAction.buscarPagina({pagina: state.item.page}));
-            store.dispatch(PaginaAction.mudarPaginaAtual('inicio'));
+            store.dispatch(ItemAction.buscarTodos({pagina: state.item.termo}));
         }).catch((error) => {
             store.dispatch(ItemAction.mostrarErro(error.response.data));
         });

@@ -1,1 +1,1 @@
-wt -p "ProjetoEstoque" ; split-pane -p "ProjetoEstoque" ; split-pane -p "ProjetoEstoqueFrontend"
+wt -p "ProjetoEstoqueMaven" ; split-pane -p "ProjetoEstoqueMaven" ; split-pane -p "ProjetoEstoqueFrontend"

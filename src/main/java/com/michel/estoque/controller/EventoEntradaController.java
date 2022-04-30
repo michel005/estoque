@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.michel.estoque.entity.EventoEntrada;
 import com.michel.estoque.model.EventoEntradaAnaliticoModel;
 import com.michel.estoque.model.EventoEntradaModel;
+import com.michel.estoque.model.FiltroEventoEntradaModel;
 import com.michel.estoque.service.EventoEntradaService;
 import com.michel.estoque.service.ServiceResponse;
 
@@ -66,13 +67,12 @@ public class EventoEntradaController extends AbstractController<EventoEntrada, E
         return ResponseEntity.ok().body(originalResposta.getObjeto());
     }
 
-    @GetMapping("/buscaPorDataEntrada")
-    public ResponseEntity<?> buscaPorDataEntrada(@RequestParam("pagina") int pagina, @RequestParam("tamanho") int tamanho, 
-    @RequestParam("dataEntrada")
-    @JsonFormat(pattern = "ddMMyyyy")
-    @DateTimeFormat(pattern = "ddMMyyyy")
-    LocalDate dataEntrada) {
-        ServiceResponse<Page<EventoEntradaAnaliticoModel>> originalResposta = servico.buscarPorDataEntrada(pagina, tamanho, dataEntrada);
+    @PostMapping("/buscaPorDataEntrada")
+    public ResponseEntity<?> buscaPorDataEntrada(
+        @RequestParam("pagina") int pagina, 
+        @RequestParam("tamanho") int tamanho, 
+        @RequestBody FiltroEventoEntradaModel filtro) {
+        ServiceResponse<Page<EventoEntradaAnaliticoModel>> originalResposta = servico.buscarPorDataEntrada(pagina, tamanho, filtro);
 
         if (originalResposta.temExcecao()) {
             return ResponseEntity.badRequest().body(originalResposta.getExcecao().getErros());

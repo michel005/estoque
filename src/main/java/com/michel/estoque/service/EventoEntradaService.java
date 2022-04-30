@@ -13,6 +13,7 @@ import com.michel.estoque.entity.ItemEventoEntrada;
 import com.michel.estoque.exception.BusinessException;
 import com.michel.estoque.model.EventoEntradaAnaliticoModel;
 import com.michel.estoque.model.EventoEntradaModel;
+import com.michel.estoque.model.FiltroEventoEntradaModel;
 import com.michel.estoque.model.ItemEventoEntradaModel;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -104,9 +105,9 @@ public class EventoEntradaService extends AbstractService<EventoEntrada, EventoE
         });
     }
 
-    public ServiceResponse<Page<EventoEntradaAnaliticoModel>> buscarPorDataEntrada(int pagina, int tamanho, LocalDate dataEntrada) {
+    public ServiceResponse<Page<EventoEntradaAnaliticoModel>> buscarPorDataEntrada(int pagina, int tamanho, FiltroEventoEntradaModel filtro) {
         return ServiceResponse.callback(() -> {
-            return negocio.buscarPorDataEntrada(pagina, tamanho, dataEntrada);
+            return negocio.buscarPorDataEntrada(pagina, tamanho, filtro);
         });
     }
 }
