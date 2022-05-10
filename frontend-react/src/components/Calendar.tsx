@@ -3,6 +3,7 @@ import { useState } from "react";
 import styled from "styled-components";
 import DateUtils from "../utils/DateUtils";
 import ButtonStyled from "./ButtonStyled";
+import { solid } from '@fortawesome/fontawesome-svg-core/import.macro' // <-- import styles to be used
 
 const AlternativeCalendarStyled = styled.div`
 overflow: hidden;
@@ -272,16 +273,16 @@ export default function Calendar({title = null, fieldID = null, value = new Date
                 <label>{title}</label>
                 <div className="inputIcon">
                     <input type="text" id={fieldID} autoComplete="false" readOnly={true} value={selectedDate === null ? '' : DateUtils.stringJustDate(selectedDate)} />
-                    <ButtonStyled onClick={eventoMostrarCalendario}><FontAwesomeIcon icon="calendar-alt" /></ButtonStyled>
+                    <ButtonStyled onClick={eventoMostrarCalendario}><FontAwesomeIcon icon={solid('calendar-alt')} /></ButtonStyled>
                 </div>
             </div>
             <div className="commandsAndCalendarViewer">
                 <div className="commands">
-                    <button title="Voltar 6 meses" onClick={() => anterior(6)}><FontAwesomeIcon icon="arrow-circle-left" /></button>
-                    <button title="Voltar 1 mês" onClick={() => anterior(1)}><FontAwesomeIcon icon="arrow-left" /></button>
+                    <button title="Voltar 6 meses" onClick={() => anterior(6)}><FontAwesomeIcon icon={solid('arrow-circle-left')} /></button>
+                    <button title="Voltar 1 mês" onClick={() => anterior(1)}><FontAwesomeIcon icon={solid('arrow-left')} /></button>
                     <div className="currentMonth">{(current.getMonth() + 1).toString().padStart(2, '0') + '/' + current.getFullYear()}</div>
-                    <button title="Avançar 1 mês" onClick={() => proximo(1)}><FontAwesomeIcon icon="arrow-right" /></button>
-                    <button title="Avançar 6 meses" onClick={() => proximo(6)}><FontAwesomeIcon icon="arrow-circle-right" /></button>
+                    <button title="Avançar 1 mês" onClick={() => proximo(1)}><FontAwesomeIcon icon={solid('arrow-right')} /></button>
+                    <button title="Avançar 6 meses" onClick={() => proximo(6)}><FontAwesomeIcon icon={solid('arrow-circle-right')} /></button>
                 </div>
                 <div className="calendarViewer">
                     <div className="weekLegend">
