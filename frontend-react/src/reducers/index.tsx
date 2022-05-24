@@ -6,8 +6,6 @@ import PaginaReducer from "./PaginaReducer";
 import EntradaReducer from "./EntradaReducer";
 import FornecedorReducer from "./FornecedorReducer";
 import ItemReducer from "./ItemReducer";
-import TabelaActionTypes from "../constants/TabelaActionTypes";
-import TabelaReducer from "./TabelaReducer";
 import ColumnsDefinitions from "./ColumnsDefinitions";
 
 const initialState = {
@@ -54,9 +52,6 @@ const initialState = {
 };
 
 function rootReducer(state: any = initialState, action: any) {
-    if (action.type.module && action.type.module === TabelaActionTypes.MODULE) {
-        return TabelaReducer(state, action);
-    } else
     if (action.type.module && action.type.module === PaginaActionTypes.MODULE) {
         return PaginaReducer(state, action);
     } else

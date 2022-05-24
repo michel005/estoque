@@ -409,7 +409,7 @@ export default function SearchComponent() {
             <div className="caixaBuscaContainer">
                 {buscaAtual.length === 0 ? <></> :
                 <div className="itemBusca">
-                    <FontAwesomeIcon icon="desktop" />
+                    <FontAwesomeIcon icon={solid("desktop")} />
                     {
                         buscaAtual.map((value: any, index: number) => {
                             return (
@@ -440,7 +440,7 @@ export default function SearchComponent() {
                     })
                 }
                 <div className='resultado' onClick={zerarBusca}>
-                    <div className='icone'><FontAwesomeIcon icon={solid("door-closed")} /> Fechar busca</div>
+                    <div className='icone'><FontAwesomeIcon icon={solid("play")} /> Fechar busca</div>
                 </div>
             </div>
         </SearchStyle>

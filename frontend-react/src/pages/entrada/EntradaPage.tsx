@@ -2,7 +2,7 @@ import { connect } from "react-redux";
 import styled from "styled-components";
 import EntradaAction from "../../actions/EntradaAction";
 import store from "../../store";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ListaComponent from "../../components/ListaComponent";
 
 const EntradaPageStyled = styled.div`
@@ -66,21 +66,11 @@ width: 100%;
 }
 `;
 
-type Types = {
-    entrada: any,
-    columnMapper: any
-};
+function EntradaPage({ entrada } : any) {
 
-function EntradaPage({ entrada, columnMapper } : Types) {
-    const [constructorHasRun, setConstructorHasRun] = useState(false);
-
-    function constructor() {
-        if (constructorHasRun) return;
+    useEffect(() => {
         document.title = store.getState().appName +  ' - Entradas';
-        setConstructorHasRun(true);
-    };
-
-    constructor();
+    })
 
     var detail = [
         { title: 'Dados gerais' },
@@ -109,9 +99,6 @@ function EntradaPage({ entrada, columnMapper } : Types) {
     ];
 
     var events = {
-        print: () => {
-            window.print();
-        },
         update: (item: any) => {
             store.dispatch(EntradaAction.statusAlterar(item.eventoEntrada.id));
         },
@@ -128,7 +115,7 @@ function EntradaPage({ entrada, columnMapper } : Types) {
 
     return (
         <EntradaPageStyled>
-            <ListaComponent dataType="entrada" columnMapper={columnMapper} data={entrada.list} detailMapper={detail} events={events} pageInfo={entrada} />
+            <ListaComponent dataType="entrada" data={entrada.list} detailMapper={detail} events={events} pageInfo={entrada} />
         </EntradaPageStyled>
     );
 };

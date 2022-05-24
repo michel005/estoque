@@ -2,7 +2,7 @@ import { connect } from "react-redux";
 import ItemAction from "../../actions/ItemAction";
 import store from "../../store";
 import styled from "styled-components";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ListaComponent from "../../components/ListaComponent";
 
 const ItemPageStyled = styled.div`
@@ -43,18 +43,12 @@ width: 100%;
 `;
 
 function ItemPage({ item }: any) {
-    const [constructorHasRun, setConstructorHasRun] = useState(false);
-
-    function constructor() {
-        if (constructorHasRun) return;
+    useEffect(() => {
         document.title = store.getState().appName +  ' - Itens';
-        store.dispatch(ItemAction.statusOcioso());
-        setConstructorHasRun(true);
-    };
-
-    constructor();
+    });
 
     var detail = [
+        { title: 'Dados gerais' },
         { 
             fields: [
                 'nome', 'categoria', 'quantidade', 'minValor', 'maxValor'
@@ -63,9 +57,6 @@ function ItemPage({ item }: any) {
     ];
 
     var events = {
-        print: () => {
-            window.print();
-        },
         update: (item: any) => {
             store.dispatch(ItemAction.statusAlterar(item));
         },
@@ -76,7 +67,6 @@ function ItemPage({ item }: any) {
             store.dispatch(ItemAction.buscarPagina({ pagina: pagina }));
         },
         filter: (value: any) => {
-            console.log(value);
             store.dispatch(ItemAction.buscarTodos(value));
         }
     }

@@ -26,8 +26,20 @@ const statusType = { PENDENTE: 'Pendente', APROVADO: 'Aprovado', CANCELADO: 'Can
  * }
  */
 export default class ColumnsDefinitions {
+    static savedValues = {
+        item: {
+
+        },
+        fornecedor: {
+
+        },
+        entrada: {
+            
+        }
+    }
     static definition = {
         item: {
+            savedValues: {},
             columnMapper: {
                 id: {
                     name: 'ID',
@@ -67,6 +79,7 @@ export default class ColumnsDefinitions {
             }
         },
         fornecedor: {
+            savedValues: {},
             columnMapper: {
                 id: {
                     name: 'ID',
@@ -101,7 +114,8 @@ export default class ColumnsDefinitions {
                 },
                 email: {
                     name: 'E-mail',
-                    icon: <FontAwesomeIcon icon={solid('mail-bulk')} />
+                    icon: <FontAwesomeIcon icon={solid('mail-bulk')} />,
+                    order: 'email'
                 },
                 cidade: {
                     name: 'Cidade',
@@ -146,6 +160,7 @@ export default class ColumnsDefinitions {
             }
         },
         entrada: {
+            savedValues: {},
             columnMapper: {
                 id: {
                     name: 'ID',

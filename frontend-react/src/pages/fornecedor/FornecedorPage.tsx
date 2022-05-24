@@ -1,9 +1,10 @@
 import { connect } from "react-redux";
 import store from "../../store";
 import styled from "styled-components";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import FornecedorAction from "../../actions/FornecedorAction";
 import ListaComponent from "../../components/ListaComponent";
+import useColumnMapper from "../../hookies/useColumnMapper";
 
 const FornecedorPageStyled = styled.div`
 width: 100%;
@@ -52,16 +53,11 @@ width: 100%;
 }
 `;
 
-function FornecedorPage({ fornecedor, columnMapper }: any) {
-    const [constructorHasRun, setConstructorHasRun] = useState(false);
+function FornecedorPage({ fornecedor }: any) {
 
-    function constructor() {
-        if (constructorHasRun) return;
+    useEffect(() => {
         document.title = store.getState().appName +  ' - Fornecedores';
-        setConstructorHasRun(true);
-    }
-
-    constructor();
+    })
 
     var detail = [
         { title: 'Dados pessoais' },
@@ -89,9 +85,6 @@ function FornecedorPage({ fornecedor, columnMapper }: any) {
     ];
 
     var events = {
-        print: () => {
-            window.print();
-        },
         update: (item: any) => {
             store.dispatch(FornecedorAction.statusAlterar(item));
         },
@@ -110,9 +103,9 @@ function FornecedorPage({ fornecedor, columnMapper }: any) {
 
     return (
         <FornecedorPageStyled>
-            <ListaComponent dataType="fornecedor" columnMapper={columnMapper} data={fornecedor.list} detailMapper={detail} events={events} pageInfo={fornecedor} />
+            <ListaComponent dataType="fornecedor" data={fornecedor.list} detailMapper={detail} events={events} pageInfo={fornecedor} />
         </FornecedorPageStyled>
-        );
+    );
 };
 
 const FornecedorPageConnected = connect((state: any) => { 
