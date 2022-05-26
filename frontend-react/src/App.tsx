@@ -1,26 +1,20 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
-import { connect } from "react-redux";
 import {
     Route,
     Routes,
     useNavigate
 } from "react-router-dom";
 import styled from 'styled-components';
-import FornecedorAction from "./actions/FornecedorAction";
 import PaginaAction from "./actions/PaginaAction";
 import SearchComponent from "./components/SearchComponent";
-import EntradaPageConnected from "./pages/entrada/EntradaPage";
-import FornecedorFormularioConnect from "./pages/fornecedor/FornecedorFormularioPage";
-import ItemFormularioConnect from "./pages/item/ItemFormularioPage";
-import EntradaFormularioConnect from "./pages/entrada/EntradaFormularioPage";
-import FornecedorPageConnected from "./pages/fornecedor/FornecedorPage";
 import InicioPageConnected from "./pages/inicio/InicioPage";
-import ItemPageConnected from "./pages/item/ItemPage";
 import store from "./store";
-import ItemAction from "./actions/ItemAction";
-import EntradaAction from "./actions/EntradaAction";
-import { solid } from '@fortawesome/fontawesome-svg-core/import.macro' // <-- import styles to be used
+import { solid } from '@fortawesome/fontawesome-svg-core/import.macro'
+import ItemPage from "./pages/item/ItemPage";
+import EntradaPage from "./pages/entrada/EntradaPage";
+import useBuscaPaginada from "./hookies/useBuscaPaginada";
+import FornecedorPage from "./pages/fornecedor/FornecedorPage";
 
 const DefaultMenuStyled = styled.div`
     background-color: #39f;
@@ -304,39 +298,39 @@ const AppStyled = styled.div`
     width: 100%;
 `;
 
-function App({ paginaAtual }: any) {
+function App() {
 
     const [fixarCadastrar, setFixarCadastrar] = useState(false);
     const [fixarNotificacoes, setFixarNotificacoes] = useState(false);
     const navigate = useNavigate();
 
+    const {
+        lista: item_lista, termoBuscaSalvo: item_termoBuscaSalvo, pageInfo: item_pageInfo, erro: item_erro, buscarTodos: item_buscarTodos
+    } = useBuscaPaginada({
+        urlBuscaPaginada: '/item/buscaTudoComQuantidade?pagina=@#PAGINA@#&tamanho=@#TAMANHO@#'
+    });
+
+    const {
+        lista: entrada_lista, termoBuscaSalvo: entrada_termoBuscaSalvo, pageInfo: entrada_pageInfo, erro: entrada_erro, buscarTodos: entrada_buscarTodos
+    } = useBuscaPaginada({
+        urlBuscaPaginada: '/evento/entrada/buscaPorDataEntrada?pagina=@#PAGINA@#&tamanho=@#TAMANHO@#'
+    });
+
+    const {
+        lista: fornecedor_lista, termoBuscaSalvo: fornecedor_termoBuscaSalvo, pageInfo: fornecedor_pageInfo, erro: fornecedor_erro, buscarTodos: fornecedor_buscarTodos
+    } = useBuscaPaginada({
+        urlBuscaPaginada: '/fornecedor/buscaPaginadaPorTermos?pagina=@#PAGINA@#&tamanho=@#TAMANHO@#'
+    });
+
     function cadastrarFornecedor() {
-        navigate('/fornecedores');
-        store.dispatch(PaginaAction.mudarPaginaAtual('inicio'));
-        store.dispatch(FornecedorAction.statusOcioso());
-        setTimeout(() => {
-            store.dispatch(FornecedorAction.statusCadastrar());
-        }, 100);
         setFixarCadastrar(false);
     }
 
     function cadastrarItem() {
-        navigate('/itens');
-        store.dispatch(PaginaAction.mudarPaginaAtual('inicio'));
-        store.dispatch(ItemAction.statusOcioso());
-        setTimeout(() => {
-            store.dispatch(ItemAction.statusCadastrar());
-        }, 100);
         setFixarCadastrar(false);
     }
 
     function cadastrarEntrada() {
-        navigate('/entradas');
-        store.dispatch(PaginaAction.mudarPaginaAtual('inicio'));
-        store.dispatch(EntradaAction.statusOcioso());
-        setTimeout(() => {
-            store.dispatch(EntradaAction.statusCadastrar());
-        }, 100);
         setFixarCadastrar(false);
     }
 
@@ -391,10 +385,10 @@ function App({ paginaAtual }: any) {
                     </div>
                     <div className="menuOptions">
                         <button className={curentLink() === '/' ? 'active' : ''} onClick={ () => navegar('/') }>Início</button>
-                        <button className={paginaAtual === 'novoFornecedor' || curentLink() === '/fornecedores' ? 'active' : ''} onClick={ () => navegar('/fornecedores') }>Fornecedores</button>
-                        <button className={paginaAtual === 'novoItem' || curentLink() === '/itens' ? 'active' : ''} onClick={ () => navegar('/itens') }>Itens</button>
-                        <button className={paginaAtual === 'novaEntrada' || curentLink() === '/entradas' ? 'active' : ''} onClick={ () => navegar('/entradas') }>Entradas</button>
-                        <button className={paginaAtual === 'novaSaida' || curentLink() === '/saidas' ? 'active' : ''} onClick={ () => navegar('/saidas') }>Saídas</button>
+                        <button className={curentLink() === '/fornecedores' ? 'active' : ''} onClick={ () => navegar('/fornecedores') }>Fornecedores</button>
+                        <button className={curentLink() === '/itens' ? 'active' : ''} onClick={ () => navegar('/itens') }>Itens</button>
+                        <button className={curentLink() === '/entradas' ? 'active' : ''} onClick={ () => navegar('/entradas') }>Entradas</button>
+                        <button className={curentLink() === '/saidas' ? 'active' : ''} onClick={ () => navegar('/saidas') }>Saídas</button>
                         <button className={curentLink() === '/inventario' ? 'active' : ''} onClick={ () => navegar('/inventario') }>Inventário</button>
                         <button className={curentLink() === '/faturamento' ? 'active' : ''} onClick={ () => navegar('/faturamento') }>Faturamento</button>
                     </div>
@@ -403,27 +397,15 @@ function App({ paginaAtual }: any) {
             <Content>
                 <div className="tamanhoTela">
                     {
-                        (paginaAtual === 'novoFornecedor'
-                        ? 
-                        <FornecedorFormularioConnect />
-                        :
-                        (paginaAtual === 'novoItem'
-                        ? 
-                        <ItemFormularioConnect />
-                        :
-                        (paginaAtual === 'novaEntrada'
-                        ? 
-                        <EntradaFormularioConnect />
-                        :
                         <Routes>
                             <Route path='/' element={<InicioPageConnected />} />
-                            <Route path='/fornecedores' element={<FornecedorPageConnected />} />
-                            <Route path='/itens' element={<ItemPageConnected />} />
-                            <Route path='/entradas' element={<EntradaPageConnected />} />
+                            <Route path='/fornecedores' element={<FornecedorPage lista={fornecedor_lista} termoBuscaSalvo={fornecedor_termoBuscaSalvo} pageInfo={fornecedor_pageInfo} erro={fornecedor_erro} buscarTodos={fornecedor_buscarTodos} />} />
+                            <Route path='/itens' element={<ItemPage lista={item_lista} termoBuscaSalvo={item_termoBuscaSalvo} pageInfo={item_pageInfo} erro={item_erro} buscarTodos={item_buscarTodos} />} />
+                            <Route path='/entradas' element={<EntradaPage lista={entrada_lista} termoBuscaSalvo={entrada_termoBuscaSalvo} pageInfo={entrada_pageInfo} erro={entrada_erro} buscarTodos={entrada_buscarTodos} />} />
                             <Route path='/saidas' element={<h1>Saídas</h1>} />
                             <Route path='/inventario' element={<h1>Inventário</h1>} />
                             <Route path='/faturamento' element={<h1>Faturamento</h1>} />
-                        </Routes>)))
+                        </Routes>
                     }
                 </div>
             </Content>
@@ -432,10 +414,4 @@ function App({ paginaAtual }: any) {
 
 }
 
-const AppConnector = connect((state: any) => { 
-    return {
-        paginaAtual: state.pagina.atual
-    }
- })(App);
-
- export default AppConnector;
+ export default App;

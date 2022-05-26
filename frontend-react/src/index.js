@@ -4,13 +4,13 @@ import './index.scss';
 import { Provider } from 'react-redux';
 import store from './store';
 import { BrowserRouter } from 'react-router-dom';
-import AppConnector from './App';
+import App from './App';
 
 ReactDOM.render(
     <Provider store={store}>
         <React.StrictMode>
             <BrowserRouter>
-                <AppConnector />
+                <App />
             </BrowserRouter>
         </React.StrictMode>
     </Provider>,

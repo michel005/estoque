@@ -29,48 +29,26 @@ flex-direction: column;
     }
 }
 
-.filtros {
+.filtrosEComandos {
     display: flex;
-    flex-direction: row;
-    justify-content: flex-end;
+    flex-direction: column;
     margin-bottom: 7px;
 
-    .linhaFiltro {
+    .linhaComandos {
         display: flex;
         flex-direction: row;
-
-        .filtro {
-            margin-right: 14px;
-            width: 100%;
-
-            .campo label, .campoLabel label {
-                margin-left: 21px;
-            }
-
-            svg {
-                font-size: 14px;
-                margin-bottom: 2px;
-            }
-        }
-
-        .filtro {
-            button.link {
-                position: absolute;
-                margin-top: 3px;
-                font-weight: bold;
-            }
-        }
-
-        .calendario {
-            width: 220px;
-        }
+        justify-content: flex-end;
 
         .comandos {
             display: flex;
-            flex-direction: column;
+            flex-direction: row;
             justify-content: flex-end;
             margin-right: 0px;
-            width: auto;
+            flex-grow: 1;
+
+            &.filtrosEsquerda {
+                justify-content: flex-start;
+            }
 
             .botoes {
                 display: flex;
@@ -130,7 +108,41 @@ flex-direction: column;
                         border-bottom-right-radius: 4px;
                     }
                 }
+
+                #botaoCadastrar {
+                    margin-right: 7px;
+                }
             }
+        }
+    }
+
+    .linhaFiltro {
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-start;
+        margin-bottom: 7px;
+
+        .filtro {
+            margin-right: 14px;
+
+            .campo label, .campoLabel label {
+                margin-left: 14px;
+            }
+
+            button.link {
+                position: absolute;
+                margin-top: 3px;
+                font-weight: bold;
+                
+                svg {
+                    font-size: 14px;
+                    transform: rotate(45deg);
+                }
+            }
+        }
+
+        .calendario {
+            width: 220px;
         }
     }
 }
@@ -281,7 +293,7 @@ flex-direction: column;
     &.selecionado {
         background-color: #fff;
         box-shadow: #3333 0px 0px 7px;
-        z-index: 100;
+        z-index: 90;
         transform: scale(1.025);
 
         .linhaInterna {

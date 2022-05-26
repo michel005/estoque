@@ -1,48 +1,35 @@
-import { connect } from "react-redux";
-import ItemAction from "../../actions/ItemAction";
 import store from "../../store";
-import styled from "styled-components";
 import { useEffect, useState } from "react";
 import ListaComponent from "../../components/ListaComponent";
+import ItemPageStyled from "./ItemPage.style";
+import useFormulario, { STATUS } from "../../hookies/useFormulario";
+import ItemFormularioPage from "./ItemFormularioPage";
+import API from "../../API";
+import JanelaStyled from "../../components/JanelaStyled";
 
-const ItemPageStyled = styled.div`
-width: 100%;
+function ItemPage({ lista, pageInfo, erro, termoBuscaSalvo, buscarTodos }: any) {
 
-.colunaId {
-    max-width: 100px;
-}
-
-.colunaCpfCnpj {
-    max-width: 150px;
-}
-
-.colunaEmail {
-    max-width: 250px;
-}
-
-.paginacao {
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-end;
-    width: 100%;
-    padding: 14px;
-    background-color: #fff;
-
-    button {
-        margin-right: 7px;
-
-        &:last-child {
-            margin-right: 0px;
+    const [categorias, setCategorias] = useState([]);
+    const {
+        status,
+        atual,
+        error: formError,
+        eventos
+    } = useFormulario({
+        defaultAtual: {},
+        urlCadastro: '/item/cadastrar',
+        urlAlteracao: '/item/alterar?id=@#ID@#',
+        urlExclusao: '/item/excluir?id=@#ID@#',
+        eventoAntes: () => {
+            API.get('/item/buscaCategorias').then((response) => {
+                setCategorias(response.data);
+            });
+        },
+        eventoDepois: () => {
+            buscarTodos({termoBusca: termoBuscaSalvo})
         }
+    })
 
-        &:disabled {
-            opacity: 0.2;
-        }
-    }
-}
-`;
-
-function ItemPage({ item }: any) {
     useEffect(() => {
         document.title = store.getState().appName +  ' - Itens';
     });
@@ -57,31 +44,29 @@ function ItemPage({ item }: any) {
     ];
 
     var events = {
+        insert: () => {
+            eventos.statusCadastrar();
+        },
         update: (item: any) => {
-            store.dispatch(ItemAction.statusAlterar(item));
+            eventos.statusAlterar(item);
         },
         delete: (item: any) => {
-            store.dispatch(ItemAction.statusExcluir(item));
+            eventos.statusExcluir(item);
         },
         page: (pagina: any) => {
-            store.dispatch(ItemAction.buscarPagina({ pagina: pagina }));
+            buscarTodos({ pagina: pagina });
         },
         filter: (value: any) => {
-            store.dispatch(ItemAction.buscarTodos(value));
+            buscarTodos({ termoBusca: value });
         }
     }
 
     return (
         <ItemPageStyled>
-            <ListaComponent dataType="item" data={item.list} detailMapper={detail} events={events} pageInfo={item} />
+            <ListaComponent dataType="item" data={lista.content} detailMapper={detail} events={events} pageInfo={pageInfo} />
+            {status !== STATUS.OCIOSO && <ItemFormularioPage item={atual} error={formError} status={status} categorias={categorias} eventos={eventos} />}
         </ItemPageStyled>
     );
 };
 
-const ItemPageConnected = connect((state: any) => { 
-    return {
-        item: state.item
-    }
- })(ItemPage);
-
-export default ItemPageConnected;
+export default ItemPage;

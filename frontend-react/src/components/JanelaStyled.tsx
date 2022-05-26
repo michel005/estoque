@@ -8,7 +8,7 @@ const JanelaStyled = styled.div`
     position:fixed;
     top: 0px;
     width: 100%;
-    z-index: 50;
+    z-index: 100;
 
     * {
         transition: all 0.5s;
@@ -33,7 +33,7 @@ const JanelaStyled = styled.div`
             color: #000;
             font-weight: bold;
             font-size: 24px;
-            padding: 21px;
+            padding: 21px 21px 0px 21px;
             width: 100%;
         }
 
@@ -46,7 +46,7 @@ const JanelaStyled = styled.div`
             display: flex;
             flex-direction: row;
             justify-content: flex-end;
-            margin-top: 21px;
+            padding: 0px 21px 21px;
             text-align: left;
             width: 100%;
 

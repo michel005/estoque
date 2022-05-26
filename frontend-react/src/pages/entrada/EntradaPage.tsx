@@ -4,6 +4,10 @@ import EntradaAction from "../../actions/EntradaAction";
 import store from "../../store";
 import { useEffect, useState } from "react";
 import ListaComponent from "../../components/ListaComponent";
+import useFormulario, { STATUS } from "../../hookies/useFormulario";
+import API from "../../API";
+import EntradaFormularioConnect from "./EntradaFormularioPage";
+import EntradaFormularioPage from "./EntradaFormularioPage";
 
 const EntradaPageStyled = styled.div`
 width: 100%;
@@ -35,38 +39,60 @@ width: 100%;
 .colunaValor {
     width: 150px;
 }
-
-@media print {
-    .filtros, .comandoslinha {
-        display: none;
-    }
-
-    .lista .entrada {
-        display: none;
-    }
-
-    .lista .entrada.selecionado {
-        box-shadow: none;
-        display: flex;
-
-        .coluna {
-            display: none;
-        }
-
-        .coluna.nome {
-            display: flex;
-            font-weight: bold;
-            font-size: 36px;
-        }
-    }
-
-    .paginacao {
-        display: none;
-    }
-}
 `;
 
-function EntradaPage({ entrada } : any) {
+function EntradaPage({ lista, pageInfo, erro, termoBuscaSalvo, buscarTodos } : any) {
+
+    const {
+        status,
+        atual,
+        setAtual,
+        error: formError,
+        complementos,
+        setComplementos,
+        eventos
+    } = useFormulario({
+        defaultAtual: { 
+            eventoEntrada: { 
+                id: null, 
+                descricao: 'Nova Entrada de Itens',
+                status: 'PENDENTE',
+                fornecedor: null
+            }, 
+            itens: [] 
+        },
+        urlCadastro: '/evento/entrada/cadastrarModelo',
+        urlAlteracao: '/evento/entrada/alterarModelo',
+        urlExclusao: '/evento/entrada/excluir?id=@#ID@#',
+        eventoAntes: () => {
+            API.get('/item/buscarTodos').then((responseItens) => {
+                var itens : any[] = [];
+                var valoresItens = Object.keys(responseItens.data);
+                valoresItens.map((valueItens) => {
+                    itens[responseItens.data[valueItens].nome] = responseItens.data[valueItens].nome;
+                    return valueItens;
+                });
+
+                
+                API.get('/fornecedor/buscarTodos').then((responseFornec) => {
+                    var fornecedores : any[] = [];
+                    var valoresFornec = Object.keys(responseFornec.data);
+                    valoresFornec.map((valueFornec) => {
+                        fornecedores[responseFornec.data[valueFornec].id] = responseFornec.data[valueFornec].nome + ' (' + responseFornec.data[valueFornec].cpfCnpj + ')';
+                        return valueFornec;
+                    });
+
+                    setComplementos({
+                        itens: itens,
+                        fornecedores: fornecedores
+                    });
+                });
+            });
+        },
+        eventoDepois: () => {
+            buscarTodos({termoBusca: termoBuscaSalvo})
+        }
+    })
 
     useEffect(() => {
         document.title = store.getState().appName +  ' - Entradas';
@@ -99,32 +125,29 @@ function EntradaPage({ entrada } : any) {
     ];
 
     var events = {
+        insert: () => {
+            eventos.statusCadastrar();
+        },
         update: (item: any) => {
-            store.dispatch(EntradaAction.statusAlterar(item.eventoEntrada.id));
+            eventos.statusAlterar(item);
         },
         delete: (item: any) => {
-            store.dispatch(EntradaAction.statusExcluir(item));
+            eventos.statusExcluir(item);
         },
         page: (pagina: any) => {
-            store.dispatch(EntradaAction.buscarPagina({pagina: pagina}));
+            buscarTodos({ pagina: pagina });
         },
         filter: (value: any) => {
-            store.dispatch(EntradaAction.buscarTodos(value));
+            buscarTodos({ termoBusca: value });
         }
     }
 
     return (
         <EntradaPageStyled>
-            <ListaComponent dataType="entrada" data={entrada.list} detailMapper={detail} events={events} pageInfo={entrada} />
+            {status === STATUS.OCIOSO && <ListaComponent dataType="entrada" data={lista.content} detailMapper={detail} events={events} pageInfo={pageInfo} />}
+            {status !== STATUS.OCIOSO && <EntradaFormularioPage entrada={atual} setAtual={setAtual} error={formError} status={status} listaFornecedores={complementos.fornecedores} listaItens={complementos.itens} eventos={eventos}  />}
         </EntradaPageStyled>
     );
 };
 
-const EntradaPageConnected = connect((state: any) => { 
-    return {
-        entrada: state.entrada,
-        columnMapper: state.tabela.entrada.columnMapper
-    }
- })(EntradaPage);
-
- export default EntradaPageConnected;
+ export default EntradaPage;

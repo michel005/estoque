@@ -1,10 +1,9 @@
-import { connect } from "react-redux";
 import store from "../../store";
 import styled from "styled-components";
 import { useEffect, useState } from "react";
-import FornecedorAction from "../../actions/FornecedorAction";
 import ListaComponent from "../../components/ListaComponent";
-import useColumnMapper from "../../hookies/useColumnMapper";
+import useFormulario, { STATUS } from "../../hookies/useFormulario";
+import FornecedorFormularioPage from "./FornecedorFormularioPage";
 
 const FornecedorPageStyled = styled.div`
 width: 100%;
@@ -22,41 +21,29 @@ width: 100%;
     min-width: 180px !important;
     width: 180px !important;
 }
-
-@media print {
-    .filtros, .comandoslinha {
-        display: none;
-    }
-
-    .lista .fornecedor {
-        display: none;
-    }
-
-    .lista .fornecedor.selecionado {
-        box-shadow: none;
-        display: flex;
-
-        .coluna {
-            display: none;
-        }
-
-        .coluna.nome {
-            display: flex;
-            font-weight: bold;
-            font-size: 36px;
-        }
-    }
-
-    .paginacao {
-        display: none;
-    }
-}
 `;
 
-function FornecedorPage({ fornecedor }: any) {
+function FornecedorPage({ lista, pageInfo, erro, termoBuscaSalvo, buscarTodos }) {
 
     useEffect(() => {
         document.title = store.getState().appName +  ' - Fornecedores';
+    })
+
+    const {
+        status,
+        atual,
+        error: formError,
+        eventos
+    } = useFormulario({
+        defaultAtual: {},
+        urlCadastro: '/fornecedor/cadastrar',
+        urlAlteracao: '/fornecedor/alterar?id=@#ID@#',
+        urlExclusao: '/fornecedor/excluir?id=@#ID@#',
+        eventoAntes: () => {
+        },
+        eventoDepois: () => {
+            buscarTodos({termoBusca: termoBuscaSalvo})
+        }
     })
 
     var detail = [
@@ -85,34 +72,29 @@ function FornecedorPage({ fornecedor }: any) {
     ];
 
     var events = {
+        insert: () => {
+            eventos.statusCadastrar();
+        },
         update: (item: any) => {
-            store.dispatch(FornecedorAction.statusAlterar(item));
+            eventos.statusAlterar(item);
         },
         delete: (item: any) => {
-            store.dispatch(FornecedorAction.statusExcluir(item));
+            eventos.statusExcluir(item);
         },
-        page: (pagina: number) => {
-            store.dispatch(FornecedorAction.buscarPagina({
-                pagina: pagina
-            }));
+        page: (pagina: any) => {
+            buscarTodos({ pagina: pagina });
         },
         filter: (value: any) => {
-            store.dispatch(FornecedorAction.buscarTodos(value));
+            buscarTodos({ termoBusca: value });
         }
     }
 
     return (
         <FornecedorPageStyled>
-            <ListaComponent dataType="fornecedor" data={fornecedor.list} detailMapper={detail} events={events} pageInfo={fornecedor} />
+            <ListaComponent dataType="fornecedor" data={lista.content} detailMapper={detail} events={events} pageInfo={pageInfo} />
+            {status !== STATUS.OCIOSO && <FornecedorFormularioPage fornecedor={atual} error={formError} status={status} eventos={eventos} />}
         </FornecedorPageStyled>
     );
 };
 
-const FornecedorPageConnected = connect((state: any) => { 
-    return {
-        fornecedor: state.fornecedor,
-        columnMapper: state.tabela.fornecedor.columnMapper
-    }
- })(FornecedorPage);
-
-export default FornecedorPageConnected;
+export default FornecedorPage;

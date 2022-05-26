@@ -1,19 +1,16 @@
-import { connect } from "react-redux";
-import store from "../../store";
 import styled from "styled-components";
 import TextField from "../../components/forms/TextField";
 import ButtonStyled from "../../components/ButtonStyled";
 import Message from "../../components/Message";
 import ChoiceMessage from "../../components/ChoiceMessage";
-import {
-    useNavigate
-} from "react-router-dom";
-import PaginaAction from "../../actions/PaginaAction";
 import SelectField from "../../components/forms/SelectField";
-import EntradaActionTypes from "../../constants/EntradaActionTypes";
-import EntradaAction from "../../actions/EntradaAction";
 import TableStyled from "../../components/TableStyled";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { STATUS } from "../../hookies/useFormulario";
+import ConvertUtils from "../../utils/ConvertUtils";
+import { useEffect, useState } from "react";
+import { solid } from '@fortawesome/fontawesome-svg-core/import.macro'
+import JanelaStyled from "../../components/JanelaStyled";
 
 const Estilo = styled.div`
 width: 100%;
@@ -142,10 +139,16 @@ function Separador({ titulo }: any) {
     );
 }
 
-function EntradaFormularioPage({current, fornecedoresList, status, error, itemList}: any) {
-    const navigate = useNavigate();
+function EntradaFormularioPage({
+    entrada, 
+    setAtual,
+    error, 
+    status, 
+    listaFornecedores,
+    listaItens, 
+    eventos 
+}) {
     const situacaoType = { PENDENTE: 'Pendente', APROVADO: 'Aprovado', CANCELADO: 'Cancelado' };
-    const moneyFormater = Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
 
     function valueById(id: string) {
         var objeto : any = elementById(id);
@@ -158,14 +161,14 @@ function EntradaFormularioPage({current, fornecedoresList, status, error, itemLi
     }
 
     function salvar() {
-        var curr = current;
+        var curr = entrada;
         curr.eventoEntrada.descricao = valueById('fieldDescricao');
         if (valueById('fieldSituacao') !== '') {
             curr.eventoEntrada.status = valueById('fieldSituacao');
         } else {
             curr.eventoEntrada.status = null;
         }
-        if (valueById('fieldFornecedor') !== '') {
+        if (valueById('fieldFornecedor') !== '' && valueById('fieldFornecedor') !== null) {
             curr.eventoEntrada.fornecedor = {
                 id: valueById('fieldFornecedor')
             };
@@ -173,11 +176,11 @@ function EntradaFormularioPage({current, fornecedoresList, status, error, itemLi
             curr.eventoEntrada.fornecedor = null;
         }
 
-        if (status === EntradaActionTypes.STATUS_CADASTRAR) {
-            store.dispatch(EntradaAction.cadastrar(curr));
-        } else
-        if (status === EntradaActionTypes.STATUS_ALTERAR) {
-            store.dispatch(EntradaAction.alterar(curr));
+        setAtual(curr);
+        if (status === STATUS.CADASTRAR) {
+            eventos.cadastrar(curr);
+        } else {
+            eventos.alterar(curr);
         }
     }
 
@@ -186,20 +189,35 @@ function EntradaFormularioPage({current, fornecedoresList, status, error, itemLi
         var quantidade = parseInt(valueById('fieldQuantidade'));
         var valor = parseFloat(valueById('fieldValor').replace('.', '').replace(',', '.'));
 
-        if (nome.trim() !== '' && ( quantidade !== 0 || valor !== 0 )) {
-            store.dispatch(EntradaAction.adicionaItemNoCurrentEntrada({ nomeItem: nome, quantidade: quantidade, valor: valor }));
+        var entradaAux = entrada;
+
+        if (nome !== null && ( quantidade !== 0 || valor !== 0 )) {
+            entradaAux.itens = ([...entradaAux.itens, { nomeItem: nome, quantidade: quantidade, valor: valor }]);
             elementById('fieldNomeItem').value = '';
             elementById('fieldQuantidade').value = '0';
             elementById('fieldValor').value = '0,00';
+
+            setAtual({...entradaAux});
         } else {
-            store.dispatch(EntradaAction.mostrarErro({
+            eventos.setError({
                 "ERRO": "É obrigatório informar o item, quantidade e valor diferente de zero!"
-            }));
+            });
         }
     }
 
     function removerItem(item: any) {
-        store.dispatch(EntradaAction.removeItemNoCurrentEntrada(item.nomeItem));
+        var index:number = -1;
+        var entradaAux = entrada;
+        entradaAux.itens.map((value:any, x:number) => {
+            if (value.nomeItem === item.nomeItem) {
+                index = x;
+            }
+            return value;
+        });
+        if (index !== -1) {
+            entradaAux.itens.splice(index, 1);
+        }
+        setAtual({...entradaAux});
     }
 
     function cancelarItem() {
@@ -209,19 +227,18 @@ function EntradaFormularioPage({current, fornecedoresList, status, error, itemLi
     }
 
     function excluir() {
-        store.dispatch(EntradaAction.statusExcluir(current));
+        eventos.statusExcluir(entrada);
     }
 
     function acaoExcluir() {
-        store.dispatch(EntradaAction.excluir(current.eventoEntrada.id));
+        eventos.excluir(entrada.eventoEntrada);
     }
 
     function fecharExcluir() {
-        store.dispatch(EntradaAction.resetarErro());
-        if (current.eventoEntrada.id === null) {
-            store.dispatch(EntradaAction.statusCadastrar());
+        if (status === STATUS.CADASTRAR) {
+            eventos.statusCadastrar(entrada);
         } else {
-            store.dispatch(EntradaAction.statusAlterar(current.eventoEntrada.id));
+            eventos.statusAlterar(entrada);
         }
     }
 
@@ -248,98 +265,94 @@ function EntradaFormularioPage({current, fornecedoresList, status, error, itemLi
     }
 
     function cancelar() {
-        store.dispatch(EntradaAction.statusOcioso());
-        store.dispatch(PaginaAction.mudarPaginaAtual('inicio'));
-        navigate('/entradas');
+        eventos.statusOcioso();
     }
+
+    useEffect(() => {
+        console.log(entrada);
+        
+    })
 
     return (
         <Estilo>
-            <h1>Formulário para Evento de Entrada</h1>
-            <Separador titulo="Dados gerais" />
-
-            <div className="linha">
-                <TextField label="Descrição" defaultValue={current.eventoEntrada.descricao} fieldID="fieldDescricao" />
-                <SelectField label="Situação" defaultValue={current.eventoEntrada.status} fieldID="fieldSituacao" list={situacaoType} nativeSelect={true} nullableOption={false} />
-            </div>
-            <div className="linha">
-                <SelectField label="Fornecedor" defaultValue={current.eventoEntrada.fornecedor !== null ? current.eventoEntrada.fornecedor.id : null} fieldID="fieldFornecedor" list={fornecedoresList} nullable={false} nativeSelect={true} />
-            </div>
-            
-            <Separador titulo="Itens" />
-            <div className="linha">
-                <div className="coluna">
-                    <TableStyled>
-                        <thead>
-                            <tr>
-                                <th className="colunaItem">Item</th>
-                                <th className="colunaQuantidade">Quantidade</th>
-                                <th className="colunaValor">Valor</th>
-                                <th className="colunaComandos"></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {
-                                current.itens.map((value: any, index: number) => {
-                                    return (
-                                        <tr key={index}>
-                                            <td>{value.nomeItem}</td>
-                                            <td className="colunaQuantidade">{value.quantidade}</td>
-                                            <td className="colunaValor">{moneyFormater.format(value.valor === null || value.valor === '' ? 0 : value.valor)}</td>
-                                            <td className="colunaComando">
-                                                <ButtonStyled className="link" title="Excluir item" onClick={() => removerItem(value)}>
-                                                    <FontAwesomeIcon icon="trash" />
-                                                </ButtonStyled>
-                                            </td>
+            <JanelaStyled>
+                <div className="content">
+                    <div className="title">Formulário de Itens</div>
+                    <div className="innerContent">
+                        <div className="linha">
+                            <TextField label="Descrição" defaultValue={entrada.eventoEntrada.descricao} fieldID="fieldDescricao" />
+                            <SelectField label="Situação" defaultValue={entrada.eventoEntrada.status} fieldID="fieldSituacao" list={situacaoType} nativeSelect={true} nullableOption={false} />
+                        </div>
+                        <div className="linha">
+                            <SelectField label="Fornecedor" defaultValue={entrada.eventoEntrada.fornecedor !== null ? entrada.eventoEntrada.fornecedor.id : null} fieldID="fieldFornecedor" list={listaFornecedores} nullable={false} nativeSelect={true} />
+                        </div>
+                        
+                        <Separador titulo="Itens" />
+                        
+                        <div className="linha">
+                            <SelectField label="Item" fieldID="fieldNomeItem" list={listaItens} nullable={false} nativeSelect={true} />
+                            <TextField label="Quantidade" type="number" defaultValue={0} nullable={false} fieldID="fieldQuantidade" validation={validaValorZerado} />
+                            <TextField label="Valor" defaultValue={"0,00"} fieldID="fieldValor" nullable={false} validation={validaSomenteNumeros} />
+                        </div>
+                        <div className="linha">
+                            <div className="coluna">
+                                <div className="comandos right">
+                                    <ButtonStyled className="primary" onClick={adicionarItem}>Adicionar</ButtonStyled>
+                                    <ButtonStyled onClick={cancelarItem}>Cancelar</ButtonStyled>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="linha">
+                            <div className="coluna">
+                                <TableStyled>
+                                    <thead>
+                                        <tr>
+                                            <th className="colunaItem">Item</th>
+                                            <th className="colunaQuantidade">Quantidade</th>
+                                            <th className="colunaValor">Valor</th>
+                                            <th className="colunaComandos"></th>
                                         </tr>
-                                    );
-                                })
-                            }
-                            {
-                                current.itens.length === 0 ?
-                                <tr>
-                                    <td colSpan={4}>Sem itens</td>
-                                </tr> : <></>
-                            }
-                        </tbody>
-                    </TableStyled>
-                </div>
-                <div className="coluna">
-                    <div className="linha">
-                        <SelectField label="Item" fieldID="fieldNomeItem" list={itemList} nullable={false} nativeSelect={true} />
-                        <TextField label="Quantidade" type="number" defaultValue={0} nullable={false} fieldID="fieldQuantidade" validation={validaValorZerado} />
-                        <TextField label="Valor" defaultValue={"0,00"} fieldID="fieldValor" nullable={false} validation={validaSomenteNumeros} />
+                                    </thead>
+                                    <tbody>
+                                        {
+                                            entrada.itens.map((value: any, index: number) => {
+                                                return (
+                                                    <tr key={index}>
+                                                        <td>{value.nomeItem}</td>
+                                                        <td className="colunaQuantidade">{value.quantidade}</td>
+                                                        <td className="colunaValor">{ConvertUtils.moneyFormat(value.valor === null || value.valor === '' ? 0 : value.valor)}</td>
+                                                        <td className="colunaComando">
+                                                            <ButtonStyled className="link" title="Excluir item" onClick={() => removerItem(value)}>
+                                                                <FontAwesomeIcon icon={solid('trash')} />
+                                                            </ButtonStyled>
+                                                        </td>
+                                                    </tr>
+                                                );
+                                            })
+                                        }
+                                        {
+                                            entrada.itens.length === 0 &&
+                                            <tr>
+                                                <td colSpan={4}>Sem itens</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </TableStyled>
+                            </div>
+                        </div>
                     </div>
-                    <div className="comandos right">
-                        <ButtonStyled className="primary" onClick={adicionarItem}>Adicionar</ButtonStyled>
-                        <ButtonStyled onClick={cancelarItem}>Cancelar</ButtonStyled>
+                    <div className="commands">
+                        <ButtonStyled className="primary" onClick={salvar}>Salvar</ButtonStyled>
+                        {status === STATUS.ALTERAR && <ButtonStyled className="alert" onClick={excluir}>Excluir</ButtonStyled>}
+                        <ButtonStyled onClick={cancelar}>Cancelar</ButtonStyled>
                     </div>
                 </div>
-            </div>
+            </JanelaStyled>
 
-            <div className="comandos">
-                <ButtonStyled className="primary" onClick={salvar}>Salvar</ButtonStyled>
-                {current.id === null ? <></> : <ButtonStyled className="alert" onClick={excluir}>Excluir</ButtonStyled>}
-                <ButtonStyled onClick={cancelar}>Cancelar</ButtonStyled>
-            </div>
-
-            {status === EntradaActionTypes.STATUS_EXCLUIR ? <>
-                <ChoiceMessage title="Exclusão de Evento de Entrada" text={'Deseja realmente excluir o evento de entrada?'} choices={[ { name: 'Sim', command: acaoExcluir }, { name: 'Não, cancelar!', command: fecharExcluir } ]} />
-            </> : <></>}
-
-            {error !== null ? <Message title="Erro no Evento de Entrada" text={error.toString()} closeEvent={fecharExcluir} /> : <></>}
+            {status === STATUS.EXCLUIR && <ChoiceMessage title="Exclusão de Evento de Entrada" text={'Deseja realmente excluir o evento de entrada?'} choices={[ { name: 'Sim', command: acaoExcluir }, { name: 'Não, cancelar!', command: fecharExcluir } ]} />}
+            {error !== null && <Message title="Erro no Evento de Entrada" text={error.toString()} closeEvent={fecharExcluir} />}
         </Estilo>
     );
 }
 
-const EntradaFormularioConnect = connect((state: any) => {
-    return {
-        current: state.entrada.currentEntrada,
-        status: state.entrada.status,
-        itemList: state.entrada.itemList,
-        fornecedoresList: state.entrada.fornecedoresList,
-        error: state.entrada.error
-    }
-})(EntradaFormularioPage);
-
-export default EntradaFormularioConnect;
+export default EntradaFormularioPage;

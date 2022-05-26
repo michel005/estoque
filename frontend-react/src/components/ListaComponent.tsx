@@ -80,7 +80,7 @@ export default function ListaComponent({
         return value;
     }
 
-    function imprimir(value: any) {
+    function imprimir() {
         if (events !== null && events.print !== undefined && events.print !== null) {
             window.print();
         }
@@ -88,12 +88,14 @@ export default function ListaComponent({
 
     function mostrarFormularioAlterar(value: any) {
         if (events !== null && events.update !== undefined && events.update !== null) {
+            setSelecionado(null);
             events.update(value);
         }
     }
 
     function mostrarFormularioExclusao(value: any) {
         if (events !== null && events.delete !== undefined && events.delete !== null) {
+            setSelecionado(null);
             events.delete(value);
         }
     }
@@ -107,6 +109,7 @@ export default function ListaComponent({
     function filtrar(ob: any = orderBy) {
         setAbrirMenuColunas(false);
         setAbrirMenuFiltros(false);
+        setSelecionado(null);
         var values: any = {};
         Object.keys(columns)
         .filter((value) => 
@@ -190,6 +193,13 @@ export default function ListaComponent({
         return (val === null ? '' : val);
     }
 
+    function eventoCadastrar() {
+        events.insert();
+        setSelecionado(null);
+        setAbrirMenuColunas(false);
+        setAbrirMenuFiltros(false);
+    }
+
     function eventoAbrirMenuColunas() {
         setAbrirMenuColunas(!abrirMenuColunas);
         setAbrirMenuFiltros(false);
@@ -225,52 +235,14 @@ export default function ListaComponent({
 
     return (
         <ListaComponentStyle>
-            <div className="filtros">
-                <div className="linhaFiltro noFullWidth">
-                    {
-                        Object.keys(columns)
-                        .filter((value) => 
-                            columns[value].filtered !== undefined && 
-                            columns[value].filtered === true && 
-                            columns[value].filterVisible !== undefined &&
-                            columns[value].filterVisible === true
-                        ).map((value: any, index: number) => {
-                            if (columns[value].convert !== undefined) {
-                                if (Object.keys(columns[value].convert).length <= 4) {
-                                    return (
-                                        <div key={index} className="filtro">
-                                            <ButtonStyled className="link" onClick={() => removerFiltro(value)}>x</ButtonStyled>
-                                            <ButtonOptions fieldID={'filtro_' + value} label={columns[value].name} list={columns[value].convert} defaultValue={defaultValue(value)} nullableOption={true} nullableOptionText="Todos" />
-                                        </div>
-                                    );
-                                } else {
-                                    return (
-                                        <div key={index} className="filtro">
-                                            <ButtonStyled className="link" onClick={() => removerFiltro(value)}>x</ButtonStyled>
-                                            <SelectField fieldID={'filtro_' + value} label={columns[value].name} list={columns[value].convert} defaultValue={defaultValue(value)} />
-                                        </div>
-                                    );
-                                }
-                            } else {
-                                if (columns[value].date !== undefined && columns[value].date === true) {
-                                    return (
-                                        <div key={index} className="filtro">
-                                            <ButtonStyled className="link" onClick={() => removerFiltro(value)}>x</ButtonStyled>
-                                            <Calendar title={columns[value].name} fieldID={'filtro_' + value} value={defaultValue(value)} />
-                                        </div>
-                                    );
-                                } else {
-                                    return (
-                                        <div key={index} className="filtro">
-                                            <ButtonStyled className="link" onClick={() => removerFiltro(value)}>x</ButtonStyled>
-                                            <TextField fieldID={'filtro_' + value} label={columns[value].name} defaultValue={defaultValue(value)} />
-                                        </div>
-                                    );
-                                }
-                            }
-                        })
-                    }
+            <div className="filtrosEComandos">
+                <div className="linhaComandos">
                     <div className="comandos">
+                        <div className="botoes">
+                            <ButtonStyled className="primary" id="botaoCadastrar" onClick={eventoCadastrar}>
+                                <FontAwesomeIcon icon={solid('plus-circle')} /> Cadastrar
+                            </ButtonStyled>
+                        </div>
                         <div className="botoes">
                             <ButtonStyled title="Mostrar colunas" onClick={eventoAbrirMenuColunas}>
                                 <FontAwesomeIcon icon={solid('columns')} />
@@ -325,6 +297,59 @@ export default function ListaComponent({
                         </div>
                     </div>
                 </div>
+                {Object.keys(columns)
+                        .filter((value) => 
+                            columns[value].filtered !== undefined && 
+                            columns[value].filtered === true && 
+                            columns[value].filterVisible !== undefined &&
+                            columns[value].filterVisible === true
+                        ).length > 0 &&
+                <div className="linhaFiltro">
+                    {
+                        Object.keys(columns)
+                        .filter((value) => 
+                            columns[value].filtered !== undefined && 
+                            columns[value].filtered === true && 
+                            columns[value].filterVisible !== undefined &&
+                            columns[value].filterVisible === true
+                        ).map((value: any, index: number) => {
+                            if (columns[value].convert !== undefined) {
+                                if (Object.keys(columns[value].convert).length <= 4) {
+                                    return (
+                                        <div key={index} className="filtro">
+                                            <ButtonStyled className="link" onClick={() => removerFiltro(value)}><FontAwesomeIcon icon={solid('plus')} /></ButtonStyled>
+                                            <ButtonOptions fieldID={'filtro_' + value} label={columns[value].name} list={columns[value].convert} defaultValue={defaultValue(value)} nullableOption={true} nullableOptionText="Todos" />
+                                        </div>
+                                    );
+                                } else {
+                                    return (
+                                        <div key={index} className="filtro">
+                                            <ButtonStyled className="link" onClick={() => removerFiltro(value)}><FontAwesomeIcon icon={solid('plus')} /></ButtonStyled>
+                                            <SelectField fieldID={'filtro_' + value} label={columns[value].name} list={columns[value].convert} defaultValue={defaultValue(value)} />
+                                        </div>
+                                    );
+                                }
+                            } else {
+                                if (columns[value].date !== undefined && columns[value].date === true) {
+                                    return (
+                                        <div key={index} className="filtro">
+                                            <ButtonStyled className="link" onClick={() => removerFiltro(value)}><FontAwesomeIcon icon={solid('plus')}/></ButtonStyled>
+                                            <Calendar title={columns[value].name} fieldID={'filtro_' + value} value={defaultValue(value)} />
+                                        </div>
+                                    );
+                                } else {
+                                    return (
+                                        <div key={index} className="filtro">
+                                            <ButtonStyled className="link" onClick={() => removerFiltro(value)}><FontAwesomeIcon icon={solid('plus')} /></ButtonStyled>
+                                            <TextField fieldID={'filtro_' + value} label={columns[value].name} defaultValue={defaultValue(value)} />
+                                        </div>
+                                    );
+                                }
+                            }
+                        })
+                    }
+                </div>
+            }
             </div>
             <div className="linha nohover">
                 <div className="linhaInterna cabecalho">
@@ -360,7 +385,7 @@ export default function ListaComponent({
                                 }
                                 <div className="coluna comandoslinha">
                                     <div className="opcoesRegistro">
-                                        <ButtonStyled title="Imprimir" onClick={() => imprimir(linha.requestData !== undefined ? linha.requestData : linha)}><FontAwesomeIcon icon={solid('print')} /></ButtonStyled>
+                                        <ButtonStyled title="Imprimir" onClick={() => imprimir()}><FontAwesomeIcon icon={solid('print')} /></ButtonStyled>
                                         <ButtonStyled title="Alterar" onClick={() => mostrarFormularioAlterar(linha.requestData !== undefined ? linha.requestData : linha)}><FontAwesomeIcon icon={solid('pencil-alt')} /></ButtonStyled>
                                         <ButtonStyled title="Excluir" onClick={() => mostrarFormularioExclusao(linha.requestData !== undefined ? linha.requestData : linha)}><FontAwesomeIcon icon={solid('trash')} /></ButtonStyled>
                                     </div>
@@ -421,15 +446,16 @@ export default function ListaComponent({
                 :<></>
             }
             {
-                pageInfo !== null ?
-                <div className="paginacao">
-                    <ButtonStyled className="transparent" disabled={pageInfo.page <= 0} onClick={() => buscarPagina(0)}><FontAwesomeIcon icon={solid('fast-backward')} /></ButtonStyled>
-                    <ButtonStyled className="transparent" disabled={pageInfo.page <= 0} onClick={() => buscarPagina(pageInfo.page - 1)}><FontAwesomeIcon icon={solid('backward')} /></ButtonStyled>
-                    {pageInfo.pageInfo.length === 0 ? <ButtonStyled className="nohover transparent">0</ButtonStyled> : <ButtonStyled className="nohover transparent">Página {pageInfo.page + 1} de { pageInfo.pageInfo.length }</ButtonStyled> }
-                    <ButtonStyled className="transparent" disabled={((pageInfo.page + 1) === pageInfo.pageInfo.length) || pageInfo.pageInfo.length === 0} onClick={() => buscarPagina(pageInfo.page + 1)}><FontAwesomeIcon icon={solid('forward')} /></ButtonStyled>
-                    <ButtonStyled className="transparent" disabled={((pageInfo.page + 1) === pageInfo.pageInfo.length) || pageInfo.pageInfo.length === 0} onClick={() => buscarPagina(pageInfo.pageInfo.length - 1)}><FontAwesomeIcon icon={solid('fast-forward')} /></ButtonStyled>
-                </div>
-                : <></>
+                pageInfo !== null &&
+                <>
+                    <div className="paginacao">
+                        <ButtonStyled className="transparent" disabled={pageInfo.atual === 0} onClick={() => buscarPagina(0)}><FontAwesomeIcon icon={solid('fast-backward')} /></ButtonStyled>
+                        <ButtonStyled className="transparent" disabled={pageInfo.atual === 0} onClick={() => buscarPagina(pageInfo.atual - 1)}><FontAwesomeIcon icon={solid('backward')} /></ButtonStyled>
+                        {pageInfo.total === 0 ? <ButtonStyled className="nohover transparent">0</ButtonStyled> : <ButtonStyled className="nohover transparent">Página {pageInfo.atual + 1} de { pageInfo.total }</ButtonStyled> }
+                        <ButtonStyled className="transparent" disabled={((pageInfo.atual + 1) === pageInfo.total) || pageInfo.total === 0} onClick={() => buscarPagina(pageInfo.atual + 1)}><FontAwesomeIcon icon={solid('forward')} /></ButtonStyled>
+                        <ButtonStyled className="transparent" disabled={((pageInfo.atual + 1) === pageInfo.total) || pageInfo.total === 0} onClick={() => buscarPagina(pageInfo.total - 1)}><FontAwesomeIcon icon={solid('fast-forward')} /></ButtonStyled>
+                    </div>
+                </>
             }
         </ListaComponentStyle>
     );

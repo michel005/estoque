@@ -1,17 +1,12 @@
-import { connect } from "react-redux";
-import store from "../../store";
 import styled from "styled-components";
 import TextField from "../../components/forms/TextField";
 import ButtonStyled from "../../components/ButtonStyled";
 import Message from "../../components/Message";
 import ChoiceMessage from "../../components/ChoiceMessage";
-import FornecedorAction from "../../actions/FornecedorAction";
-import FornecedorActionTypes from "../../constants/FornecedorActionTypes";
-import {
-    useNavigate
-} from "react-router-dom";
-import PaginaAction from "../../actions/PaginaAction";
 import SelectField from "../../components/forms/SelectField";
+import { STATUS } from "../../hookies/useFormulario";
+import JanelaStyled from "../../components/JanelaStyled";
+import ButtonOptions from "../../components/forms/ButtonOptions";
 
 const StyledFormulario = styled.div`
 width: 100%;
@@ -69,18 +64,6 @@ a {
         margin-left: 14px;
     }
 }
-
-.comandos {
-    margin-top: 48px;
-
-    button {
-        margin-right: 14px;
-
-        &:last-child {
-            margin-right: 0px;
-        }
-    }
-}
 `;
 
 function Separador({ titulo }: any) {
@@ -92,8 +75,12 @@ function Separador({ titulo }: any) {
     );
 }
 
-function FornecedorFormularioPage({ fornecedor, error, status }: any) {
-    const navigate = useNavigate();
+function FornecedorFormularioPage({ 
+    fornecedor, 
+    error, 
+    status,
+    eventos 
+}) {
     const tipoPessoaType = { F: 'Física', J: 'Jurídica' };
 
     function valueById(id: string) {
@@ -117,84 +104,83 @@ function FornecedorFormularioPage({ fornecedor, error, status }: any) {
         forn.bairro = valueById('fieldBairro');
         forn.complemento = valueById('fieldComplemento');
 
-        if (fornecedor.id === null) {
-            store.dispatch(FornecedorAction.cadastrar(forn));
+        if (status === STATUS.CADASTRAR) {
+            eventos.cadastrar(forn);
         } else {
-            store.dispatch(FornecedorAction.alterar(forn));
+            eventos.alterar(forn);
         }
     }
 
     function excluir() {
-        store.dispatch(FornecedorAction.statusExcluir(fornecedor));
+        eventos.statusExcluir(fornecedor);
     }
 
     function acaoExcluir() {
-        store.dispatch(FornecedorAction.excluir(fornecedor));
+        eventos.excluir(fornecedor);
     }
 
     function fecharExcluir() {
-        if (fornecedor.id === null) {
-            store.dispatch(FornecedorAction.statusCadastrar());
+        if (status === STATUS.CADASTRAR) {
+            eventos.statusCadastrar(fornecedor);
         } else {
-            store.dispatch(FornecedorAction.statusAlterar(fornecedor));
+            eventos.statusAlterar(fornecedor);
         }
     }
 
     function cancelar() {
-        store.dispatch(FornecedorAction.statusOcioso());
-        store.dispatch(PaginaAction.mudarPaginaAtual('inicio'));
-        navigate('/fornecedores');
+        eventos.statusOcioso();
     }
 
     return (
         <StyledFormulario>
-            <h1>Formulário de Fornecedor</h1>
-            <Separador titulo="Dados pessoais" />
-            <div className="linha">
-                <TextField label="Nome Completo" defaultValue={fornecedor.nome} fieldID="fieldNome" nullable={false} />
-                <SelectField label="Tipo Pessoa" defaultValue={fornecedor.tipoPessoa} fieldID="fieldTipoPessoa" nativeSelect={true} nullable={false} nullableOption={false} list={tipoPessoaType} />
-                <TextField label="CPF/CNPJ" defaultValue={fornecedor.cpfCnpj} fieldID="fieldCpfCnpj" nullable={false} />
-            </div>
-            <div className="linha">
-                <TextField label="Telefone" defaultValue={fornecedor.telefone} fieldID="fieldTelefone" />
-                <TextField label="E-mail" defaultValue={fornecedor.email} fieldID="fieldEmail" />
-                <div className="campo"></div>
-            </div>
-            <Separador titulo="Endereço" />
-            <div className="linha">
-                <TextField label="Cidade" defaultValue={fornecedor.cidade} fieldID="fieldCidade" />
-                <TextField label="Estado" defaultValue={fornecedor.estado} fieldID="fieldEstado" />
-                <TextField label="País" defaultValue={fornecedor.pais} fieldID="fieldPais" />
-                <TextField label="CEP" defaultValue={fornecedor.cep} fieldID="fieldCEP" />
-            </div>
-            <div className="linha">
-                <TextField label="Rua" defaultValue={fornecedor.rua} fieldID="fieldRua" />
-                <TextField label="Número" defaultValue={fornecedor.numero} fieldID="fieldNumero" />
-                <TextField label="Bairro" defaultValue={fornecedor.bairro} fieldID="fieldBairro" />
-                <TextField label="Complemento" defaultValue={fornecedor.complemento} fieldID="fieldComplemento" />
-            </div>
-            <div className="comandos">
-                <ButtonStyled className="primary" onClick={salvar}>Salvar</ButtonStyled>
-                {fornecedor.id === null ? <></> : <ButtonStyled className="alert" onClick={excluir}>Excluir</ButtonStyled>}
-                <ButtonStyled onClick={cancelar}>Cancelar</ButtonStyled>
-            </div>
+            <JanelaStyled>
+                <div className="content">
+                    <div className="title">Formulário de Fornecedores</div>
+                    <div className="innerContent">
+                        <Separador titulo="Dados pessoais" />
+                        <div className="linha">
+                            <TextField label="Nome Completo" defaultValue={fornecedor.nome} fieldID="fieldNome" nullable={false} />
+                        </div>
+                        <div className="linha">
+                            <ButtonOptions label="Tipo Pessoa" defaultValue={fornecedor.tipoPessoa} fieldID="fieldTipoPessoa" nullableOption={false} list={tipoPessoaType} />
+                            <TextField label="CPF/CNPJ" defaultValue={fornecedor.cpfCnpj} fieldID="fieldCpfCnpj" nullable={false} />
+                        </div>
+                        <div className="linha">
+                            <TextField label="Telefone" defaultValue={fornecedor.telefone} fieldID="fieldTelefone" />
+                            <TextField label="E-mail" defaultValue={fornecedor.email} fieldID="fieldEmail" />
+                            <div className="campo"></div>
+                        </div>
+                        <Separador titulo="Endereço" />
+                        <div className="linha">
+                            <TextField label="Cidade" defaultValue={fornecedor.cidade} fieldID="fieldCidade" />
+                            <TextField label="Estado" defaultValue={fornecedor.estado} fieldID="fieldEstado" />
+                            <TextField label="País" defaultValue={fornecedor.pais} fieldID="fieldPais" />
+                        </div>
+                        <div className="linha">
+                            <TextField label="Rua" defaultValue={fornecedor.rua} fieldID="fieldRua" />
+                            <TextField label="Complemento" defaultValue={fornecedor.complemento} fieldID="fieldComplemento" />
+                        </div>
+                        <div className="linha">
+                            <TextField label="CEP" defaultValue={fornecedor.cep} fieldID="fieldCEP" />
+                            <TextField label="Bairro" defaultValue={fornecedor.bairro} fieldID="fieldBairro" />
+                            <TextField label="Número" defaultValue={fornecedor.numero} fieldID="fieldNumero" />
+                        </div>
+                    </div>
+                    <div className="commands">
+                        <ButtonStyled className="primary" onClick={salvar}>Salvar</ButtonStyled>
+                        {status === STATUS.ALTERAR && <ButtonStyled className="alert" onClick={excluir}>Excluir</ButtonStyled>}
+                        <ButtonStyled onClick={cancelar}>Cancelar</ButtonStyled>
+                    </div>
+                </div>
+            </JanelaStyled>
 
-            {status === FornecedorActionTypes.STATUS_EXCLUIR ? <>
-                <ChoiceMessage title="Exclusão de Fornecedor" text={'Deseja realmente excluir o fornecedor "' + fornecedor.nome + '"?'} choices={[ { name: 'Sim', command: acaoExcluir }, { name: 'Não, cancelar!', command: fecharExcluir } ]} />
-            </> : <></>}
+            {status === STATUS.EXCLUIR &&
+            <ChoiceMessage title="Exclusão de Fornecedor" text={'Deseja realmente excluir o fornecedor "' + fornecedor.nome + '"?'} choices={[ { name: 'Sim', command: acaoExcluir }, { name: 'Não, cancelar!', command: fecharExcluir } ]} />}
 
-            {error !== null ? <Message title="Erro no Fornecedor" text={error.toString()} closeEvent={fecharExcluir} /> : <></>}
+            {error !== null && <Message title="Erro no Fornecedor" text={error.toString()} closeEvent={fecharExcluir} />}
         </StyledFormulario>
     );
 }
 
-const FornecedorFormularioConnect = connect((state: any) => { 
-    return {
-        fornecedor: state.fornecedor.currentFornecedor,
-        status: state.fornecedor.status,
-        error: state.fornecedor.error
-    }
- })(FornecedorFormularioPage);
-
  
-export default FornecedorFormularioConnect;
+export default FornecedorFormularioPage;

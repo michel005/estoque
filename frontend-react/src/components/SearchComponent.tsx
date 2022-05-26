@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import EntradaAction from '../actions/EntradaAction';
 import FornecedorAction from '../actions/FornecedorAction';
-import ItemAction from '../actions/ItemAction';
 import API from '../API';
 import store from '../store';
 import { solid, regular, brands } from '@fortawesome/fontawesome-svg-core/import.macro' // <-- import styles to be used
@@ -284,121 +283,58 @@ export default function SearchComponent() {
 
     function eventoCadastrarFornecedor() {
         navigate('/fornecedores');
-        store.dispatch(FornecedorAction.statusOcioso());
-        setTimeout(() => {
-            store.dispatch(FornecedorAction.statusCadastrar());
-        }, 100);
     }
 
     function eventoAlterarFornecedorCPF(cpfCnpj: string) {
         navigate('/fornecedores');
-        API.post('/fornecedor/buscaPaginadaPorTermos?pagina=0&tamanho=1', { nome: '', cpfCnpj: cpfCnpj, tipoPessoa: '', orderBy: 'nome', orderByDirection: 'asc' }).then((value) => {
-            store.dispatch(FornecedorAction.statusOcioso());
-            setTimeout(() => {
-                store.dispatch(FornecedorAction.statusAlterar(value.data.content[0]));
-            }, 100);
-        });
     }
 
     function eventoAlterarFornecedorID(id: any) {
         navigate('/fornecedores');
-        API.get('/fornecedor/buscarPorId?id=' + id).then((value) => {
-            store.dispatch(FornecedorAction.statusOcioso());
-            setTimeout(() => {
-                store.dispatch(FornecedorAction.statusAlterar(value.data));
-            }, 100);
-        })
     }
 
     function eventoExcluirFornecedorCPF(cpfCnpj: string) {
         navigate('/fornecedores');
-        API.post('/fornecedor/buscaPaginadaPorTermos?pagina=0&tamanho=1', { nome: '', cpfCnpj: cpfCnpj, tipoPessoa: '', orderBy: 'nome', orderByDirection: 'asc' }).then((value) => {
-            store.dispatch(FornecedorAction.statusOcioso());
-            setTimeout(() => {
-                store.dispatch(FornecedorAction.statusExcluir(value.data.content[0]));
-            }, 100);
-        });
     }
 
     function eventoExcluirFornecedorID(id: any) {
         navigate('/fornecedores');
-        API.get('/fornecedor/buscarPorId?id=' + id).then((value) => {
-            store.dispatch(FornecedorAction.statusOcioso());
-            setTimeout(() => {
-                store.dispatch(FornecedorAction.statusExcluir(value.data));
-            }, 100);
-        })
     }
 
     function eventoInicioFornecedor() {
-        store.dispatch(FornecedorAction.statusOcioso());
         navigate('/fornecedores');
     }
 
     function eventoCadastrarItem() {
         navigate('/itens');
-        store.dispatch(ItemAction.statusOcioso());
-        setTimeout(() => {
-            store.dispatch(ItemAction.statusCadastrar());
-        }, 100);
     }
 
     function eventoAlterarItemNome(nome: any) {
         navigate('/itens');
-        API.get('/item/buscaPorNome?nome=' + nome).then((value) => {
-            store.dispatch(ItemAction.statusOcioso());
-            setTimeout(() => {
-                store.dispatch(ItemAction.statusAlterar(value.data));
-            }, 100);
-        });
     }
 
     function eventoAlterarItemID(id: any) {
         navigate('/itens');
-        API.get('/item/buscarPorId?id=' + id).then((value) => {
-            store.dispatch(ItemAction.statusOcioso());
-            setTimeout(() => {
-                store.dispatch(ItemAction.statusAlterar(value.data));
-            }, 100);
-        });
     }
 
     function eventoExcluirItemNome(nome: any) {
         navigate('/itens');
-        API.get('/item/buscaPorNome?nome=' + nome).then((value) => {
-            store.dispatch(ItemAction.statusOcioso());
-            setTimeout(() => {
-                store.dispatch(ItemAction.statusExcluir(value.data));
-            }, 100);
-        });
     }
 
     function eventoExcluirItemID(id: any) {
         navigate('/itens');
-        API.get('/item/buscarPorId?id=' + id).then((value) => {
-            store.dispatch(ItemAction.statusOcioso());
-            setTimeout(() => {
-                store.dispatch(ItemAction.statusExcluir(value.data));
-            }, 100);
-        });
     }
 
     function eventoInicioItem() {
-        store.dispatch(ItemAction.statusOcioso());
         navigate('/itens');
     }
 
     function eventoInicioEntrada() {
-        store.dispatch(EntradaAction.statusOcioso());
         navigate('/entradas');
     }
 
     function eventoCadastrarEntrada() {
         navigate('/entradas');
-        store.dispatch(EntradaAction.statusOcioso());
-        setTimeout(() => {
-            store.dispatch(EntradaAction.statusCadastrar());
-        }, 100);
     }
 
     return (
