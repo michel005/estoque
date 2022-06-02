@@ -5,7 +5,7 @@ const JanelaStyled = styled.div`
     backdrop-filter: blur(10px);
     height: 100vh;
     left: 0px;
-    position:fixed;
+    position: fixed;
     top: 0px;
     width: 100%;
     z-index: 100;
@@ -24,7 +24,7 @@ const JanelaStyled = styled.div`
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-        position:fixed;
+        position: fixed;
         top: 50%;
         left: 50%;
         transform: translateX(-50%) translateY(-50%);
@@ -52,7 +52,7 @@ const JanelaStyled = styled.div`
 
             button {
                 margin-right: 14px;
-                
+
                 &:last-child {
                     margin-right: 0px;
                 }

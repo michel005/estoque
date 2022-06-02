@@ -49,28 +49,25 @@ const Style = styled.div`
     }
 `;
 
-export default function ButtonOptions ({
-    label = null,
-    list = [],
-    fieldID = '',
-    defaultValue = null,
-    nullableOption = false,
-    nullableOptionText = ''
-}: any) {
+export default function ButtonOptions({ label = null, list = [], fieldID = "", defaultValue = null, nullableOption = false, nullableOptionText = "" }: any) {
     const [selecionado, setSelecionado] = useState<any>(defaultValue);
 
     return (
         <Style className="campo">
-            {label === null ? <></> : <label>{label}</label>}
+            {label !== null && <label>{label}</label>}
             <div className="opcoes">
                 {Object.keys(list).map((val, index) => {
                     return (
-                        <ButtonStyled key={index} className={selecionado === val ? 'primary' : ''} onClick={() => setSelecionado(val)}>{list[val]}</ButtonStyled>
-                    )
+                        <ButtonStyled key={index} className={selecionado === val ? "primary" : ""} onClick={() => setSelecionado(val)}>
+                            {list[val]}
+                        </ButtonStyled>
+                    );
                 })}
-                {nullableOption === true ? 
-                    <ButtonStyled className={selecionado === '' ? 'primary' : ''} onClick={() => setSelecionado('')}>{nullableOptionText}</ButtonStyled>
-                : <></>}
+                {nullableOption === true && (
+                    <ButtonStyled className={selecionado === "" ? "primary" : ""} onClick={() => setSelecionado("")}>
+                        {nullableOptionText}
+                    </ButtonStyled>
+                )}
             </div>
             <input type="hidden" id={fieldID} name={fieldID} defaultValue={selecionado} />
         </Style>

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import styled from "styled-components";
+import ValueUtils from "../../utils/ValueUtils";
 
 const Style = styled.div`
     display: flex;
@@ -11,12 +12,13 @@ const Style = styled.div`
         color: #999;
 
         .notNullable {
-            color: #CCC;
+            color: #ccc;
             font-size: 14px;
         }
     }
 
-    input, select {
+    input,
+    select {
         border-radius: 4px;
         border: 1px solid #aaa;
         margin: 0px;
@@ -55,77 +57,88 @@ const StyleError = styled.span`
     display: block;
 `;
 
-const SelectField = ( {
-    externalError = '', 
-    fieldID = '', 
-    label = '', 
-    nullable = true, 
-    defaultValue = null, 
-    list = {}, 
-    placeholder = '',
+const SelectField = ({
+    externalError = "",
+    fieldID = "",
+    label = "",
+    nullable = true,
+    defaultValue = null,
+    list = {},
+    placeholder = "",
     nativeSelect = false,
     nullableOption = true,
-    nullableOptionText = '',
-    nullableOptionValue = null,
-    enterEvent = () => {}
-}: any ) => {
+    nullableOptionText = "",
+    nullableOptionValue = null
+}: any) => {
     const [error, setError] = useState(externalError);
 
     const showError = (errorMessage: string) => {
         var rootComponent = document.getElementsByClassName(fieldID)[0];
-        rootComponent.classList.remove('withError');
+        rootComponent.classList.remove("withError");
         setError(errorMessage);
-        if (errorMessage !== '') {
-            rootComponent.classList.add('withError');
+        if (errorMessage !== "") {
+            rootComponent.classList.add("withError");
         }
     };
 
-    function valueById(id: string) {
-        var objeto : any = document.getElementById(id);
-        return objeto !== undefined && objeto !== null ? (objeto.value === '' ? null : objeto.value) : null;
-    }
-
     const validate = () => {
-        var value : string = valueById(fieldID);
-        var erro = '';
-        if (nullable === false && (value === null || value.trim() === '')) {
-            erro = 'Campo obrigatório não preenchido!';
+        var value: string = ValueUtils.valueById(fieldID);
+        var erro = "";
+        if (nullable === false && (value === null || value.trim() === "")) {
+            erro = "Campo obrigatório não preenchido!";
         }
-        if (erro === '' && value !== null && value !== '' && nativeSelect === false) {
-            if (list[value] === undefined ) {
-                erro = 'Valor informado não é válido';
+        if (erro === "" && value !== null && value !== "" && nativeSelect === false) {
+            if (list[value] === undefined) {
+                erro = "Valor informado não é válido";
             }
         }
         showError(erro);
-    }
-
-    function enterEventInner(event: any) {
-        if (event.charCode === 13) {
-            event.preventDefault();
-            enterEvent();
-        }
-    }
+    };
 
     return (
-        <Style className={'campo ' + (error && error !== '' ? 'withError ' + fieldID : fieldID)}>
-            {label === '' ? <></> : <label htmlFor={fieldID}>{label} {nullable === false ? <span className="notNullable">(Obrigatório)</span> : <></>}</label>}
-            { nativeSelect === false ?
-            <>
-                <input list={fieldID + '_datalist'} onKeyPress={enterEventInner} autoComplete="false" type="text" id={fieldID} name={fieldID} defaultValue={defaultValue} onBlur={validate} placeholder={placeholder} />
-                <datalist id={fieldID + '_datalist'}>
-                    {nullableOption === true ? <option value={nullableOptionValue}>{nullableOptionText}</option> : <></>}
-                    {Object.keys(list).map((value,index) => {
-                        return (<option key={index} value={value}>{list[value]}</option>);
+        <Style className={"campo " + (error && error !== "" ? "withError " + fieldID : fieldID)}>
+            {label === "" ? (
+                <></>
+            ) : (
+                <label htmlFor={fieldID}>
+                    {label} {nullable === false && <span className="notNullable">(Obrigatório)</span>}
+                </label>
+            )}
+            {nativeSelect === false ? (
+                <>
+                    <input
+                        list={fieldID + "_datalist"}
+                        autoComplete="false"
+                        type="text"
+                        id={fieldID}
+                        name={fieldID}
+                        defaultValue={defaultValue}
+                        onBlur={validate}
+                        placeholder={placeholder}
+                    />
+                    <datalist id={fieldID + "_datalist"}>
+                        {nullableOption === true && <option value={nullableOptionValue}>{nullableOptionText}</option>}
+                        {Object.keys(list).map((value, index) => {
+                            return (
+                                <option key={index} value={value}>
+                                    {list[value]}
+                                </option>
+                            );
+                        })}
+                    </datalist>
+                </>
+            ) : (
+                <select defaultValue={defaultValue} id={fieldID} onBlur={validate} name={fieldID}>
+                    {nullableOption === true && <option value={nullableOptionValue}>{nullableOptionText}</option>}
+                    {Object.keys(list).map((value, index) => {
+                        return (
+                            <option key={index} value={value}>
+                                {list[value]}
+                            </option>
+                        );
                     })}
-                </datalist>
-            </>
-            : 
-            <select defaultValue={defaultValue} id={fieldID} onBlur={validate}  name={fieldID}>
-                {nullableOption === true ? <option value={nullableOptionValue}>{nullableOptionText}</option> : <></>}
-                {Object.keys(list).map((value,index) => {
-                    return (<option key={index} value={value}>{list[value]}</option>);
-                })}
-            </select>}
+                </select>
+            )}
             <StyleError>{error}</StyleError>
         </Style>
     );

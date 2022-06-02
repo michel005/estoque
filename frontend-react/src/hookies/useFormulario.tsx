@@ -2,104 +2,92 @@ import { useEffect, useState } from "react";
 import API from "../API";
 
 export const STATUS = {
-    OCIOSO: 'O',
-    CADASTRAR: 'C',
-    ALTERAR: 'A',
-    EXCLUIR: 'E'
-}
+    OCIOSO: "O",
+    CADASTRAR: "C",
+    ALTERAR: "A"
+};
 
-export default function useFormulario({
-    urlCadastro, 
-    urlAlteracao, 
-    urlExclusao, 
-    defaultAtual, 
-    eventoAntes = () => {}, 
-    eventoDepois = () => {}
-}) {
+export default function useFormulario({ setErro, urlCadastro, urlAlteracao, urlExclusao, defaultAtual, eventoAntes = () => {}, eventoDepois = () => {} }) {
     const [status, setStatus] = useState<any>(STATUS.OCIOSO);
-    const [error, setError] = useState<any>(null);
     const [atual, setAtual] = useState<any>({});
     const [complementos, setComplementos] = useState<any>({});
 
     function statusCadastrar(atualExterno = defaultAtual) {
         eventoAntes();
         setStatus(STATUS.CADASTRAR);
-        setError(null);
+        setErro(null);
         setAtual(atualExterno);
     }
 
     function statusAlterar(atualExterno) {
         eventoAntes();
         setStatus(STATUS.ALTERAR);
-        setError(null);
-        setAtual(atualExterno);
-    }
-
-    function statusExcluir(atualExterno) {
-        eventoAntes();
-        setStatus(STATUS.EXCLUIR);
-        setError(null);
+        setErro(null);
         setAtual(atualExterno);
     }
 
     function statusOcioso() {
         setStatus(STATUS.OCIOSO);
-        setError(null);
+        setErro(null);
         setAtual(null);
     }
 
     function resetError() {
-        setError(null);
+        setErro(null);
     }
 
-    function preencheErro(resposta:any) {
-        setError(resposta[Object.keys(resposta)[0]]);
+    function preencheErro(resposta: any) {
+        setErro(resposta[Object.keys(resposta)[0]]);
     }
 
     function cadastrar(atualExterno) {
-        API.post(urlCadastro, atualExterno).then(() => {
-            eventoDepois();
-            statusOcioso();
-        }).catch((error) => {
-            preencheErro(error.response.data);
-        });
+        API.post(urlCadastro, atualExterno)
+            .then(() => {
+                eventoDepois();
+                statusOcioso();
+            })
+            .catch((error) => {
+                preencheErro(error.response.data);
+            });
     }
 
     function alterar(atualExterno) {
-        API.post(urlAlteracao.replace('@#ID@#', atual.id), atualExterno).then(() => {
-            eventoDepois();
-            statusOcioso();
-        }).catch((error) => {
-            preencheErro(error.response.data);
-        });
+        API.post(urlAlteracao.replace("@#ID@#", atual.id), atualExterno)
+            .then(() => {
+                eventoDepois();
+                statusOcioso();
+            })
+            .catch((error) => {
+                preencheErro(error.response.data);
+            });
     }
 
-    function excluir() {
-        API.post(urlExclusao.replace('@#ID@#', atual.id)).then(() => {
-            eventoDepois();
-            statusOcioso();
-        }).catch((error) => {
-            preencheErro(error.response.data);
-        });
+    function excluir(atualExterno) {
+        API.post(urlExclusao.replace("@#ID@#", atualExterno.id))
+            .then(() => {
+                eventoDepois();
+                statusOcioso();
+            })
+            .catch((error) => {
+                preencheErro(error.response.data);
+            });
     }
 
     return {
-        status, 
-        atual, 
+        status,
+        atual,
         setAtual,
-        error, 
-        complementos, 
-        setComplementos, 
+        complementos,
+        setComplementos,
         eventos: {
-            statusCadastrar, 
-            statusAlterar, 
-            statusExcluir, 
-            statusOcioso, 
-            resetError, 
+            statusCadastrar,
+            statusAlterar,
+            statusOcioso,
+            resetError,
             cadastrar,
-            alterar, 
+            alterar,
             excluir,
-            setError
-        }
+            setErro,
+        },
     };
 }

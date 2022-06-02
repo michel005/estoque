@@ -20,7 +20,7 @@ const LightTableStyled = styled.table`
             table-layout: fixed;
             display: table;
             width: 100%;
-            
+
             th {
                 padding: 21px;
                 text-align: left;
@@ -93,7 +93,8 @@ const LightTableStyled = styled.table`
                 justify-content: center;
                 padding: 14px;
 
-                button, select {
+                button,
+                select {
                     margin-right: 7px;
                 }
             }

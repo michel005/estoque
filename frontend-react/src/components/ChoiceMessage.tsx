@@ -7,7 +7,7 @@ const ChoiceMessageStyled = styled.div`
     backdrop-filter: blur(10px);
     height: 100vh;
     left: 0px;
-    position:fixed;
+    position: fixed;
     top: 0px;
     width: 100%;
     z-index: 100;
@@ -18,7 +18,7 @@ const ChoiceMessageStyled = styled.div`
 
     .content {
         background-color: #fff;
-        position:fixed;
+        position: fixed;
         top: 50%;
         left: 50%;
         transform: translate(-50%);
@@ -54,11 +54,14 @@ const ChoiceMessageStyled = styled.div`
     }
 `;
 
-export default function ChoiceMessage({title = 'Janela sem Título', text, choices = [ 
-    { name: 'Sim', command: () => {} },
-    { name: 'Não', command: () => {} }
-]}: any) {
-
+export default function ChoiceMessage({
+    title = "Janela sem Título",
+    text,
+    choices = [
+        { name: "Sim", command: () => {} },
+        { name: "Não", command: () => {} },
+    ],
+}: any) {
     return (
         <ChoiceMessageStyled id="message_box">
             <div className="content">
@@ -67,7 +70,9 @@ export default function ChoiceMessage({title = 'Janela sem Título', text, choic
                 <div className="commands">
                     {choices.map((choice: any, index: number) => {
                         return (
-                            <ButtonStyled key={index} className={index === 0 ? 'primary' : ''} onClick={choice.command}>{choice.name}</ButtonStyled>
+                            <ButtonStyled key={index} className={index === 0 ? "primary" : ""} onClick={choice.command}>
+                                {choice.name}
+                            </ButtonStyled>
                         );
                     })}
                 </div>

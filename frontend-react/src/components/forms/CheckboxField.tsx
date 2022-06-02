@@ -31,7 +31,7 @@ const Style = styled.div`
         border: 1px solid red;
         border-radius: 4px;
         padding: 7px;
-        
+
         label {
             color: red;
         }
@@ -46,26 +46,20 @@ const Style = styled.div`
     }
 `;
 
-const CheckboxField = ( {
-    error = '', 
-    value = false, 
-    fieldID = '', 
-    validation = () => { }, 
-    label = ''
-}: any) => {
+const CheckboxField = ({ error = "", value = false, fieldID = "", validation = () => {}, label = "" }: any) => {
     const [errorMSG] = useState(error);
 
     const validate = () => {
         if (validation !== undefined) {
             validation(!value, fieldID);
         }
-        value = (!value);
+        value = !value;
     };
 
     return (
-        <Style className={'campo checkbox ' + (errorMSG === '' ? fieldID : 'withError ' + fieldID)}>
+        <Style className={"campo checkbox " + (errorMSG === "" ? fieldID : "withError " + fieldID)}>
             <div>
-                <input type='checkbox' id={fieldID} checked={value} onChange={validate} />
+                <input type="checkbox" id={fieldID} checked={value} onChange={validate} />
                 <label htmlFor={fieldID}>{label}</label>
             </div>
         </Style>

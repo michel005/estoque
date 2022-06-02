@@ -16,7 +16,7 @@ public class ItemValidation extends AbstractValidation<Item, ItemRepository> {
     public void validaCadastro(Item item) throws BusinessException {
         BusinessException exception = new BusinessException();
 
-        exception.add(item.getNome().isBlank(), "NOME", "ITEM-001");
+        exception.add(item.getNome() == null || item.getNome().isBlank(), "NOME", "ITEM-001");
 
         List<Item> opt = repo.findByNome(item.getNome());
         exception.add(!opt.isEmpty(), "NOME", "ITEM-003", item.getNome());

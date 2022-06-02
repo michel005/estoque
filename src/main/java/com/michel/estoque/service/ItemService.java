@@ -14,7 +14,9 @@ public class ItemService extends AbstractService<Item, ItemBusiness> {
 
     @Override
     public void antesCadastrar(Item entidade) {
-        entidade.setNome(CharUtils.deAccent(entidade.getNome().toUpperCase()));
+        if (entidade.getNome() != null) {
+            entidade.setNome(CharUtils.deAccent(entidade.getNome().toUpperCase()));
+        }
         if (entidade.getCategoria() != null) {
             entidade.setCategoria(CharUtils.deAccent(entidade.getCategoria().toUpperCase()));
         }
@@ -22,7 +24,9 @@ public class ItemService extends AbstractService<Item, ItemBusiness> {
 
     @Override
     public void antesAlterar(Item entidade) {
-        entidade.setNome(CharUtils.deAccent(entidade.getNome().toUpperCase()));
+        if (entidade.getNome() != null) {
+            entidade.setNome(CharUtils.deAccent(entidade.getNome().toUpperCase()));
+        }
         if (entidade.getCategoria() != null) {
             entidade.setCategoria(CharUtils.deAccent(entidade.getCategoria().toUpperCase()));
         }

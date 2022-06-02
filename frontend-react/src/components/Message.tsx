@@ -7,7 +7,7 @@ const MessageStyled = styled.div`
     backdrop-filter: blur(10px);
     height: 100vh;
     left: 0px;
-    position:fixed;
+    position: fixed;
     top: 0px;
     width: 100%;
     z-index: 100;
@@ -19,7 +19,7 @@ const MessageStyled = styled.div`
     .content {
         background-color: #fff;
         padding: 14px;
-        position:fixed;
+        position: fixed;
         top: 50%;
         left: 50%;
         transform: translate(-50%);
@@ -44,14 +44,15 @@ const MessageStyled = styled.div`
     }
 `;
 
-export default function Message({title, text, closeEvent = () => {}}: any) {
-
+export default function Message({ title, text, closeEvent = () => {} }: any) {
     return (
         <MessageStyled id="message_box">
             <div className="content">
-                {title === null ? <></> : <div className="title">{title}</div>}
+                {title !== null && <div className="title">{title}</div>}
                 <div className="textContent">{text}</div>
-                <div className="commands"><ButtonStyled onClick={closeEvent}>Fechar</ButtonStyled></div>
+                <div className="commands">
+                    <ButtonStyled onClick={closeEvent}>Fechar</ButtonStyled>
+                </div>
             </div>
         </MessageStyled>
     );

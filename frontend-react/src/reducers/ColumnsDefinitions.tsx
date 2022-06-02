@@ -2,9 +2,9 @@ import { faCalendar, faDollarSign, faFile, faFolderMinus, faHashtag, faIdCard, f
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import DateUtils from "../utils/DateUtils";
 import { solid } from '@fortawesome/fontawesome-svg-core/import.macro' // <-- import styles to be used
+import EntradaStatusType from "../constants/EntradaStatusType";
 
 const tipoPessoaType = { F: 'Física', J: 'Jurídica' };
-const statusType = { PENDENTE: 'Pendente', APROVADO: 'Aprovado', CANCELADO: 'Cancelado' };
 
 /**
  * [modulo]: {
@@ -200,7 +200,7 @@ export default class ColumnsDefinitions {
                     getValue: (reg: any) => {
                         return reg.eventoEntrada.status;
                     },
-                    convert: statusType,
+                    convert: EntradaStatusType,
                     order: 'status'
                 },
                 fornecedor: {

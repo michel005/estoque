@@ -1,22 +1,16 @@
-import { connect } from "react-redux";
-import store from "../../store";
 import styled from "styled-components";
-import { useState } from "react";
+import { useEffect } from "react";
+import GeneralConstants from "../../constants/GeneralConstants";
 
 const InicioPageStyle = styled.div`
 width: 100%;
 `;
 
-function InicioPage({ inicio }: any) {
-    const [constructorHasRun, setConstructorHasRun] = useState(false);
+function InicioPage() {
 
-    function constructor() {
-        if (constructorHasRun) return;
-        document.title = store.getState().appName +  ' - Início';
-        setConstructorHasRun(true);
-    };
-
-    constructor();
+    useEffect(() => {
+        document.title = GeneralConstants.AppName +  ' - Início';
+    });
 
     return (
         <InicioPageStyle>
@@ -24,10 +18,4 @@ function InicioPage({ inicio }: any) {
     );
 };
 
-const InicioPageConnected = connect((state: any) => { 
-    return {
-        inicio: state.inicio
-    }
- })(InicioPage);
-
-export default InicioPageConnected;
+export default InicioPage;

@@ -6,15 +6,15 @@ import {
     useNavigate
 } from "react-router-dom";
 import styled from 'styled-components';
-import PaginaAction from "./actions/PaginaAction";
 import SearchComponent from "./components/SearchComponent";
 import InicioPageConnected from "./pages/inicio/InicioPage";
-import store from "./store";
 import { solid } from '@fortawesome/fontawesome-svg-core/import.macro'
 import ItemPage from "./pages/item/ItemPage";
 import EntradaPage from "./pages/entrada/EntradaPage";
 import useBuscaPaginada from "./hookies/useBuscaPaginada";
 import FornecedorPage from "./pages/fornecedor/FornecedorPage";
+import Message from "./components/Message";
+import GeneralConstants from "./constants/GeneralConstants";
 
 const DefaultMenuStyled = styled.div`
     background-color: #39f;
@@ -302,24 +302,28 @@ function App() {
 
     const [fixarCadastrar, setFixarCadastrar] = useState(false);
     const [fixarNotificacoes, setFixarNotificacoes] = useState(false);
+    const [erro, setErro] = useState<any>(null);
     const navigate = useNavigate();
 
     const {
-        lista: item_lista, termoBuscaSalvo: item_termoBuscaSalvo, pageInfo: item_pageInfo, erro: item_erro, buscarTodos: item_buscarTodos
+        lista: item_lista, termoBuscaSalvo: item_termoBuscaSalvo, pageInfo: item_pageInfo, buscarTodos: item_buscarTodos
     } = useBuscaPaginada({
-        urlBuscaPaginada: '/item/buscaTudoComQuantidade?pagina=@#PAGINA@#&tamanho=@#TAMANHO@#'
+        urlBuscaPaginada: '/item/buscaTudoComQuantidade?pagina=@#PAGINA@#&tamanho=@#TAMANHO@#',
+        setErro: setErro
     });
 
     const {
-        lista: entrada_lista, termoBuscaSalvo: entrada_termoBuscaSalvo, pageInfo: entrada_pageInfo, erro: entrada_erro, buscarTodos: entrada_buscarTodos
+        lista: entrada_lista, termoBuscaSalvo: entrada_termoBuscaSalvo, pageInfo: entrada_pageInfo, buscarTodos: entrada_buscarTodos
     } = useBuscaPaginada({
-        urlBuscaPaginada: '/evento/entrada/buscaPorDataEntrada?pagina=@#PAGINA@#&tamanho=@#TAMANHO@#'
+        urlBuscaPaginada: '/evento/entrada/buscaPorDataEntrada?pagina=@#PAGINA@#&tamanho=@#TAMANHO@#',
+        setErro: setErro
     });
 
     const {
-        lista: fornecedor_lista, termoBuscaSalvo: fornecedor_termoBuscaSalvo, pageInfo: fornecedor_pageInfo, erro: fornecedor_erro, buscarTodos: fornecedor_buscarTodos
+        lista: fornecedor_lista, termoBuscaSalvo: fornecedor_termoBuscaSalvo, pageInfo: fornecedor_pageInfo, buscarTodos: fornecedor_buscarTodos
     } = useBuscaPaginada({
-        urlBuscaPaginada: '/fornecedor/buscaPaginadaPorTermos?pagina=@#PAGINA@#&tamanho=@#TAMANHO@#'
+        urlBuscaPaginada: '/fornecedor/buscaPaginadaPorTermos?pagina=@#PAGINA@#&tamanho=@#TAMANHO@#',
+        setErro: setErro
     });
 
     function cadastrarFornecedor() {
@@ -335,7 +339,6 @@ function App() {
     }
 
     function navegar(link: string) {
-        store.dispatch(PaginaAction.mudarPaginaAtual('inicio'));
         navigate(link);
     }
 
@@ -350,7 +353,7 @@ function App() {
             <DefaultMenuStyled>
                 <div className="tamanhoTela">
                     <div className="appTitle noprint">
-                        <button onClick={ () => navegar('/') }>{store.getState().appName}</button>
+                        <button onClick={ () => navegar('/') }>{GeneralConstants.AppName}</button>
                         <SearchComponent />
                         <div className="menuUsuario">
                             <div className={'menuCadastrar ' + (fixarCadastrar === true ? 'fixar' : '')}>
@@ -399,15 +402,16 @@ function App() {
                     {
                         <Routes>
                             <Route path='/' element={<InicioPageConnected />} />
-                            <Route path='/fornecedores' element={<FornecedorPage lista={fornecedor_lista} termoBuscaSalvo={fornecedor_termoBuscaSalvo} pageInfo={fornecedor_pageInfo} erro={fornecedor_erro} buscarTodos={fornecedor_buscarTodos} />} />
-                            <Route path='/itens' element={<ItemPage lista={item_lista} termoBuscaSalvo={item_termoBuscaSalvo} pageInfo={item_pageInfo} erro={item_erro} buscarTodos={item_buscarTodos} />} />
-                            <Route path='/entradas' element={<EntradaPage lista={entrada_lista} termoBuscaSalvo={entrada_termoBuscaSalvo} pageInfo={entrada_pageInfo} erro={entrada_erro} buscarTodos={entrada_buscarTodos} />} />
+                            <Route path='/fornecedores' element={<FornecedorPage setErro={setErro} lista={fornecedor_lista} termoBuscaSalvo={fornecedor_termoBuscaSalvo} pageInfo={fornecedor_pageInfo} buscarTodos={fornecedor_buscarTodos} />} />
+                            <Route path='/itens' element={<ItemPage setErro={setErro} lista={item_lista} termoBuscaSalvo={item_termoBuscaSalvo} pageInfo={item_pageInfo} buscarTodos={item_buscarTodos} />} />
+                            <Route path='/entradas' element={<EntradaPage setErro={setErro} lista={entrada_lista} termoBuscaSalvo={entrada_termoBuscaSalvo} pageInfo={entrada_pageInfo} buscarTodos={entrada_buscarTodos} />} />
                             <Route path='/saidas' element={<h1>Saídas</h1>} />
                             <Route path='/inventario' element={<h1>Inventário</h1>} />
                             <Route path='/faturamento' element={<h1>Faturamento</h1>} />
                         </Routes>
                     }
                 </div>
+                {erro !== null && <Message text={erro} closeEvent={() => setErro(null)} />}
             </Content>
         </AppStyled>
     );
