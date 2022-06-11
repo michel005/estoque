@@ -173,11 +173,11 @@ const ListaComponentStyle = styled.div`
         }
 
         .linhaInterna {
+            cursor: pointer;
             display: flex;
             flex-direction: row;
             flex-flow: row;
             width: 100%;
-            transition: all 0.25s;
 
             .coluna {
                 color: #999;
@@ -192,7 +192,6 @@ const ListaComponentStyle = styled.div`
                 word-wrap: break-word;
                 word-break: normal;
                 width: 100%;
-                transition: all 0.25s;
 
                 &.align {
                     &.right {
@@ -209,7 +208,7 @@ const ListaComponentStyle = styled.div`
                     display: flex;
                     flex-direction: row;
                     justify-content: flex-end;
-                    max-width: 50px;
+                    display: none;
 
                     .opcoesRegistro {
                         background-color: transparent;
@@ -217,19 +216,18 @@ const ListaComponentStyle = styled.div`
                         padding: 0px;
                         display: none;
                         flex-direction: row;
-                        margin-right: 14px;
                         transform: none;
                         position: static;
                         transition: none;
-                        min-width: 100px;
                     }
 
                     .botaoSelecionar {
                         color: #999;
                         transition: all 0.25s;
+                        display: none;
 
-                        &.selecionado {
-                            transform: rotate(180deg);
+                        svg {
+                            transform: rotate(45deg);
                         }
                     }
                 }
@@ -296,9 +294,11 @@ const ListaComponentStyle = styled.div`
             background-color: #fff;
             box-shadow: #3333 0px 0px 7px;
             z-index: 90;
-            transform: scale(1.025);
+            transform: scale(1.02);
 
             .linhaInterna {
+                cursor: default;
+
                 .coluna {
                     display: none;
                 }
@@ -312,7 +312,6 @@ const ListaComponentStyle = styled.div`
 
                 .comandoslinha {
                     display: flex;
-                    min-width: 200px;
 
                     .opcoesRegistro {
                         display: flex;
@@ -324,7 +323,7 @@ const ListaComponentStyle = styled.div`
                             color: #3339;
                             font-size: 18px;
                             width: auto;
-                            margin-right: 14px;
+                            margin-left: 14px;
                             transition: none;
                             display: flex;
                             flex-direction: column;
@@ -341,10 +340,7 @@ const ListaComponentStyle = styled.div`
                         color: #999;
                         transition: all 0.25s;
                         margin-right: 4px;
-
-                        &.selecionado {
-                            transform: rotate(180deg);
-                        }
+                        display: block;
                     }
 
                     .botaoSelecionar {

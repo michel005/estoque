@@ -1,8 +1,17 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import API from "../API";
+import { ErrorContext } from "./context/ErrorContext";
 
-export default function useBuscaPaginada({ urlBuscaPaginada, setErro }) {
-    const [lista, setLista] = useState<any>({});
+export interface BuscaPaginadaType {
+    lista: [] | null, 
+    pageInfo: JSON | null, 
+    termoBuscaSalvo: any | null, 
+    buscarTodos: Function | null
+}
+
+export default function useBuscaPaginada({ urlBuscaPaginada }) {
+    const erro = useContext(ErrorContext);
+    const [lista, setLista] = useState<any>({content:[]});
     const [pageInfo, setPageInfo] = useState<any>({
         atual: 0,
         total: 0,
@@ -24,7 +33,7 @@ export default function useBuscaPaginada({ urlBuscaPaginada, setErro }) {
                 setLista(response.data);
             })
             .catch((error) => {
-                setErro(error.response.data);
+                erro.error = error.response.data;
             });
     }
 

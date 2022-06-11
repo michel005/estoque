@@ -8,7 +8,7 @@ const JanelaStyled = styled.div`
     position: fixed;
     top: 0px;
     width: 100%;
-    z-index: 100;
+    z-index: 90;
 
     * {
         transition: all 0.5s;
@@ -29,6 +29,10 @@ const JanelaStyled = styled.div`
         left: 50%;
         transform: translateX(-50%) translateY(-50%);
 
+        .tabela {
+            width: 100%;
+        }
+
         .title {
             color: #000;
             font-weight: bold;
@@ -40,6 +44,10 @@ const JanelaStyled = styled.div`
         .innerContent {
             padding: 21px;
             width: 100%;
+
+            .campo {
+                margin-bottom: 7px;
+            }
         }
 
         .commands {

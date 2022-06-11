@@ -3,4 +3,9 @@ export default class ValueUtils {
         var objeto: any = document.getElementById(id);
         return objeto !== undefined && objeto !== null ? (objeto.value === "" ? null : objeto.value) : null;
     }
+
+    static elementById(id: string) {
+        var objeto: any = document.getElementById(id);
+        return objeto !== undefined && objeto !== null ? objeto : null;
+    }
 }

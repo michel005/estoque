@@ -7,12 +7,15 @@ import ButtonOptions from "./forms/ButtonOptions";
 import Calendar from "./Calendar";
 import DateUtils from "../utils/DateUtils";
 import { solid } from "@fortawesome/fontawesome-svg-core/import.macro";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import ListaComponentStyle from "./ListaComponent.style";
 import useColumnMapper from "../hookies/useColumnMapper";
 import ChoiceMessage from "./ChoiceMessage";
+import Separador from "./Separador";
+import { CRUDContext } from "../hookies/context/CRUDContext";
 
-export default function ListaComponent({ dataType = "", data = [], detailMapper = null, events = null, pageInfo = null, textoPerguntaExclusao = "Deseja realmente excluir este registro?" }: any) {
+export default function ListaComponent({ dataType = "entrada", detailMapper = null, textoPerguntaExclusao = "Deseja realmente excluir este registro?" }: any) {
+    const context = useContext(CRUDContext)[dataType];
     const [selecionado, setSelecionado] = useState<any>(null);
     const [perguntaExclusao, setPerguntaExclusao] = useState<any>(null);
     const [abrirMenuColunas, setAbrirMenuColunas] = useState(false);
@@ -20,6 +23,23 @@ export default function ListaComponent({ dataType = "", data = [], detailMapper 
     const [orderBy, setOrderBy] = useState<any>(null);
 
     const [columns, modifyColumnAtt, savedValues, modifySavedFilters] = useColumnMapper(dataType);
+    var events = {
+        insert: () => {
+            context.form.statusCadastrar();
+        },
+        update: (item: any) => {
+            context.form.statusAlterar(item);
+        },
+        delete: (item: any) => {
+            context.form.excluir(item);
+        },
+        page: (pagina: any) => {
+            context.busca.buscarTodos({ pagina: pagina });
+        },
+        filter: (value: any) => {
+            context.busca.buscarTodos({ termoBusca: value });
+        },
+    };
 
     useState(() => {
         initialOrderBy();
@@ -54,10 +74,6 @@ export default function ListaComponent({ dataType = "", data = [], detailMapper 
         setOrderBy(finishOrderBy);
     }
 
-    function selecionar(value: any) {
-        setSelecionado(selecionado === null || selecionado.id !== value.id ? value : null);
-    }
-
     function columnStyles(dadosLinha: any) {
         var st = columns[dadosLinha].align !== undefined ? " align " + columns[dadosLinha].align : "";
         st += " coluna" + ConvertUtils.firstUpperCase(dadosLinha) + " ";
@@ -90,13 +106,6 @@ export default function ListaComponent({ dataType = "", data = [], detailMapper 
         if (events !== null && events.update !== undefined && events.update !== null) {
             setSelecionado(null);
             events.update(value);
-        }
-    }
-
-    function mostrarFormularioExclusao(value: any) {
-        if (events !== null && events.delete !== undefined && events.delete !== null) {
-            setSelecionado(null);
-            events.delete(value);
         }
     }
 
@@ -149,7 +158,7 @@ export default function ListaComponent({ dataType = "", data = [], detailMapper 
     }
 
     function mouseOver(value: any) {
-        if (data.length > 0) {
+        if (context.busca.lista.content.length > 0) {
             var st = document.getElementsByClassName("colunaEstiloInterno" + value);
             for (var i = 0; i < st.length; i++) {
                 var item = st.item(i);
@@ -234,7 +243,7 @@ export default function ListaComponent({ dataType = "", data = [], detailMapper 
     }
 
     function montaTextoPerguntaExclusao() {
-        var registro = data.find((value: any) => value.id === perguntaExclusao);
+        var registro = context.busca.lista.content.find((value: any) => value.id === perguntaExclusao);
         var aux = textoPerguntaExclusao;
         Object.keys(columns).map((column: any) => {
             aux = aux.replace("@#" + column + "@#", registro[column]);
@@ -243,7 +252,7 @@ export default function ListaComponent({ dataType = "", data = [], detailMapper 
     }
 
     function eventoExcluir() {
-        var registro = data.find((value: any) => value.id === perguntaExclusao);
+        var registro = context.busca.lista.content.find((value: any) => value.id === perguntaExclusao);
         events.delete(registro);
         setPerguntaExclusao(null);
     }
@@ -392,15 +401,15 @@ export default function ListaComponent({ dataType = "", data = [], detailMapper 
                                     onMouseOut={(x) => mouseOut(value)}
                                     onClick={() => changeOrderBy(value)}
                                     className={"coluna colunaEstiloInterno" + value + " " + columnStyles(value) + " " + value}
+                                    style={columns[value].width ? { minWidth: columns[value].width, maxWidth: columns[value].width } : {}}
                                 >
                                     {columns[value].icon !== undefined && columns[value].icon} {columns[value].name} {orderByIcon(value)}
                                 </div>
                             );
                         })}
-                    <div className="coluna comandoslinha"></div>
                 </div>
             </div>
-            {data.map((linha: any, idx: number) => {
+            {context.busca.lista.content.map((linha: any, idx: number) => {
                 return (
                     <div key={idx} className={"linha " + (selecionado !== null && selecionado.id === linha.id ? "selecionado" : "")}>
                         <div className="linhaInterna">
@@ -408,7 +417,12 @@ export default function ListaComponent({ dataType = "", data = [], detailMapper 
                                 .filter((dadosLinha) => dadosLinha !== "requestData" && (columns[dadosLinha].visible === undefined || columns[dadosLinha].visible === true))
                                 .map((dadosLinha: any, indexLinha: number) => {
                                     return (
-                                        <div key={indexLinha} className={"coluna colunaEstiloInterno" + dadosLinha + " " + columnStyles(dadosLinha) + " " + dadosLinha}>
+                                        <div
+                                            key={indexLinha}
+                                            className={"coluna colunaEstiloInterno" + dadosLinha + " " + columnStyles(dadosLinha) + " " + dadosLinha}
+                                            onClick={() => setSelecionado(linha)}
+                                            style={columns[dadosLinha].width ? { minWidth: columns[dadosLinha].width, maxWidth: columns[dadosLinha].width } : {}}
+                                        >
                                             {valueModifier(linha, dadosLinha)}
                                         </div>
                                     );
@@ -425,18 +439,14 @@ export default function ListaComponent({ dataType = "", data = [], detailMapper 
                                     <ButtonStyled title="Excluir" onClick={() => setPerguntaExclusao(linha.id)}>
                                         <FontAwesomeIcon icon={solid("trash")} />
                                     </ButtonStyled>
-                                </div>
-                                {detailMapper !== null ? (
                                     <ButtonStyled
-                                        title="Mostrar detalhes"
+                                        title="Esconder detalhes"
                                         className={"botaoSelecionar link " + (selecionado !== null && selecionado.id === linha.id ? "selecionado" : "")}
-                                        onClick={() => selecionar(linha)}
+                                        onClick={() => setSelecionado(null)}
                                     >
-                                        <FontAwesomeIcon icon={solid("chevron-down")} />
+                                        <FontAwesomeIcon icon={solid("plus")} />
                                     </ButtonStyled>
-                                ) : (
-                                    <></>
-                                )}
+                                </div>
                             </div>
                         </div>
                         {detailMapper !== null && selecionado !== null && selecionado.id === linha.id && (
@@ -444,18 +454,15 @@ export default function ListaComponent({ dataType = "", data = [], detailMapper 
                                 {Object.keys(detailMapper)
                                     .filter((value) => detailMapper[value].title !== undefined || detailMapper[value].fields !== undefined)
                                     .map((detField: any, idx1: any) => {
-                                        if (detailMapper[detField].title !== undefined) {
-                                            return (
-                                                <div key={idx1} className="separador">
-                                                    <div className="tituloSeparador">{detailMapper[detField].title}</div>
-                                                    <div className="barraSeparador"></div>
-                                                </div>
-                                            );
+                                        if (detailMapper[detField] === null) {
+                                            return <div className="campo"></div>;
+                                        } else if (detailMapper[detField].title !== undefined) {
+                                            return <Separador titulo={detailMapper[detField].title} key={idx1} />;
                                         } else {
                                             return (
                                                 <div key={idx1} className="linhaDetalhe">
                                                     {detailMapper[detField].fields.map((field: any, idx2: any) => {
-                                                        if (field !== "") {
+                                                        if (field !== "" && field !== null) {
                                                             return (
                                                                 <TextField
                                                                     key={idx2}
@@ -478,7 +485,7 @@ export default function ListaComponent({ dataType = "", data = [], detailMapper 
                     </div>
                 );
             })}
-            {data.length === 0 ? (
+            {context.busca.lista.content.length === 0 ? (
                 <div>
                     <div className="linha empty">
                         <div className="linhaInterna">
@@ -489,26 +496,34 @@ export default function ListaComponent({ dataType = "", data = [], detailMapper 
             ) : (
                 <></>
             )}
-            {pageInfo !== null && (
+            {context.busca.pageInfo !== null && (
                 <>
                     <div className="paginacao">
-                        <ButtonStyled className="transparent" disabled={pageInfo.atual === 0} onClick={() => buscarPagina(0)}>
+                        <ButtonStyled className="transparent" disabled={context.busca.pageInfo.atual === 0} onClick={() => buscarPagina(0)}>
                             <FontAwesomeIcon icon={solid("fast-backward")} />
                         </ButtonStyled>
-                        <ButtonStyled className="transparent" disabled={pageInfo.atual === 0} onClick={() => buscarPagina(pageInfo.atual - 1)}>
+                        <ButtonStyled className="transparent" disabled={context.busca.pageInfo.atual === 0} onClick={() => buscarPagina(context.busca.pageInfo.atual - 1)}>
                             <FontAwesomeIcon icon={solid("backward")} />
                         </ButtonStyled>
-                        {pageInfo.total === 0 ? (
+                        {context.busca.pageInfo.total === 0 ? (
                             <ButtonStyled className="nohover transparent">0</ButtonStyled>
                         ) : (
                             <ButtonStyled className="nohover transparent">
-                                Página {pageInfo.atual + 1} de {pageInfo.total}
+                                Página {context.busca.pageInfo.atual + 1} de {context.busca.pageInfo.total}
                             </ButtonStyled>
                         )}
-                        <ButtonStyled className="transparent" disabled={pageInfo.atual + 1 === pageInfo.total || pageInfo.total === 0} onClick={() => buscarPagina(pageInfo.atual + 1)}>
+                        <ButtonStyled
+                            className="transparent"
+                            disabled={context.busca.pageInfo.atual + 1 === context.busca.pageInfo.total || context.busca.pageInfo.total === 0}
+                            onClick={() => buscarPagina(context.busca.pageInfo.atual + 1)}
+                        >
                             <FontAwesomeIcon icon={solid("forward")} />
                         </ButtonStyled>
-                        <ButtonStyled className="transparent" disabled={pageInfo.atual + 1 === pageInfo.total || pageInfo.total === 0} onClick={() => buscarPagina(pageInfo.total - 1)}>
+                        <ButtonStyled
+                            className="transparent"
+                            disabled={context.busca.pageInfo.atual + 1 === context.busca.pageInfo.total || context.busca.pageInfo.total === 0}
+                            onClick={() => buscarPagina(context.busca.pageInfo.total - 1)}
+                        >
                             <FontAwesomeIcon icon={solid("fast-forward")} />
                         </ButtonStyled>
                     </div>

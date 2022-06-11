@@ -1,43 +1,82 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import API from "../API";
+import { ErrorContext } from "./context/ErrorContext";
 
 export const STATUS = {
     OCIOSO: "O",
     CADASTRAR: "C",
-    ALTERAR: "A"
+    ALTERAR: "A",
 };
 
-export default function useFormulario({ setErro, urlCadastro, urlAlteracao, urlExclusao, defaultAtual, eventoAntes = () => {}, eventoDepois = () => {} }) {
-    const [status, setStatus] = useState<any>(STATUS.OCIOSO);
-    const [atual, setAtual] = useState<any>({});
+export interface FormularioReturnType {
+    status: string;
+    atual: any | null;
+    setAtual: Function;
+    complementos: Array<any>;
+    setComplementos: Function;
+    statusCadastrar: Function;
+    statusAlterar: Function;
+    statusOcioso: Function;
+    resetError: Function;
+    cadastrar: Function;
+    alterar: Function;
+    excluir: Function;
+}
+
+export default function useFormulario({
+    urlCadastro,
+    urlAlteracao,
+    urlExclusao,
+    defaultAtual,
+    tituloErro = "",
+    eventoAntes = () => {
+        return true;
+    },
+    eventoDepois = () => {
+        return true;
+    },
+}) {
+    const erro = useContext(ErrorContext);
+    const [status, setStatus] = useState<string>(STATUS.OCIOSO);
+    const [atual, setAtual] = useState<any>(null);
     const [complementos, setComplementos] = useState<any>({});
 
     function statusCadastrar(atualExterno = defaultAtual) {
-        eventoAntes();
-        setStatus(STATUS.CADASTRAR);
-        setErro(null);
-        setAtual(atualExterno);
+        if (eventoAntes()) {
+            setStatus(STATUS.CADASTRAR);
+            erro.setError(null);
+            setAtual(atualExterno);
+        }
     }
 
     function statusAlterar(atualExterno) {
-        eventoAntes();
-        setStatus(STATUS.ALTERAR);
-        setErro(null);
-        setAtual(atualExterno);
+        if (eventoAntes()) {
+            setStatus(STATUS.ALTERAR);
+            erro.setError(null);
+            setAtual(atualExterno);
+        }
     }
 
     function statusOcioso() {
         setStatus(STATUS.OCIOSO);
-        setErro(null);
+        erro.setError(null);
         setAtual(null);
     }
 
     function resetError() {
-        setErro(null);
+        erro.setError(null);
     }
 
     function preencheErro(resposta: any) {
-        setErro(resposta[Object.keys(resposta)[0]]);
+        erro.setError({ title: tituloErro, body: resposta[Object.keys(resposta)[0]] });
+    }
+
+    function salvar(atualExterno) {
+        if (status === STATUS.CADASTRAR) {
+            cadastrar(atualExterno);
+        } else {
+            alterar(atualExterno);
+        }
     }
 
     function cadastrar(atualExterno) {
@@ -66,7 +105,6 @@ export default function useFormulario({ setErro, urlCadastro, urlAlteracao, urlE
         API.post(urlExclusao.replace("@#ID@#", atualExterno.id))
             .then(() => {
                 eventoDepois();
-                statusOcioso();
             })
             .catch((error) => {
                 preencheErro(error.response.data);
@@ -79,15 +117,13 @@ export default function useFormulario({ setErro, urlCadastro, urlAlteracao, urlE
         setAtual,
         complementos,
         setComplementos,
-        eventos: {
-            statusCadastrar,
-            statusAlterar,
-            statusOcioso,
-            resetError,
-            cadastrar,
-            alterar,
-            excluir,
-            setErro,
-        },
+        statusCadastrar,
+        statusAlterar,
+        statusOcioso,
+        resetError,
+        salvar,
+        cadastrar,
+        alterar,
+        excluir,
     };
 }

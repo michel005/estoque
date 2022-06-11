@@ -1,5 +1,5 @@
 import { useState } from "react";
-import ColumnsDefinitions from "../reducers/ColumnsDefinitions";
+import ColumnsDefinitions from "../constants/ColumnsDefinitions";
 
 export default function useColumnMapper(dataType: string) {
     const [columns, setColumns] = useState<any>(ColumnsDefinitions.definition[dataType].columnMapper);
