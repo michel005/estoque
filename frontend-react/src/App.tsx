@@ -12,6 +12,7 @@ import { STATUS } from "./hookies/useFormulario";
 import ItemFormularioPage from "./paginas/ItemFormularioPage";
 import FornecedorFormularioPage from "./paginas/FornecedorFormularioPage";
 import EntradaFormularioPage from "./paginas/EntradaFormularioPage";
+import InicioPage from "./paginas/InicioPage";
 
 function App() {
     const error = useContext(ErrorContext);
@@ -24,7 +25,7 @@ function App() {
                 <div className="TamanhoTela">
                     {
                         <Routes>
-                            <Route path="/" element={<h1>Início</h1>} />
+                            <Route path="/" element={<InicioPage />} />
                             <Route path="/fornecedores" element={<FornecedorPage />} />
                             <Route path="/itens" element={<ItemPage />} />
                             <Route path="/entradas" element={<EntradaPage />} />
@@ -34,13 +35,12 @@ function App() {
                         </Routes>
                     }
                 </div>
+
+                {crud.item.form.status !== STATUS.OCIOSO && <ItemFormularioPage />}
+                {crud.fornecedor.form.status !== STATUS.OCIOSO && <FornecedorFormularioPage />}
+                {crud.entrada.form.status !== STATUS.OCIOSO && <EntradaFormularioPage />}
+                {error.error !== null && <Message title={error.error.title} text={error.error.body} closeEvent={() => error.setError(null)} />}
             </div>
-            <>{console.log(error.error)}</>
-            
-            {crud.item.form.status !== STATUS.OCIOSO && <ItemFormularioPage />}
-            {crud.fornecedor.form.status !== STATUS.OCIOSO && <FornecedorFormularioPage />}
-            {crud.entrada.form.status !== STATUS.OCIOSO && <EntradaFormularioPage />}
-            {error.error !== null && <Message title={error.error.title} text={error.error.body} closeEvent={() => error.setError(null)} />}
         </AppStyled>
     );
 }

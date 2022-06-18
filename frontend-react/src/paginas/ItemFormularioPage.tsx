@@ -29,7 +29,9 @@ export default function ItemFormularioPage() {
                     <SelectField label="Categoria" fieldID="formulario_item_categoria" defaultValue={form.atual.categoria} list={categorias} />
                 </div>
                 <div className="commands">
-                    <ButtonStyled onClick={salvar} className="primary">Salvar</ButtonStyled>
+                    <ButtonStyled onClick={salvar} className="primary" loading={form.salvando}>
+                        Salvar
+                    </ButtonStyled>
                     <ButtonStyled onClick={form.statusOcioso}>Cancelar</ButtonStyled>
                 </div>
             </div>

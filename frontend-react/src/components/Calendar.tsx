@@ -3,7 +3,7 @@ import { useState } from "react";
 import styled from "styled-components";
 import DateUtils from "../utils/DateUtils";
 import ButtonStyled from "./ButtonStyled";
-import { solid } from "@fortawesome/fontawesome-svg-core/import.macro"; // <-- import styles to be used
+import { solid } from "@fortawesome/fontawesome-svg-core/import.macro";
 
 const AlternativeCalendarStyled = styled.div`
     overflow: hidden;

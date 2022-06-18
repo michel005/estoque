@@ -11,16 +11,24 @@ const AppStyled = styled.div`
         justify-content: center;
         flex-grow: 1;
         width: 100%;
-        height: 100%;
-        overflow-y: auto;
+        height: calc(100% - 130px);
+        max-height: calc(100% - 130px);
         z-index: 0;
 
         .TamanhoTela {
             display: flex;
-            width: 1400px;
-            padding: 14px 0px;
-            padding-top: 14px;
-            margin: 0px 14px;
+            flex-direction: row;
+            width: 100%;
+            max-height: 100%;
+
+            & > * {
+                display: flex;
+                flex-direction: column;
+                flex-grow: 1;
+                height: 100%;
+                max-height: 100%;
+                width: 100%;
+            }
         }
     }
 `;

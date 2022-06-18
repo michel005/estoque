@@ -68,7 +68,8 @@ const SelectField = ({
     nativeSelect = false,
     nullableOption = true,
     nullableOptionText = "",
-    nullableOptionValue = null
+    nullableOptionValue = null,
+    validar=() => { return ""; }
 }: any) => {
     const [error, setError] = useState(externalError);
 
@@ -91,6 +92,9 @@ const SelectField = ({
             if (list[value] === undefined) {
                 erro = "Valor informado não é válido";
             }
+        }
+        if (erro === "") {
+            erro = validar()
         }
         showError(erro);
     };
@@ -128,7 +132,7 @@ const SelectField = ({
                     </datalist>
                 </>
             ) : (
-                <select defaultValue={defaultValue} id={fieldID} onBlur={validate} name={fieldID}>
+                <select defaultValue={defaultValue} id={fieldID} onChange={validate} name={fieldID}>
                     {nullableOption === true && <option value={nullableOptionValue}>{nullableOptionText}</option>}
                     {Object.keys(list).map((value, index) => {
                         return (

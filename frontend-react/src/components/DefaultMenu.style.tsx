@@ -1,12 +1,11 @@
 import styled from "styled-components";
 
 const DefaultMenuStyled = styled.div`
-    background-color: #39f;
+    background-color: #222;
     display: flex;
     flex-direction: row;
     justify-content: center;
     width: 100%;
-    box-shadow: #3336 2px 0px 7px;
 
     @media print {
         display: none;
@@ -15,8 +14,9 @@ const DefaultMenuStyled = styled.div`
     .tamanhoTela {
         display: flex;
         flex-direction: column;
-        width: 1400px;
-        max-width: 1400px;
+        width: 100%;
+        height: 130px;
+        max-height: 130px;
         margin: 0px 14px;
 
         .appTitle {
@@ -26,7 +26,6 @@ const DefaultMenuStyled = styled.div`
             justify-content: flex-start;
             padding: 14px 0px;
             transition: all 0.25s;
-            margin-bottom: -10px;
             width: 100%;
 
             & > button {
@@ -149,7 +148,6 @@ const DefaultMenuStyled = styled.div`
             display: flex;
             flex-direction: row;
             justify-content: center;
-            margin-top: -14px;
             width: 100%;
 
             button {

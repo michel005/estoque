@@ -141,6 +141,9 @@ const TextField = ({
     defaultValue = null,
     placeholder = "",
     disabled = false,
+    validate = () => {
+        return "";
+    },
     className = "",
     icon = null,
     eventIcon = () => {},
@@ -150,23 +153,14 @@ const TextField = ({
 }: any) => {
     const [error, setError] = useState("");
 
-    const showError = (errorMessage: any) => {
-        var rootComponent = document.getElementsByClassName(fieldID)[0];
-        rootComponent.classList.remove("withError");
-        setError(errorMessage);
-        if (errorMessage !== "") {
-            rootComponent.classList.add("withError");
-        }
-    };
-
     const validateEvent = () => {
         var el: any = document.getElementById(fieldID);
         var value = el.value;
-        var erro = "";
-        if (nullable === false && value.trim() === "") {
+        var erro = validate();
+        if (erro === "" && nullable === false && value.trim() === "") {
             erro = "Campo obrigatório não preenchido!";
         }
-        showError(erro);
+        setError(erro);
     };
 
     function convertValue() {
@@ -196,7 +190,16 @@ const TextField = ({
                         </label>
                     )}
                     <div className="iconContainer">
-                        <input autoComplete="false" type={type} id={fieldID} defaultValue={defaultValue} placeholder={placeholder} onBlur={validateEvent} disabled={disabled} />
+                        <input
+                            autoComplete="false"
+                            type={type}
+                            id={fieldID}
+                            className={error !== "" ? "widthError" : ""}
+                            defaultValue={defaultValue}
+                            placeholder={placeholder}
+                            onBlur={validateEvent}
+                            disabled={disabled}
+                        />
                         {icon !== null && (
                             <ButtonStyled onClick={eventIcon} className="icon">
                                 {icon}

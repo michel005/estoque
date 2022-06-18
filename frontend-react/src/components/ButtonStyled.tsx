@@ -1,6 +1,8 @@
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import styled from "styled-components";
+import { solid } from "@fortawesome/fontawesome-svg-core/import.macro";
 
-const ButtonStyled = styled.button`
+const Style = styled.button`
     background-color: #333;
     border: none;
     border-radius: 4px;
@@ -39,7 +41,6 @@ const ButtonStyled = styled.button`
         }
 
         &:disabled {
-
             &:hover {
                 background-color: #39f;
             }
@@ -55,7 +56,6 @@ const ButtonStyled = styled.button`
         }
 
         &:disabled {
-
             &:hover {
                 background-color: #00821a;
             }
@@ -112,7 +112,6 @@ const ButtonStyled = styled.button`
         }
 
         &:disabled {
-
             &:hover {
                 background-color: #ff7575;
             }
@@ -149,5 +148,22 @@ const ButtonStyled = styled.button`
         }
     }
 `;
+
+function ButtonStyled({ children = <></>, className = "", onClick = () => {}, id = "", title = "", disabled = false, loading = false, icon = null }:any) {
+    return (
+        <>
+            {!loading && (
+                <Style className={className} onClick={onClick} id={id} title={title} disabled={disabled}>
+                    {icon !== null && <FontAwesomeIcon icon={icon} />} {children}
+                </Style>
+            )}
+            {loading && (
+                <Style className={className} id={id} title={title} disabled={true}>
+                    <FontAwesomeIcon icon={solid("spinner")} spin />
+                </Style>
+            )}
+        </>
+    );
+}
 
 export default ButtonStyled;

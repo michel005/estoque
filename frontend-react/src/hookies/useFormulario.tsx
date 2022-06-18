@@ -38,6 +38,7 @@ export default function useFormulario({
 }) {
     const erro = useContext(ErrorContext);
     const [status, setStatus] = useState<string>(STATUS.OCIOSO);
+    const [salvando, setSalvando] = useState(false);
     const [atual, setAtual] = useState<any>(null);
     const [complementos, setComplementos] = useState<any>({});
 
@@ -80,6 +81,7 @@ export default function useFormulario({
     }
 
     function cadastrar(atualExterno) {
+        setSalvando(true);
         API.post(urlCadastro, atualExterno)
             .then(() => {
                 eventoDepois();
@@ -87,10 +89,14 @@ export default function useFormulario({
             })
             .catch((error) => {
                 preencheErro(error.response.data);
+            })
+            .finally(() => {
+                setSalvando(false);
             });
     }
 
     function alterar(atualExterno) {
+        setSalvando(true);
         API.post(urlAlteracao.replace("@#ID@#", atual.id), atualExterno)
             .then(() => {
                 eventoDepois();
@@ -98,22 +104,30 @@ export default function useFormulario({
             })
             .catch((error) => {
                 preencheErro(error.response.data);
+            })
+            .finally(() => {
+                setSalvando(false);
             });
     }
 
     function excluir(atualExterno) {
+        setSalvando(true);
         API.post(urlExclusao.replace("@#ID@#", atualExterno.id))
             .then(() => {
                 eventoDepois();
             })
             .catch((error) => {
                 preencheErro(error.response.data);
+            })
+            .finally(() => {
+                setSalvando(false);
             });
     }
 
     return {
         status,
         atual,
+        salvando,
         setAtual,
         complementos,
         setComplementos,

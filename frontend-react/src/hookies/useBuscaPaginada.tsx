@@ -12,15 +12,16 @@ export interface BuscaPaginadaType {
 export default function useBuscaPaginada({ urlBuscaPaginada }) {
     const erro = useContext(ErrorContext);
     const [lista, setLista] = useState<any>({content:[]});
+    const [buscando, setBuscando] = useState(false);
+    const [tamanhoPagina, setTamanhoPagina] = useState(30);
+    const [termoBuscaSalvo, setTermoBuscaSalvo] = useState<any>({});
     const [pageInfo, setPageInfo] = useState<any>({
         atual: 0,
         total: 0,
     });
-    const tamanhoPagina = 10;
-
-    const [termoBuscaSalvo, setTermoBuscaSalvo] = useState<any>({});
 
     function buscarTodos({ termoBusca = termoBuscaSalvo, pagina = 0 }) {
+        setBuscando(true);
         var url = urlBuscaPaginada.replace("@#PAGINA@#", pagina + "");
         url = url.replace("@#TAMANHO@#", tamanhoPagina + "");
         API.post(url, termoBusca)
@@ -34,8 +35,11 @@ export default function useBuscaPaginada({ urlBuscaPaginada }) {
             })
             .catch((error) => {
                 erro.error = error.response.data;
+            })
+            .finally(() => {
+                setBuscando(false);
             });
     }
 
-    return { lista, pageInfo, termoBuscaSalvo, buscarTodos };
+    return { lista, pageInfo, termoBuscaSalvo, buscando, buscarTodos, tamanhoPagina, setTamanhoPagina };
 }

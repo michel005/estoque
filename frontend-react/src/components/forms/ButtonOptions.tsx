@@ -1,6 +1,7 @@
 import ButtonStyled from "../ButtonStyled";
 import styled from "styled-components";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import ValueUtils from "../../utils/ValueUtils";
 
 const Style = styled.div`
     display: flex;
@@ -27,7 +28,7 @@ const Style = styled.div`
             border-bottom-width: 1px;
 
             &:hover {
-                background-color: #3330;
+                background-color: #6661;
             }
 
             &.primary {
@@ -49,8 +50,22 @@ const Style = styled.div`
     }
 `;
 
-export default function ButtonOptions({ label = null, list = [], fieldID = "", defaultValue = null, nullableOption = false, nullableOptionText = "" }: any) {
+export default function ButtonOptions({ label = null, list = [], fieldID = "", defaultValue = null, nullableOption = false, nullableOptionText = "", validate = () => {} }: any) {
     const [selecionado, setSelecionado] = useState<any>(defaultValue);
+    const [inicio, setInicio] = useState<any>(false);
+
+    useEffect(() => {
+        if (!inicio) {
+            validate();
+            setInicio(true);
+        }
+    }, [selecionado]);
+
+    function selecionar(val) {
+        setSelecionado(val);
+        ValueUtils.elementById(fieldID).value = val;
+        validate();
+    }
 
     return (
         <Style className="campo">
@@ -58,7 +73,7 @@ export default function ButtonOptions({ label = null, list = [], fieldID = "", d
             <div className="opcoes">
                 {Object.keys(list).map((val, index) => {
                     return (
-                        <ButtonStyled key={index} className={selecionado === val ? "primary" : ""} onClick={() => setSelecionado(val)}>
+                        <ButtonStyled key={index} className={((parseInt(selecionado) === parseInt(val)) || (selecionado === val)) ? "primary" : ""} onClick={() => selecionar(val)}>
                             {list[val]}
                         </ButtonStyled>
                     );

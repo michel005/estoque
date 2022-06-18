@@ -1,5 +1,5 @@
 import ListaComponent from "../components/ListaComponent";
-import ItemPageStyled from "./ItemPage.style";
+import FornecedorPageStyled from "./FornecedorPage.style";
 
 export default function FornecedorPage() {
 
@@ -21,8 +21,8 @@ export default function FornecedorPage() {
     ];
 
     return (
-        <ItemPageStyled>
+        <FornecedorPageStyled>
             <ListaComponent dataType="fornecedor" detailMapper={detail} />
-        </ItemPageStyled>
+        </FornecedorPageStyled>
     );
 }

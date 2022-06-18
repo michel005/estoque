@@ -3,437 +3,415 @@ import styled from "styled-components";
 const ListaComponentStyle = styled.div`
     display: flex;
     flex-direction: column;
+    height: 100%;
+    width: 100%;
+    background-color: #fff;
+    /* box-shadow: 4px 4px 7px #3333;
+    border-radius: 7px;
+    overflow: hidden; */
 
-    .columnActive {
-        background-color: #3331;
-        color: #666 !important;
-    }
-
-    .cabecalho > .columnActive {
-        background-color: #444 !important;
-        color: #fff !important;
-    }
-
-    .selecionado .columnActive {
-        background-color: #fff;
-        color: #3339 !important;
-    }
-
-    .orderBy {
-        color: #fff;
-        margin-left: 7px;
-
-        &.desc {
-            transform: rotate(180deg);
-            margin-left: 0px;
-        }
-    }
-
-    .filtrosEComandos {
+    .comandos {
+        background-color: #333;
         display: flex;
-        flex-direction: column;
-        margin-bottom: 7px;
-
-        .linhaComandos {
-            display: flex;
-            flex-direction: row;
-            justify-content: flex-end;
-
-            .comandos {
-                display: flex;
-                flex-direction: row;
-                justify-content: flex-end;
-                margin-right: 0px;
-                flex-grow: 1;
-
-                &.filtrosEsquerda {
-                    justify-content: flex-start;
-                }
-
-                .botoes {
-                    display: flex;
-                    flex-direction: row;
-
-                    .opcoesColunas {
-                        background-color: #3339;
-                        border-radius: 4px;
-                        display: flex;
-                        flex-direction: column;
-                        padding: 7px;
-                        position: fixed;
-                        transform: translateY(40px);
-                        z-index: 100 !important;
-                        backdrop-filter: blur(10px);
-
-                        .title {
-                            color: #fff;
-                            padding: 4px;
-                        }
-
-                        button {
-                            color: #aaa;
-                            padding: 4px;
-                            text-align: left;
-                            font-size: 12px;
-                            font-weight: normal;
-
-                            &.showing {
-                                color: #eee;
-                            }
-
-                            &:hover {
-                                color: #eee;
-                                background-color: #3339;
-                            }
-
-                            svg {
-                                font-size: 12px;
-                                margin-right: 7px;
-                                width: 12px;
-                            }
-                        }
-                    }
-
-                    button {
-                        min-width: 40px;
-                        border-radius: 0px;
-
-                        &:first-child {
-                            border-top-left-radius: 4px;
-                            border-bottom-left-radius: 4px;
-                        }
-
-                        &:last-child {
-                            border-top-right-radius: 4px;
-                            border-bottom-right-radius: 4px;
-                        }
-                    }
-
-                    #botaoCadastrar {
-                        margin-right: 7px;
-                    }
-                }
-            }
-        }
-
-        .linhaFiltro {
-            display: flex;
-            flex-direction: row;
-            justify-content: flex-start;
-            margin-bottom: 7px;
-
-            .filtro {
-                margin-right: 14px;
-
-                .campo label,
-                .campoLabel label {
-                    margin-left: 14px;
-                }
-
-                button.link {
-                    position: absolute;
-                    margin-top: 3px;
-                    font-weight: bold;
-
-                    svg {
-                        font-size: 14px;
-                        transform: rotate(45deg);
-                    }
-                }
-            }
-
-            .calendario {
-                width: 220px;
-            }
-        }
-    }
-
-    .linha {
-        background-color: #f4f4f4;
-        display: flex;
-        flex-direction: column;
+        flex-direction: row;
+        min-height: 56px;
         width: 100%;
-        transition: all 0.25s;
 
-        &:nth-child(even) {
-            background-color: #fff;
-        }
-
-        &:hover {
-            background-color: #eee;
-        }
-
-        &.nohover,
-        &.nohover:hover {
-            background-color: transparent;
-        }
-
-        &.empty {
-            background-color: #fff;
-        }
-
-        .linhaInterna {
-            cursor: pointer;
+        .espacador {
             display: flex;
-            flex-direction: row;
-            flex-flow: row;
-            width: 100%;
+            flex-grow: 1;
+        }
 
-            .coluna {
-                color: #999;
-                display: flex;
-                flex-direction: row;
-                text-align: left;
-                font-size: 15px;
-                padding: 14px;
-                flex-grow: 1;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                word-wrap: break-word;
-                word-break: normal;
-                width: 100%;
+        button {
+            font-size: 13px;
 
-                &.align {
-                    &.right {
-                        text-align: right;
-                        justify-content: flex-end;
-                    }
-                    &.center {
-                        text-align: center;
-                        justify-content: center;
-                    }
-                }
-
-                &.comandoslinha {
-                    display: flex;
-                    flex-direction: row;
-                    justify-content: flex-end;
-                    display: none;
-
-                    .opcoesRegistro {
-                        background-color: transparent;
-                        backdrop-filter: unset;
-                        padding: 0px;
-                        display: none;
-                        flex-direction: row;
-                        transform: none;
-                        position: static;
-                        transition: none;
-                    }
-
-                    .botaoSelecionar {
-                        color: #999;
-                        transition: all 0.25s;
-                        display: none;
-
-                        svg {
-                            transform: rotate(45deg);
-                        }
-                    }
-                }
+            &:hover {
+                background-color: #444;
             }
 
-            &.cabecalho {
-                background-color: #333;
+            &.primary:hover {
+                background-color: #39fc;
+            }
 
-                .coluna {
-                    color: #fff;
-                    transition: all 0.25s;
-
-                    svg {
-                        margin-top: 3px;
-                        margin-right: 7px;
-                    }
-                }
+            svg {
+                margin-right: 7px;
             }
         }
 
-        .detalhes {
-            background-color: #fff;
-            padding: 0px 14px 14px;
+        & > * {
+            min-height: 56px;
+            border-radius: 0px;
+        }
+    }
+
+    .filtros,
+    .colunas {
+        background-color: #fffc;
+        backdrop-filter: blur(10px);
+        border-radius: 7px;
+        display: flex;
+        flex-direction: column;
+        position: fixed;
+        padding: 4px;
+        box-shadow: 4px 4px 7px #3333;
+
+        .title {
+            padding: 4px;
+            font-weight: bold;
+        }
+
+        button {
+            padding: 4px;
+            color: #333;
+            font-weight: normal;
+            text-align: left;
+            width: 100%;
+            font-size: 14px;
+            margin-top: 4px;
+
+            :hover {
+                background-color: #3333;
+            }
+
+            svg {
+                width: 18px;
+                text-align: left;
+                margin-right: 4px;
+            }
+        }
+    }
+
+    .filtrosVisiveis {
+        background-color: #f4f4f4;
+        border: 1px solid #333;
+        border-width: 0px 1px 0px 0px;
+        display: flex;
+        flex-direction: column;
+        padding: 14px;
+        height: auto;
+
+        .title {
+            font-size: 24px;
+            margin-bottom: 14px;
+        }
+
+        .filtro {
             margin-bottom: 14px;
 
-            .separador {
-                display: flex;
-                flex-direction: row;
-                margin-top: 14px;
-                margin-bottom: 14px;
-                width: 100%;
+            &:hover {
+                .link {
+                    opacity: 1;
+                    transform: translateY(4px) translateX(0%);
 
-                .tituloSeparador {
-                    color: #aaa;
-                    font-weight: bold;
-                    font-size: 20px;
-                    display: flex;
-                    margin-right: 14px;
-                    width: auto;
+                    &:hover {
+                        color: #aaa;
+                    }
                 }
 
-                .barraSeparador {
-                    display: flex;
-                    background-color: #ddd;
-                    height: 2px;
-                    flex-grow: 1;
-                    transform: translateY(15px);
+                label {
+                    transform: translateX(20px);
                 }
             }
 
-            .linhaDetalhe {
-                display: flex;
-                flex-direction: row;
+            .link {
+                position: fixed;
+                font-weight: 50;
+                color: #ddd;
+                transition: all 0.5s;
+                transform: translateY(4px) translateX(-200%);
+                opacity: 0;
 
-                .campo {
-                    flex-grow: 1;
-                    margin-bottom: 14px;
-                    width: 25%;
+                svg {
+                    transform: rotate(45deg);
                 }
+            }
+
+            label {
+                transition: all 0.5s;
+                transform: translateX(0px);
             }
         }
 
-        &.selecionado {
-            background-color: #fff;
-            box-shadow: #3333 0px 0px 7px;
-            z-index: 90;
-            transform: scale(1.02);
-
-            .linhaInterna {
-                cursor: default;
-
-                .coluna {
-                    display: none;
-                }
-
-                .coluna.titleColumn {
-                    color: #3339;
-                    display: flex;
-                    font-size: 30px;
-                    flex-grow: 1;
-                }
-
-                .comandoslinha {
-                    display: flex;
-
-                    .opcoesRegistro {
-                        display: flex;
-
-                        button {
-                            background-color: transparent;
-                            width: 100px;
-                            padding: 0px;
-                            color: #3339;
-                            font-size: 18px;
-                            width: auto;
-                            margin-left: 14px;
-                            transition: none;
-                            display: flex;
-                            flex-direction: column;
-                            justify-content: center;
-
-                            &:hover {
-                                background-color: transparent;
-                                color: #39f;
-                            }
-                        }
-                    }
-
-                    .botaoSelecionar {
-                        color: #999;
-                        transition: all 0.25s;
-                        margin-right: 4px;
-                        display: block;
-                    }
-
-                    .botaoSelecionar {
-                        height: 100%;
-                    }
-                }
-            }
+        .espacamento {
+            display: flex;
+            flex-grow: 1;
         }
+    }
 
-        .opcoesColunas {
-            background-color: #3339;
-            border-radius: 4px;
+    .filtros {
+        transform: translate(190px, 56px);
+    }
+
+    .colunas {
+        transform: translate(94px, 56px);
+    }
+
+    .columnActive {
+        transition: all 0.5s;
+    }
+
+    .tabelaEFiltros {
+        display: flex;
+        flex-direction: row-reverse;
+        min-height: calc(100% - 56px);
+    }
+
+    .tabela {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+        height: 100%;
+
+        .coluna {
             display: flex;
             flex-direction: column;
-            padding: 7px;
-            position: fixed;
-            transform: translateY(30px);
-            z-index: 100 !important;
-            backdrop-filter: blur(10px);
+            flex-grow: 1;
+            font-size: 14px;
+            width: 100%;
+            padding: 0px 14px;
+            justify-content: center;
 
-            .title {
-                color: #fff;
-                padding: 4px;
+            &.align {
+                &.right {
+                    text-align: right;
+                }
+            }
+        }
+
+        .cabecalho {
+            background-color: #444;
+            display: flex;
+            flex-direction: row;
+            min-height: 56px;
+            width: 100%;
+
+            .espacoScroll {
+                min-width: 15px;
             }
 
-            button {
-                color: #aaa;
-                padding: 4px;
-                text-align: left;
-                font-size: 12px;
-                font-weight: normal;
+            .coluna {
+                color: #fff;
 
-                &.showing {
-                    color: #eee;
+                &.columnActive {
+                    background-color: #555;
+                }
+
+                & > div svg {
+                    margin-top: 4px;
+                    margin-right: 7px;
+                }
+
+                .orderBy {
+                    svg {
+                        margin-left: 4px;
+                        color: #fff;
+                        transition: all 0.5s;
+                    }
+
+                    &.desc {
+                        svg {
+                            transform: rotate(180deg);
+                        }
+                    }
+                }
+            }
+        }
+
+        .linhas {
+            display: flex;
+            flex-direction: column;
+            overflow-y: scroll;
+            height: 100%;
+            width: 100%;
+
+            &::-webkit-scrollbar {
+                width: 15px; // manage scrollbar width here
+            }
+            &::-webkit-scrollbar * {
+                background: transparent; // manage scrollbar background color here
+            }
+            &::-webkit-scrollbar-thumb {
+                background: #666; // manage scrollbar thumb background color here
+            }
+
+            .linhaVazia {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                text-align: center;
+                height: 100%;
+                width: 100%;
+            }
+
+            .linha {
+                background-color: #fff;
+                transition: all 0.5s;
+
+                &:nth-child(even) {
+                    background-color: #f4f4f4;
+
+                    .coluna.columnActive {
+                        background-color: #ddd;
+                    }
                 }
 
                 &:hover {
-                    color: #eee;
-                    background-color: #3339;
+                    background-color: #ddd;
                 }
 
-                svg {
-                    font-size: 12px;
-                    margin-right: 7px;
-                    width: 12px;
+                .coluna.columnActive {
+                    background-color: #eee;
+                }
+
+                .linhaInterna {
+                    display: flex;
+                    flex-direction: row;
+                    min-height: 56px;
+
+                    .comandoslinha {
+                        display: none;
+                    }
+                }
+            }
+
+            .selecionado {
+                &:hover {
+                    background-color: #fff;
+                }
+                .linhaInterna {
+                    display: flex;
+                    min-height: none;
+                    justify-content: center;
+
+                    &:hover {
+                        background-color: #fff;
+                    }
+
+                    .coluna {
+                        display: none;
+
+                        &.titleColumn {
+                            display: flex;
+                            font-size: 24px;
+                            font-weight: bold;
+                        }
+                    }
+
+                    .comandoslinha {
+                        display: flex;
+                        flex-direction: row;
+                        width: auto;
+                        justify-content: center;
+                        padding: 14px;
+
+                        & > div {
+                            display: flex;
+                            flex-direction: row;
+
+                            button {
+                                display: flex;
+                                color: #333;
+                                margin-left: 7px;
+                            }
+
+                            .botaoSelecionar {
+                                transform: rotate(45deg);
+                                margin-top: -2px;
+                            }
+                        }
+                    }
+                }
+
+                .detalhes {
+                    padding: 14px;
+                    display: flex;
+                    flex-direction: column;
+
+                    .linhaDetalhe {
+                        display: flex;
+                        flex-direction: row;
+                        margin-bottom: 14px;
+
+                        .campo {
+                            width: 100%;
+                        }
+                    }
                 }
             }
         }
-    }
 
-    .paginacao {
-        display: flex;
-        flex-direction: row;
-        justify-content: flex-end;
-        width: 100%;
-        padding: 14px;
-        background-color: #fff;
-
-        button {
-            margin-right: 7px;
-
-            &:last-child {
-                margin-right: 0px;
-            }
-
-            &:disabled {
-                opacity: 0.2;
-            }
-        }
-    }
-
-    @media print {
-        .linha {
-            display: none;
-        }
-
-        .linha.selecionado {
-            box-shadow: none;
+        .rodape {
+            background-color: #333;
             display: flex;
-            transform: none;
+            flex-direction: row;
+            min-height: 56px;
+            padding: 0px 14px;
+            width: 100%;
 
-            .coluna {
-                display: none;
-            }
-
-            .coluna.titleColumn {
+            .controleTamanhoPagina {
                 display: flex;
-                font-weight: bold;
-                font-size: 36px;
+                flex-direction: column;
+                justify-content: center;
+                color: #fff;
+
+                .primary,
+                button:hover {
+                    color: #fff;
+                }
+
+                & > div {
+                    display: flex;
+                    flex-direction: row;
+                    font-size: 14px;
+
+                    .labelTamanhoPagina {
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: center;
+                        margin-right: 14px;
+                        font-weight: bold;
+                    }
+                }
             }
 
-            .comandosLinha {
-                display: none;
+            .espacamento {
+                display: flex;
+                flex-grow: 1;
+            }
+
+            .controleDePagina {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                color: #fff;
+
+                & > div {
+                    display: flex;
+                    flex-direction: row;
+                    font-size: 14px;
+
+                    .descricaoPagina {
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: center;
+                        margin-bottom: 3px;
+                        margin-right: 7px;
+                        margin-left: 7px;
+                        font-weight: bold;
+                    }
+
+                    button {
+                        margin: 0px 3px;
+
+                        &:hover {
+                            background-color: #aaa6;
+                        }
+                    }
+
+                    svg {
+                        color: #fff;
+                    }
+                }
             }
         }
     }

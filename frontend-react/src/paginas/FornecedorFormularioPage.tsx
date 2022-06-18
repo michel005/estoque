@@ -70,7 +70,7 @@ export default function FornecedorFormularioPage() {
                     </FormularioStyled>
                 </div>
                 <div className="commands">
-                    <ButtonStyled onClick={salvar} className="primary">
+                    <ButtonStyled onClick={salvar} className="primary" loading={form.salvando}>
                         Salvar
                     </ButtonStyled>
                     <ButtonStyled onClick={form.statusOcioso}>Cancelar</ButtonStyled>
