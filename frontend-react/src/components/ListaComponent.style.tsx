@@ -359,6 +359,10 @@ const ListaComponentStyle = styled.div`
                     color: #fff;
                 }
 
+                .primary {
+                    background-color: #999;
+                }
+
                 & > div {
                     display: flex;
                     flex-direction: row;
@@ -369,6 +373,14 @@ const ListaComponentStyle = styled.div`
                         flex-direction: column;
                         justify-content: center;
                         margin-right: 14px;
+                        font-weight: bold;
+                    }
+
+                    .labelMostrando {
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: center;
+                        margin-left: 14px;
                         font-weight: bold;
                     }
                 }
